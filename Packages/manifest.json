@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "com.cysharp.r3": "1.3.1",
+    "com.cysharp.unitask": "2.5.11",
     "com.unity.cinemachine": "3.1.6",
     "com.unity.collab-proxy": "2.12.4",
     "com.unity.feature.2d": "2.0.1",
@@ -12,6 +14,8 @@
     "com.unity.timeline": "1.8.7",
     "com.unity.ugui": "2.0.0",
     "com.unity.visualscripting": "1.9.6",
+    "org.nuget.observablecollections.r3": "3.3.4",
+    "org.nuget.r3": "1.3.1",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
@@ -44,5 +48,16 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  }
+  },
+  "scopedRegistries": [
+    {
+      "name": "OpenUPM",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.cysharp",
+        "org.nuget"
+      ],
+      "overrideBuiltIns": true
+    }
+  ]
 }
