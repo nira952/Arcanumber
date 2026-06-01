@@ -1,0 +1,3 @@
+Assets/_Project/Fonts/**/*.asset filter=lfs diff=lfs merge=lfs -text
+Assets/_Project/Fonts/**/*.ttf filter=lfs diff=lfs merge=lfs -text
+Assets/_Project/Fonts/**/*.otf filter=lfs diff=lfs merge=lfs -text
