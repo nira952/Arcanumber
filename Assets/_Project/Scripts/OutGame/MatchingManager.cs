@@ -23,6 +23,8 @@ public class MatchingManager : MonoBehaviour
 
     private Lobby currentLobby;
 
+    private ILobbyEvents lobbyEvents; // コールバックを管理するインターフェース
+
     private const string RelayKey = "RelayJoinCode"; // ロビーにRelayコードを保存するためのキー
 
     private const string MatchTypeKey = "MatchType";
@@ -31,15 +33,19 @@ public class MatchingManager : MonoBehaviour
 
     private const string MatchTypeCasual = "Casual";
 
-    private IDisposable privateMatchSubscription;
 
-    private IDisposable casualMatchSubscription;
+    // ─── R3: ロビーの人数変更を通知するプロパティ ───
+    private readonly SerializableReactiveProperty<int> _playerCount = new(0);
+    public ReadOnlyReactiveProperty<int> PlayerCount => _playerCount;
+
+    // R3: 購読（イベント監視）をまとめて解除するためのゴミ箱
+    private readonly CompositeDisposable _disposables = new();
 
     private CancellationToken destroyCancellationToken;
 
+
     private void Awake()
     {
-
         // UniTask: 破棄時キャンセルに統一
         destroyCancellationToken = this.GetCancellationTokenOnDestroy();
 
@@ -47,9 +53,9 @@ public class MatchingManager : MonoBehaviour
         if (titleUIManager != null)
         {
 
-            privateMatchSubscription = titleUIManager.OnPrivateMatchRequested.Subscribe(_ => HandlePrivateMatchAsync().Forget());
+            _disposables.Add(titleUIManager.OnPrivateMatchRequested.Subscribe(_ => HandlePrivateMatchAsync().Forget()));
 
-            casualMatchSubscription = titleUIManager.OnCasualMatchRequested.Subscribe(_ => HandleCasualMatchAsync().Forget());
+            _disposables.Add(titleUIManager.OnCasualMatchRequested.Subscribe(_ => HandleCasualMatchAsync().Forget()));
 
         }
         else
@@ -65,27 +71,20 @@ public class MatchingManager : MonoBehaviour
 
     private void Start()
     {
-
         // Unity Servicesの初期化と匿名サインインを開始
-
         InitializeServicesAsync().Forget();
 
     }
-
-
 
     /// <summary>
     /// Unity Services 初期化と匿名認証を行う
     /// </summary>
     private async UniTask InitializeServicesAsync()
     {
-
         // 初期化とサインインが完了するまではボタンを無効化しておく
         titleUIManager.OpenLoadingPanel("サービスに接続中...");
-
         try
         {
-
             await UnityServices.InitializeAsync();
 
             if (!AuthenticationService.Instance.IsSignedIn)
@@ -128,22 +127,13 @@ public class MatchingManager : MonoBehaviour
 
     }
 
-
-
     // プライベートマッチの処理を非同期で実行する
-
     private async UniTask HandlePrivateMatchAsync()
-
     {
-
         if (titleUIManager == null)
-
         {
-
             Debug.LogError("TitleUIManagerがアサインされていません。");
-
             return;
-
         }
 
 
@@ -153,137 +143,79 @@ public class MatchingManager : MonoBehaviour
 
 
         // 合言葉の入力チェック
-
         if (string.IsNullOrEmpty(rawInput))
-
         {
-
             Debug.LogWarning("合言葉を入力してください。");
-
             return;
-
         }
-
-
 
         string targetLobbyName = rawInput;
 
-
-
         string matchingMessage = "ロビー作成中...";
 
-
-
         // マッチング処理中はボタンを無効化して多重クリックを防止
-
         titleUIManager.OpenLoadingPanel("マッチング中...");
 
-
-
         // 1. 同じ合言葉＆空きがあるロビーを探す
-
         Lobby existingLobby = await FindAvailableLobbyByName(targetLobbyName, MatchTypePrivate);
 
-
-
         if (existingLobby != null)
-
         {
 
             // 2. 空きがあるロビーがあった ＝ クライアントとして参加
-
             Debug.Log($"合言葉【{targetLobbyName}】のロビーが見つかりました。参加します...");
 
             matchingMessage = "ロビー参加中...";
 
-
-
             await JoinLobbyAndRelay(existingLobby);
 
         }
-
         else
-
         {
-
             // 3. ロビーがない/満員 ＝ 自分がホストになって新規作成
-
             Debug.Log($"合言葉【{targetLobbyName}】のロビーがない、または満員のため、新しく作成します...");
 
             matchingMessage = "ロビー作成中...";
-
-
 
             await CreateLobbyAndRelay(targetLobbyName, MatchTypePrivate);
 
         }
 
 
-
-
-
         titleUIManager.UpdateLoadingStatus(matchingMessage);
 
-
-
         // 数秒待つ
-
         await UniTask.Delay(TimeSpan.FromSeconds(2), cancellationToken: destroyCancellationToken);
 
 
-
-
-
         titleUIManager.CloseLoadingPanel();
-
-
-
-        LobbyJoin(NetworkManager.Singleton.IsHost);
 
     }
 
 
 
     // カジュアルマッチの処理を非同期で実行する
-
     private async UniTask HandleCasualMatchAsync()
-
     {
 
         titleUIManager.OpenLoadingPanel("マッチング中...");
 
-
-
         string matchingMessage = "ロビー作成中...";
 
-
-
         // 1. カジュアルマッチの空きロビーを探す
-
         Lobby existingLobby = await FindAvailableCasualLobby();
 
-
-
         if (existingLobby != null)
-
         {
-
             // 2. 空きがあるロビーがあった ＝ クライアントとして参加
-
             Debug.Log("カジュアルマッチのロビーが見つかりました。参加します...");
 
             matchingMessage = "ロビー参加中...";
 
-
-
             await JoinLobbyAndRelay(existingLobby);
-
         }
-
         else
-
         {
-
             // 3. 空きがない ＝ 自分がホストになって新規作成
 
             string newLobbyName = $"Casual_{Guid.NewGuid():N}";
@@ -292,13 +224,9 @@ public class MatchingManager : MonoBehaviour
 
             matchingMessage = "ロビー作成中...";
 
-
-
             await CreateLobbyAndRelay(newLobbyName, MatchTypeCasual);
 
         }
-
-
 
         titleUIManager.UpdateLoadingStatus(matchingMessage);
 
@@ -308,59 +236,16 @@ public class MatchingManager : MonoBehaviour
 
         titleUIManager.CloseLoadingPanel();
 
-
-
-        LobbyJoin(NetworkManager.Singleton.IsHost);
-
     }
 
 
-
-    private void LobbyJoin(bool isHost)
-
-    {
-
-        // ロビーパネルを開く
-
-        titleUIManager.OpenLobbyPanel();
-
-
-
-        if (isHost)
-
-        {
-
-            Debug.Log("ホストとしてロビーに入りました。");
-
-            // ホストの場合は、参加者の待機やゲーム開始の処理をここに追加できます
-
-        }
-
-        else
-
-        {
-
-            Debug.Log("クライアントとしてロビーに入りました。");
-
-            // クライアントの場合は、ホストからの開始信号を待つ処理などをここに追加できます
-
-        }
-
-
-
-    }
 
     // 名前とマッチ種別を条件に空きロビーを検索するメソッド
     private async UniTask<Lobby> FindAvailableLobbyByName(string lobbyName, string matchType)
-
     {
-
         try
-
         {
-
             QueryLobbiesOptions options = new QueryLobbiesOptions
-
             {
 
                 Count = 1,
@@ -398,7 +283,6 @@ public class MatchingManager : MonoBehaviour
         }
 
         catch (LobbyServiceException e)
-
         {
 
             Debug.LogError($"ロビー検索エラー: {e.Message}");
@@ -412,17 +296,11 @@ public class MatchingManager : MonoBehaviour
 
 
     // カジュアルマッチ用の空きロビー検索
-
     private async UniTask<Lobby> FindAvailableCasualLobby()
-
     {
-
         try
-
         {
-
             QueryLobbiesOptions options = new QueryLobbiesOptions
-
             {
 
                 Count = 1,
@@ -439,14 +317,9 @@ public class MatchingManager : MonoBehaviour
 
             };
 
-
-
             QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync(options);
 
-
-
             if (response.Results.Count > 0)
-
             {
 
                 return response.Results[0];
@@ -472,55 +345,34 @@ public class MatchingManager : MonoBehaviour
 
 
     // ホスト処理：Relayの部屋を作り、そのコードを持ったLobbyを建てる
-
     private async UniTask CreateLobbyAndRelay(string lobbyName, string matchType)
-
     {
-
         try
-
         {
-
             // ① 先にRelayでホストの枠を確保
-
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(MaxPlayers - 1);
 
             string relayJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
 
-
             // ② NGOのネットワークトランスポートにRelay情報をセット
-
             var utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
 
             utp.SetHostRelayData(
-
                 allocation.RelayServer.IpV4,
-
                 (ushort)allocation.RelayServer.Port,
-
                 allocation.AllocationIdBytes,
-
                 allocation.Key,
-
                 allocation.ConnectionData
 
             );
 
-
-
             // ③ ロビーを作成し、カスタムデータとしてRelayの接続コードとカテゴリを埋め込む
-
             CreateLobbyOptions options = new CreateLobbyOptions
-
             {
-
                 IsPrivate = false,
-
                 Data = new Dictionary<string, DataObject>
-
                 {
-
                     {
 
                         RelayKey, new DataObject(
@@ -550,19 +402,12 @@ public class MatchingManager : MonoBehaviour
 
 
             // ロビー作成（ロビー名 ＝ 合言葉）
-
             currentLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, MaxPlayers, options);
 
-
-
             // 定期的にロビーの生存信号（ハートビート）を送る処理を開始（切断防止）
-
             HeartbeatLobbyAsync(currentLobby.Id, 15, destroyCancellationToken).Forget();
 
-
-
             // NGOホスト起動
-
             NetworkManager.Singleton.StartHost();
 
             Debug.Log($"ホストとして部屋【{lobbyName}】を作成しました！他のプレイヤーの参加を待っています。");
@@ -570,9 +415,7 @@ public class MatchingManager : MonoBehaviour
         }
 
         catch (Exception e)
-
         {
-
             Debug.LogError($"ホスト作成失敗: {e.Message}");
 
         }
@@ -580,37 +423,26 @@ public class MatchingManager : MonoBehaviour
     }
 
 
-
     // クライアント処理：Lobbyに入り、中にあるRelayコードを使って接続する
-
     private async UniTask JoinLobbyAndRelay(Lobby lobby)
-
     {
-
         try
-
         {
-
-            // ① ロビーに入室する
-
+            // ロビーに入室する
             currentLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobby.Id);
 
+            // 現在のロビーのプレイヤー数を取得
+            _playerCount.Value = currentLobby.Players.Count;
 
 
-            // ② ロビーに保存されているRelayの接続コードを取り出す
 
+            // ロビーに保存されているRelayの接続コードを取り出す
             string relayJoinCode = currentLobby.Data[RelayKey].Value;
 
-
-
-            // ③ 取り出したコードを使ってRelayに参加
-
+            // 取り出したコードを使ってRelayに参加
             JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayJoinCode);
 
-
-
-            // ④ NGOにRelayのデータをセット
-
+            // NGOにRelayのデータをセット
             var utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
 
             utp.SetClientRelayData(
@@ -629,10 +461,7 @@ public class MatchingManager : MonoBehaviour
 
             );
 
-
-
             // NGOクライアント起動
-
             NetworkManager.Singleton.StartClient();
 
             Debug.Log($"クライアントとして部屋【{lobby.Name}】に参加成功しました！");
@@ -640,7 +469,6 @@ public class MatchingManager : MonoBehaviour
         }
 
         catch (Exception e)
-
         {
 
             Debug.LogError($"ロビー・Relay参加失敗: {e.Message}");
@@ -652,61 +480,39 @@ public class MatchingManager : MonoBehaviour
 
 
     // ロビーが消えないように維持するハートビート処理（ホストのみ必要）
-
     private async UniTask HeartbeatLobbyAsync(string lobbyId, float waitTimeSeconds, CancellationToken cancellationToken)
-
     {
-
+        // ループはロビーが存在し、かつキャンセルされていない限り続ける
         while (currentLobby != null && !cancellationToken.IsCancellationRequested)
-
         {
-
             try
-
             {
-
                 await LobbyService.Instance.SendHeartbeatPingAsync(lobbyId);
 
             }
-
             catch (Exception e)
-
             {
 
                 Debug.LogWarning($"ハートビート送信失敗: {e.Message}");
 
             }
 
-
-
             await UniTask.Delay(TimeSpan.FromSeconds(waitTimeSeconds), cancellationToken: cancellationToken);
 
         }
-
     }
 
 
 
     private void OnDestroy()
-
     {
-
         // R3購読の解放
-
-        privateMatchSubscription?.Dispose();
-
-        casualMatchSubscription?.Dispose();
-
-
+        _disposables.Dispose(); // R3の購読解除
 
         // アプリ終了時やシーン遷移時にロビーを退出・削除する
-
         if (currentLobby != null)
-
         {
-
             if (NetworkManager.Singleton.IsHost)
-
             {
                 try
                 {
@@ -717,9 +523,7 @@ public class MatchingManager : MonoBehaviour
                     Debug.LogError($"ロビー削除失敗: {e.Message}");
                 }
             }
-
             else
-
             {
 
                 LobbyService.Instance.RemovePlayerAsync(currentLobby.Id, AuthenticationService.Instance.PlayerId).AsUniTask().Forget();

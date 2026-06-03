@@ -26,7 +26,7 @@ public class TitleManager : MonoBehaviour
 
 
         // プレイヤーの名前が設定されていない場合、名前入力パネルを表示する
-        if (string.IsNullOrWhiteSpace(playerSettingData.playerName))
+        if (string.IsNullOrWhiteSpace(playerSettingData.playerInfo.Name.ToString()))
         {
             titleUIManager.OpenNameInputPanel();
         }
@@ -65,8 +65,13 @@ public class TitleManager : MonoBehaviour
         string inputName = titleUIManager.NameInputText;
         Debug.Log($"入力された名前: {inputName}");
 
-        playerSettingData.playerName = inputName;
-        Debug.Log($"プレイヤーの名前を設定しました: {playerSettingData.playerName}");
+        playerSettingData.playerInfo.Name = inputName;
+        Debug.Log($"プレイヤーの名前を設定しました: {playerSettingData.playerInfo.Name}");
+
+        playerSettingData.Save();
+
+        PlayerDataManager.Instance.SetPlayerData(playerSettingData);
+
         titleUIManager.CloseNameInputPanel();
     }
 
@@ -75,7 +80,7 @@ public class TitleManager : MonoBehaviour
     /// </summary>
     private void HandleNameReset()
     {
-        playerSettingData.playerName = string.Empty;
+        playerSettingData.playerInfo.Name = string.Empty;
         playerSettingData.Save();
         titleUIManager.OpenNameInputPanel();
     }
