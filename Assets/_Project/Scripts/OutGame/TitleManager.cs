@@ -24,6 +24,8 @@ public class TitleManager : MonoBehaviour
         playerSettingData.Load();
         playerSettingData.InitializeIfNeeded();
 
+        PlayerDataManager.Instance.SetPlayerData(playerSettingData);
+
 
         // プレイヤーの名前が設定されていない場合、名前入力パネルを表示する
         if (string.IsNullOrWhiteSpace(playerSettingData.playerInfo.Name.ToString()))
@@ -72,7 +74,9 @@ public class TitleManager : MonoBehaviour
 
         PlayerDataManager.Instance.SetPlayerData(playerSettingData);
 
-        titleUIManager.CloseNameInputPanel();
+        titleUIManager.CloseAllPanel();
+
+        titleUIManager.OpenTitlePanel();
     }
 
     /// <summary>

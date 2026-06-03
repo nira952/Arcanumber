@@ -6,8 +6,8 @@ using UnityEngine;
 [Serializable]
 public struct PlayerInfo : INetworkSerializable, System.IEquatable<PlayerInfo>
 {
-    public FixedString32Bytes Name;
-    public FixedString32Bytes Id;
+    public FixedString64Bytes Name;
+    public FixedString64Bytes Id;
     public int LobbyIndex;
 
     /// <summary>

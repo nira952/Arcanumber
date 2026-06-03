@@ -23,8 +23,6 @@ public class MatchingManager : MonoBehaviour
 
     private Lobby currentLobby;
 
-    private ILobbyEvents lobbyEvents; // コールバックを管理するインターフェース
-
     private const string RelayKey = "RelayJoinCode"; // ロビーにRelayコードを保存するためのキー
 
     private const string MatchTypeKey = "MatchType";
@@ -38,10 +36,15 @@ public class MatchingManager : MonoBehaviour
     private readonly SerializableReactiveProperty<int> _playerCount = new(0);
     public ReadOnlyReactiveProperty<int> PlayerCount => _playerCount;
 
+    private readonly SerializableReactiveProperty<string> _currentLobbyName = new("");
+    public ReadOnlyReactiveProperty<string> CurrentLobbyName => _currentLobbyName;
+
+
     // R3: 購読（イベント監視）をまとめて解除するためのゴミ箱
     private readonly CompositeDisposable _disposables = new();
 
     private CancellationToken destroyCancellationToken;
+
 
 
     private void Awake()
@@ -71,6 +74,9 @@ public class MatchingManager : MonoBehaviour
 
     private void Start()
     {
+        // UIのObservableを設定する
+        titleUIManager.MatchingManagerObservable(this);
+
         // Unity Servicesの初期化と匿名サインインを開始
         InitializeServicesAsync().Forget();
 
@@ -88,7 +94,6 @@ public class MatchingManager : MonoBehaviour
             await UnityServices.InitializeAsync();
 
             if (!AuthenticationService.Instance.IsSignedIn)
-
             {
 
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
@@ -111,14 +116,13 @@ public class MatchingManager : MonoBehaviour
 
             // サインインが完了したら、ロードパネルを閉じ、タイトルパネルを開く
 
-            titleUIManager.CloseLoadingPanel();
+            titleUIManager.CloseAllPanel();
 
             titleUIManager.OpenTitlePanel();
 
         }
 
         catch (Exception e)
-
         {
 
             Debug.LogError($"初期化エラー: {e.Message}");
@@ -136,11 +140,7 @@ public class MatchingManager : MonoBehaviour
             return;
         }
 
-
-
         string rawInput = titleUIManager.RoomCodeText.Trim();
-
-
 
         // 合言葉の入力チェック
         if (string.IsNullOrEmpty(rawInput))
@@ -188,7 +188,9 @@ public class MatchingManager : MonoBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(2), cancellationToken: destroyCancellationToken);
 
 
-        titleUIManager.CloseLoadingPanel();
+        titleUIManager.CloseAllPanel();
+
+        titleUIManager.OpenLobbyPanel();
 
     }
 
@@ -234,7 +236,9 @@ public class MatchingManager : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(2), cancellationToken: destroyCancellationToken);
 
-        titleUIManager.CloseLoadingPanel();
+        titleUIManager.CloseAllPanel();
+
+        titleUIManager.OpenLobbyPanel();
 
     }
 
@@ -404,6 +408,17 @@ public class MatchingManager : MonoBehaviour
             // ロビー作成（ロビー名 ＝ 合言葉）
             currentLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, MaxPlayers, options);
 
+            // ロビー名を更新（プライベートマッチは合言葉を表示、カジュアルマッチは空文字などにする）
+            if (matchType == MatchTypePrivate)
+            {
+                _currentLobbyName.Value = lobbyName;
+            }
+            else
+            {
+                _currentLobbyName.Value = "カジュアルマッチ";
+            }
+
+            _playerCount.Value = currentLobby.Players.Count;
             // 定期的にロビーの生存信号（ハートビート）を送る処理を開始（切断防止）
             HeartbeatLobbyAsync(currentLobby.Id, 15, destroyCancellationToken).Forget();
 
@@ -431,7 +446,17 @@ public class MatchingManager : MonoBehaviour
             // ロビーに入室する
             currentLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobby.Id);
 
-            // 現在のロビーのプレイヤー数を取得
+            // ロビー名を更新
+            if (currentLobby.Data.TryGetValue(MatchTypeKey, out var matchTypeData) && matchTypeData.Value == MatchTypePrivate)
+            {
+                // ロビー名（合言葉）をセット
+                _currentLobbyName.Value = currentLobby.Name; 
+            }
+            else
+            {
+                _currentLobbyName.Value = "カジュアルマッチ";
+            }
+                // 現在のロビーのプレイヤー数を取得
             _playerCount.Value = currentLobby.Players.Count;
 
 
@@ -479,40 +504,46 @@ public class MatchingManager : MonoBehaviour
 
 
 
-    // ロビーが消えないように維持するハートビート処理（ホストのみ必要）
     private async UniTask HeartbeatLobbyAsync(string lobbyId, float waitTimeSeconds, CancellationToken cancellationToken)
     {
-        // ループはロビーが存在し、かつキャンセルされていない限り続ける
-        while (currentLobby != null && !cancellationToken.IsCancellationRequested)
+        while (currentLobby != null && currentLobby.Id == lobbyId && !cancellationToken.IsCancellationRequested)
         {
             try
             {
                 await LobbyService.Instance.SendHeartbeatPingAsync(lobbyId);
-
+            }
+            catch (LobbyServiceException ex) when (ex.Reason == LobbyExceptionReason.LobbyNotFound)
+            {
+                // ロビーがすでに存在しない場合は、ループを完全に抜ける
+                Debug.Log("ロビーが既に削除されているため、ハートビートを終了します。");
+                break;
             }
             catch (Exception e)
             {
-
                 Debug.LogWarning($"ハートビート送信失敗: {e.Message}");
-
             }
 
-            await UniTask.Delay(TimeSpan.FromSeconds(waitTimeSeconds), cancellationToken: cancellationToken);
-
+            // 次の送信まで待機（キャンセルされたら即座に抜ける）
+            bool isCanceled = await UniTask.Delay(TimeSpan.FromSeconds(waitTimeSeconds), cancellationToken: cancellationToken).SuppressCancellationThrow();
+            if (isCanceled) break;
         }
     }
-
 
 
     private void OnDestroy()
     {
         // R3購読の解放
-        _disposables.Dispose(); // R3の購読解除
+        _disposables.Dispose();
 
         // アプリ終了時やシーン遷移時にロビーを退出・削除する
         if (currentLobby != null)
         {
-            if (NetworkManager.Singleton.IsHost)
+            // ★ NetworkManager 自体が存在するか、および NGO が起動中かを安全にチェック
+            bool isHost = NetworkManager.Singleton != null &&
+                          NetworkManager.Singleton.IsListening &&
+                          NetworkManager.Singleton.IsHost;
+
+            if (isHost)
             {
                 try
                 {
@@ -525,15 +556,11 @@ public class MatchingManager : MonoBehaviour
             }
             else
             {
-
+                // NetworkManagerが既に無くても、自分自身がLobbyのAPIを叩いて抜ける処理は安全に実行可能
                 LobbyService.Instance.RemovePlayerAsync(currentLobby.Id, AuthenticationService.Instance.PlayerId).AsUniTask().Forget();
-
             }
-
         }
-
     }
-
 
 
 }
