@@ -66,7 +66,7 @@ public class TitleUIManager : MonoBehaviour
 
     private readonly CompositeDisposable _disposables = new();
 
-    private void Awake()
+    private void Start()
     {
         // 最初はすべてのパネルを非表示にする
         CloseAllPanel();
