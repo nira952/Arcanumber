@@ -5,13 +5,17 @@ using UnityEngine.UI;
 
 public class LobbyUIManager : MonoBehaviour
 {
-    public const string PlayerNameKey = "PlayerName";
+    // --- パネル --
 
     [SerializeField] private GameObject loadingPanel;
     [SerializeField] private GameObject roomPanel;
 
+    // --- 入力フィールド --
+
     [SerializeField] private TMP_InputField roomCodeInput;
     [SerializeField] private TMP_InputField playerNameInput;
+
+    // --- ボタン --
 
     [SerializeField] private Button lobbyJoinPrivateButton;
     [SerializeField] private Button lobbyJoinCasualButton;
@@ -21,11 +25,17 @@ public class LobbyUIManager : MonoBehaviour
     [SerializeField] private Button signInButton;
     [SerializeField] private Button offlineButton;
 
+    [SerializeField] private Button nextSceneButton;
+
+    // --- テキスト ---
+
     [SerializeField] private TextMeshProUGUI loadingText;
     [SerializeField] private TextMeshProUGUI roomNameText;
     [SerializeField] private TextMeshProUGUI[] playerListTexts = new TextMeshProUGUI[4];
 
-    // 🟢 R3: ボタンのクリックイベントを外部（DemoManager）へ Observable として公開
+    // --- 外部からアクセスするためのプロパティやObservable --
+
+    // R3: ボタンのクリックイベントを外部（DemoManager）へ Observable として公開
     public Observable<Unit> OnJoinPrivateMatchRequested => lobbyJoinPrivateButton.OnClickAsObservable();
 
     public Observable<Unit> OnJoinCasualMatchRequested => lobbyJoinCasualButton.OnClickAsObservable();
@@ -36,7 +46,9 @@ public class LobbyUIManager : MonoBehaviour
 
     public Observable<Unit> OnOfflineRequested => offlineButton.OnClickAsObservable();
 
-    // 🟢 読み取り専用のプロパティ
+    public Observable<Unit> OnNextSceneRequested => nextSceneButton.OnClickAsObservable();
+
+    // 読み取り専用のプロパティ
     public string RoomCodeText => roomCodeInput != null ? roomCodeInput.text.Trim() : string.Empty;
 
 
@@ -136,6 +148,9 @@ public class LobbyUIManager : MonoBehaviour
         if (cancelOrLeaveButton != null) cancelOrLeaveButton.interactable = false;
 
         if (roomNameText != null) roomNameText.text = "待機中...";
+        if (roomPanel != null) roomPanel.SetActive(false);
+
+
         if (playerListTexts != null)
         {
             foreach (var playerListText in playerListTexts)
@@ -167,7 +182,7 @@ public class LobbyUIManager : MonoBehaviour
     /// </summary>
     public void UpdateRoomName(string text)
     {
-        if (roomNameText != null) roomNameText.text = text;
+        if (roomNameText != null) roomNameText.text = $"- {text} -";
     }
 
     /// <summary>
@@ -180,4 +195,10 @@ public class LobbyUIManager : MonoBehaviour
             if (playerListTexts[index] != null) playerListTexts[index].text = text;
         }
     }
+
+    public void SetNextSceneButtonActive(bool active)
+    {
+        if (nextSceneButton != null) nextSceneButton.gameObject.SetActive(active);
+    }
+
 }

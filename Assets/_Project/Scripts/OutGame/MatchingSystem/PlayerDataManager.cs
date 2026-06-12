@@ -1,4 +1,3 @@
-using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -6,12 +5,15 @@ public class PlayerDataManager : NetworkBehaviour
 {
     public static PlayerDataManager Instance { get; private set; }
 
-    public const string DefaultPlayerNamePrefix = "Player";
-    // 🟢 ネットワーク接続前に、自分の名前や設定を一時保存しておくローカル変数
-    public string LocalPlayerName { get; private set; } = DefaultPlayerNamePrefix;
-
     // セーブデータ用のキー
     private const string NameSaveKey = "Save_PlayerName";
+
+    // 初期名の定数
+    public const string DefaultPlayerNamePrefix = "プレイヤー";
+
+    // ネットワーク接続前に、自分の名前や設定を一時保存しておくローカル変数
+    public string LocalPlayerName { get; private set; } = DefaultPlayerNamePrefix;
+
 
     // ホストがデータを確定させ、全クライアントへ自動同期するリスト
     private readonly NetworkList<PlayerNetworkData> _allPlayerData = new();
@@ -34,7 +36,7 @@ public class PlayerDataManager : NetworkBehaviour
     }
 
     // ==========================================
-    // 🔍 プレイヤーがデータを取得するための便利なメソッド群
+    // プレイヤーがデータを取得するための便利なメソッド群
     // ==========================================
 
     /// <summary>
@@ -68,7 +70,7 @@ public class PlayerDataManager : NetworkBehaviour
     }
 
     // ==========================================
-    // ✍️ 【サーバー専用】データをセットする処理
+    // 【サーバー専用】データをセットする処理
     // ==========================================
 
     /// <summary>
@@ -92,7 +94,7 @@ public class PlayerDataManager : NetworkBehaviour
     // ==========================================
 
     /// <summary>
-    /// 🟢 ネットワーク接続前：ローカルに保存されている名前をロードする
+    /// ネットワーク接続前：ローカルに保存されている名前をロードする
     /// </summary>
     public void LoadLocalPlayerData()
     {
