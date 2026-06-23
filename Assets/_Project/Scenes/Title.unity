@@ -7306,6 +7306,7 @@ MonoBehaviour:
   joinCasualButton: {fileID: 487879472}
   joinPrivateButton: {fileID: 226903434}
   roomCodeInput: {fileID: 308738244}
+  playerNameInput: {fileID: 567910184}
   lanModeToggle: {fileID: 2005043263}
   localIpText: {fileID: 774799610}
   targetIpInput: {fileID: 623709867}

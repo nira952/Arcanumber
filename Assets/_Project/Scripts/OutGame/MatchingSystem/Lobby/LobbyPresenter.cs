@@ -142,15 +142,16 @@ public class LobbyPresenter : IDisposable
                 // カジュアル処理 (前回コード略)
             }
 
+            // ここからはオンライン・LAN共通の処理
             if (_isHost)
             {
-                _networkModel.StartHostRelay(_myLocalPlayerId);
+                _networkModel.StartHostRelay(_myLocalPlayerId, PlayerDataManager.Instance.LocalPlayerName);
                 _lobbyModel.HeartbeatLobbyAsync(linkedToken).Forget();
                 SpawnPlayerDataManager();
             }
             else
             {
-                await StartClientWaitAsync(_myLocalPlayerId, linkedToken);
+                await StartClientWaitAsync(_myLocalPlayerId, linkedToken); // ここは後述の StartClientWaitAsync で変更
             }
 
             _lobbyModel.StartLobbyPollingLoopAsync(linkedToken).Forget();
@@ -175,32 +176,36 @@ public class LobbyPresenter : IDisposable
         _matchCts = new CancellationTokenSource();
         var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_matchCts.Token, _destroyToken).Token;
 
+        // HandleLanMatchAsync の一部
         try
         {
             if (_isHost)
             {
                 string myIp = _networkModel.GetLocalIPAddress();
-                _networkModel.StartHostLAN(_myLocalPlayerId, myIp);
+                _networkModel.StartHostLAN(_myLocalPlayerId, PlayerDataManager.Instance.LocalPlayerName, myIp);
                 SpawnPlayerDataManager();
 
                 _view.UpdateRoomName($"LANホスト: {myIp}");
                 _view.HideLoading();
                 _view.ShowRoomPanel();
 
-                // LAN専用の参加者監視ループを回す
+                // ホスト用ループ
                 LanPollingLoopAsync(linkedToken).Forget();
             }
             else
             {
-                // UIの入力欄からターゲットIPを取得する
                 string targetIp = _view.TargetIPInputFieldText.Trim();
                 if (string.IsNullOrEmpty(targetIp)) throw new Exception("IPアドレスを入力してください");
 
+                // 💡 ここでホストへの接続完了を待つ
                 await StartClientWaitAsync(_myLocalPlayerId, linkedToken, true, targetIp);
 
                 _view.UpdateRoomName($"LAN参加中: {targetIp}");
                 _view.HideLoading();
                 _view.ShowRoomPanel();
+
+                // 🛠️【追加】ゲスト用ループをここで起動する！
+                LanClientPollingLoopAsync(linkedToken).Forget();
             }
         }
         catch (Exception e) { HandleMatchError(e); }
@@ -212,11 +217,23 @@ public class LobbyPresenter : IDisposable
         while (!token.IsCancellationRequested && _isHost && _isLanMode)
         {
             int connectedCount = NetworkManager.Singleton.ConnectedClientsIds.Count;
-            _view.UpdatePlayerList("ホスト (あなた)", 1);
+
+            // ホスト（自分）の名前
+            _view.UpdatePlayerList(PlayerDataManager.Instance.LocalPlayerName + " (Host)", 1);
 
             if (connectedCount >= 2)
             {
-                _view.UpdatePlayerList("LANゲスト", 2);
+                // ゲストの名前を辞書から探す
+                string guestName = "接続中...";
+                foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
+                {
+                    if (clientId != NetworkManager.Singleton.LocalClientId && _networkModel.ClientIdToPlayerNameMap.TryGetValue(clientId, out var name))
+                    {
+                        guestName = name;
+                    }
+                }
+
+                _view.UpdatePlayerList(guestName, 2);
                 _view.SetNextSceneButtonActive(true);
             }
             else
@@ -224,6 +241,31 @@ public class LobbyPresenter : IDisposable
                 _view.UpdatePlayerList("待機中...", 2);
                 _view.SetNextSceneButtonActive(false);
             }
+
+            await UniTask.Delay(1000, cancellationToken: token);
+        }
+    }
+
+    // 💡 新設：LANゲスト用：サーバー（ホスト）から同期されてくる接続状況を監視してUIに反映する
+    private async UniTask LanClientPollingLoopAsync(CancellationToken token)
+    {
+        while (!token.IsCancellationRequested && !_isHost && _isLanMode)
+        {
+            // ネットワークが切断されていたらループを抜ける
+            if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsClient) break;
+
+            // ゲスト視点では、NetworkManager.Singleton.ConnectedClientsIds には
+            // 「自分」と「サーバー（ホスト）」のIDしか見えません。
+            int connectedCount = NetworkManager.Singleton.ConnectedClientsIds.Count;
+
+            // 1P枠：ホストの名前（まだ完全にデータを貰っていない間は「ホスト」と表示）
+            _view.UpdatePlayerList("ホストプレイヤー", 1);
+
+            // 2P枠：自分の名前（PlayerDataManagerから取得）
+            _view.UpdatePlayerList(PlayerDataManager.Instance.LocalPlayerName + " (あなた)", 2);
+
+            // 💡 もしより厳密にホストの名前をロビー表示中にも取得したい場合、
+            // 今後の拡張としてNetworkVariableなどを使う必要がありますが、LAN内の2人プレイであればこの挙動で十分に「自分が参加できていること」が視覚的に確認できます。
 
             await UniTask.Delay(1000, cancellationToken: token);
         }
@@ -247,8 +289,11 @@ public class LobbyPresenter : IDisposable
         void OnConnected(ulong clientId) { if (clientId == NetworkManager.Singleton.LocalClientId) tcs.TrySetResult(true); }
         NetworkManager.Singleton.OnClientConnectedCallback += OnConnected;
 
-        bool startResult = isLan ? _networkModel.StartClientLAN(playerId, ip) : _networkModel.StartClientRelay(playerId);
+        // 💡 ペイロードとして送る自分の名前を取得
+        string myName = PlayerDataManager.Instance.LocalPlayerName;
 
+        // 名前を引数に追加
+        bool startResult = isLan ? _networkModel.StartClientLAN(playerId, myName, ip) : _networkModel.StartClientRelay(playerId, myName);
         if (!startResult)
         {
             NetworkManager.Singleton.OnClientConnectedCallback -= OnConnected;
@@ -298,7 +343,7 @@ public class LobbyPresenter : IDisposable
         _view.HideLoading();
     }
 
-    // 💡 大事な修正: ロビーデータに依存せず通信辞書からプレイヤーリストを構築する
+    // ロビーデータに依存せず通信辞書からプレイヤーリストを構築する
     private async UniTask HandleStartGameAsync()
     {
         if (!NetworkManager.Singleton.IsServer) return;
@@ -306,15 +351,17 @@ public class LobbyPresenter : IDisposable
         var finalizedList = new List<PlayerNetworkData>();
         int index = 0;
 
-        // LAN/オンライン問わず、確実なマッピング辞書からデータを生成する
         foreach (var kvp in _networkModel.PlayerIdToClientIdMap)
         {
-            string pName = $"Player{index + 1}"; // 本来はUGSデータやローカル設定から取得
+            ulong clientId = kvp.Value;
+
+            // 💡 辞書から名前を取得する（無ければPlayer〇という仮名にする）
+            string pName = _networkModel.ClientIdToPlayerNameMap.TryGetValue(clientId, out var name) ? name : $"Player{index + 1}";
 
             finalizedList.Add(new PlayerNetworkData
             {
                 LobbyIndex = index,
-                ClientId = kvp.Value,
+                ClientId = clientId,
                 PlayerName = pName,
             });
             index++;
@@ -328,6 +375,7 @@ public class LobbyPresenter : IDisposable
 
         GameSceneManager.Instance.LoadNetworkScene(_nextSceneName);
     }
+
 
     public void Dispose()
     {

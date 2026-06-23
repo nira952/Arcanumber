@@ -21,6 +21,8 @@ public class LobbyUIManager : MonoBehaviour
     [SerializeField] private Button joinPrivateButton;
     [SerializeField] private TMP_InputField roomCodeInput;    // UGS用合言葉
 
+    [SerializeField] private TMP_InputField playerNameInput;    // プレイヤー名入力欄
+
     [Header("--- LANモード UI ---")]
     [SerializeField] private Toggle lanModeToggle;            // LANモード切替
     [SerializeField] private TextMeshProUGUI localIpText;     // 自分のIP表示用
@@ -107,6 +109,26 @@ public class LobbyUIManager : MonoBehaviour
             });
             SwitchInputUI(lanModeToggle.isOn); // 初期状態を反映
         }
+    }
+
+    private void Start()
+    {
+        // ローカルに保存されたプレイヤー名をロードして、入力欄に反映する
+        PlayerDataManager.Instance.LoadLocalPlayerData();
+
+        if (playerNameInput != null)
+        {
+            playerNameInput.text = PlayerDataManager.Instance.LocalPlayerName;
+        }
+
+        playerNameInput.onValueChanged.AddListener(newName =>
+        {
+            // プレイヤー名が空文字の場合はデフォルト名を設定する
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+                playerNameInput.text = PlayerDataManager.DefaultPlayerNamePrefix;
+            }
+        });
     }
 
     private void OnDestroy()
