@@ -99,6 +99,8 @@ public class LobbyModel
 
     public async UniTask CreateLobbyAndRelayAsync(string lobbyName, string matchType, CancellationToken cancellationToken)
     {
+        Debug.Log($"[Debug] ロビー作成要求 - 名前(合言葉): {lobbyName}, タイプ: {matchType}");
+
         cancellationToken.ThrowIfCancellationRequested();
         Allocation allocation = await RelayService.Instance.CreateAllocationAsync(MaxPlayers - 1);
         string relayJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);

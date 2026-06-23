@@ -12,9 +12,17 @@ public class TitleUIManager : MonoBehaviour
 
     [SerializeField] private GameObject casualMatchPanel;
 
+    [SerializeField] private GameObject lanJoinPanel;
+
+    [SerializeField] private GameObject lanHostPanel;
+
     [SerializeField] private Button privateMatchPanelButton;
 
     [SerializeField] private Button casualMatchPanelButton;
+
+    [SerializeField] private Button lanJoinPanelButton;
+
+  [SerializeField] private Button lanHostPanelButton;
 
     // --- ボタンのクリックイベントをObservableとして公開 ---
 
@@ -22,6 +30,9 @@ public class TitleUIManager : MonoBehaviour
 
     public Observable<Unit> OnOpenCasualMatchPanelRequested => casualMatchPanelButton.OnClickAsObservable();
 
+    public Observable<Unit> OnOpenLanJoinPanelRequested => lanJoinPanelButton.OnClickAsObservable();
+
+    public Observable<Unit> OnOpenLanHostPanelRequested => lanHostPanelButton.OnClickAsObservable();
 
     private readonly CompositeDisposable _disposables = new();
 
@@ -64,6 +75,22 @@ public class TitleUIManager : MonoBehaviour
             })
             .AddTo(_disposables);
 
+        OnOpenLanHostPanelRequested
+            .Subscribe(_ =>
+            {
+                CloseAllPanel();
+                OpenLanHostPanel();
+            })
+            .AddTo(_disposables);
+
+        OnOpenLanJoinPanelRequested
+            .Subscribe(_ =>
+            {
+                CloseAllPanel();
+                OpenLanJoinPanel();
+            })
+            .AddTo(_disposables);
+
     }
 
     public void CloseAllPanel()
@@ -71,6 +98,9 @@ public class TitleUIManager : MonoBehaviour
         if (titlePanel != null) titlePanel.SetActive(false);
         if (privateMatchPanel != null) privateMatchPanel.SetActive(false);
         if (casualMatchPanel != null) casualMatchPanel.SetActive(false);
+        if (lanJoinPanel != null) lanJoinPanel.SetActive(false);
+        if (lanHostPanel != null) lanHostPanel.SetActive(false);
+
     }
 
     public void OpenTitlePanel() 
@@ -90,5 +120,16 @@ public class TitleUIManager : MonoBehaviour
     public void OpenPrivateMatchPanel() { if (privateMatchPanel != null) privateMatchPanel.SetActive(true); }
 
     public void OpenCasualMatchPanel() { if (casualMatchPanel != null) casualMatchPanel.SetActive(true); }
+
+    public void OpenLanJoinPanel() { if (lanJoinPanel != null) lanJoinPanel.SetActive(true); }
+
+
+    public void OpenLanHostPanel() { if (lanHostPanel != null) lanHostPanel.SetActive(true); }
+
+
+    public void ClosePanel(GameObject panel)
+    {
+        if (panel != null) panel.SetActive(false);
+    }
 
 }
