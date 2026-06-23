@@ -6,14 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Project/Scenes/SampleScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
-  - enabled: 1
-    path: Assets/Demos/Demo_Nira/InternetScene.unity
-    guid: e452ffe30020e7f4ba9741c5b28269a4
-  - enabled: 1
     path: Assets/_Project/Scenes/Title.unity
     guid: 0884f5b657d656d48b66abea7bcd8bd1
+  - enabled: 1
+    path: Assets/_Project/Scenes/Game.unity
+    guid: 79db70511ae2e78468074b598bbd454e
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
