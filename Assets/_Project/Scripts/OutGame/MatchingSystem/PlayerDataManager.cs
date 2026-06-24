@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -88,6 +89,35 @@ public class PlayerDataManager : NetworkBehaviour
 
         Debug.Log($"[PlayerDataManager] {_allPlayerData.Count}人分のプレイヤーデータを確定・同期しました。");
     }
+
+    /// <summary>
+    /// 【ホスト専用】ロビー待機中、接続人数が変わるたびに現在のメンバー名リストを全クライアントへ即時同期する
+    /// </summary>
+    public void Server_UpdateLobbyData(Dictionary<ulong, string> clientIdToNameMap)
+    {
+        if (!IsServer) return;
+
+        _allPlayerData.Clear();
+        int index = 0;
+
+        // 現在接続されている全ClientIdをループ
+        foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            // 名前マップから取得（なければフォールバック）
+            string pName = clientIdToNameMap.TryGetValue(clientId, out var name) ? name : $"Player{index + 1}";
+
+            _allPlayerData.Add(new PlayerNetworkData
+            {
+                LobbyIndex = index,
+                ClientId = clientId,
+                PlayerName = pName
+            });
+            index++;
+        }
+
+        Debug.Log($"[PlayerDataManager] ロビーの同期データを更新しました。現在人数: {_allPlayerData.Count}人");
+    }
+
 
     // ==========================================
     // ✍️ 【ローカル専用】名前をセットする処理
