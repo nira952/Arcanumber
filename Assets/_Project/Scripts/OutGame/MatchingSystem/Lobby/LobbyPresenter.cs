@@ -10,6 +10,9 @@ using UnityEngine;
 
 public class LobbyPresenter : IDisposable
 {
+    // スタートボタンを出す最低人数
+    private const int MinPlayersToStart = 2;
+
     private readonly LobbyUIManager _view;
     private readonly LobbyModel _lobbyModel;
     private readonly NetworkSessionModel _networkModel;
@@ -255,7 +258,7 @@ public class LobbyPresenter : IDisposable
             int connectedCount = NetworkManager.Singleton.ConnectedClientsIds.Count;
             _view.UpdatePlayerList(PlayerDataManager.Instance.LocalPlayerName + " (ホスト)", 1);
 
-            if (connectedCount >= 2)
+            if (connectedCount >= MinPlayersToStart)
             {
                 string guestName = "接続中...";
                 foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
@@ -267,12 +270,12 @@ public class LobbyPresenter : IDisposable
                     }
                 }
 
-                _view.UpdatePlayerList(guestName, 2);
+                _view.UpdatePlayerList(guestName, MinPlayersToStart);
                 _view.SetNextSceneButtonActive(true);
             }
             else
             {
-                _view.UpdatePlayerList("待機中...", 2);
+                _view.UpdatePlayerList("待機中...", MinPlayersToStart);
                 _view.SetNextSceneButtonActive(false);
             }
 
@@ -289,7 +292,7 @@ public class LobbyPresenter : IDisposable
 
             // 表示枠を一旦リセットして待機状態にする
             _view.UpdatePlayerList("待機中...", 1);
-            _view.UpdatePlayerList("待機中...", 2);
+            _view.UpdatePlayerList("待機中...", MinPlayersToStart);
 
             // 💡 ホストから同期されてきているNetworkList（AllPlayerData）をそのままUIに投影する
             foreach (var data in PlayerDataManager.Instance.AllPlayerData)
@@ -371,7 +374,7 @@ public class LobbyPresenter : IDisposable
         // 💡 自分のUGS IDを取得（「あなた」という表記をつけるかの判定用）
         string myPlayerId = AuthenticationService.Instance.PlayerId;
 
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < MinPlayersToStart; i++)
         {
             if (i < lobby.Players.Count)
             {
@@ -408,7 +411,7 @@ public class LobbyPresenter : IDisposable
 
         // 全員が揃ってNGO接続も完了したら「次へ」ボタンを有効化
         int ngoCount = NetworkManager.Singleton != null ? NetworkManager.Singleton.ConnectedClientsIds.Count : 0;
-        _view.SetNextSceneButtonActive(_isHost && lobby.Players.Count >= 2 && ngoCount >= 2);
+        _view.SetNextSceneButtonActive(_isHost && lobby.Players.Count >= MinPlayersToStart && ngoCount >= MinPlayersToStart);
     }
 
 
@@ -433,9 +436,19 @@ public class LobbyPresenter : IDisposable
         var finalizedList = new List<PlayerNetworkData>();
         int index = 0;
 
+        // 🛠️ 重複チェック用のハッシュセットを用意
+        var processedClientIds = new HashSet<ulong>();
+
         foreach (var kvp in _networkModel.PlayerIdToClientIdMap)
         {
             ulong clientId = kvp.Value;
+
+            // すでに同じClientIdを処理済みの場合はスキップ
+            if (processedClientIds.Contains(clientId))
+            {
+                Debug.LogWarning($"[HandleStartGame] 重複したClientId（{clientId}）を検出したため、リスト作成からスキップします。");
+                continue;
+            }
 
             // マップから正しいプレイヤー名を取得する（万が一無い場合はフォールバック）
             string pName = _networkModel.ClientIdToPlayerNameMap.TryGetValue(clientId, out var name)
@@ -448,6 +461,9 @@ public class LobbyPresenter : IDisposable
                 ClientId = clientId,
                 PlayerName = pName,
             });
+
+            // 処理済みとして記録
+            processedClientIds.Add(clientId);
             index++;
         }
 

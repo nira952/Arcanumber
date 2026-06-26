@@ -105,14 +105,23 @@ public class NetWorkAudioManager : NetworkBehaviour
     }
 
 
-    // --- ここからNGO（ネットワーク経由で全員）に鳴らす関数 ---
+    // --- NGO（ネットワーク経由で全員）に鳴らす関数 ---
 
     /// <summary>
     /// 【全員共有】誰から呼び出されても、ロビー内全員の画面で同じSEを再生します
+    /// ロビーにいない（接続していない）場合は、自動的に自分の画面だけで再生します
     /// </summary>
     public void PlayGlobal(SeName name)
     {
-        // もし自分がサーバー（ホスト）なら、直接全員に送る
+        // NetworkManagerが起動していない、または誰とも接続していない場合
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
+        {
+            // ローカル再生に切り替えて処理を抜ける（エラーを防止）
+            PlayLocal(name);
+            return;
+        }
+
+        // 自分がサーバー（ホスト）なら、直接全員に送る
         if (IsServer)
         {
             PlaySeRpc(name);
@@ -125,9 +134,16 @@ public class NetWorkAudioManager : NetworkBehaviour
 
     /// <summary>
     /// 【全員共有】誰から呼び出されても、ロビー内全員の画面で同じBGMを再生します
+    /// ロビーにいない（接続していない）場合は、自動的に自分の画面だけで再生します
     /// </summary>
     public void PlayGlobal(BgmName name)
     {
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
+        {
+            PlayLocal(name);
+            return;
+        }
+
         if (IsServer)
         {
             PlayBgmRpc(name);
@@ -138,17 +154,17 @@ public class NetWorkAudioManager : NetworkBehaviour
         }
     }
 
-    // --- NGO用のRPCメソッド群 ---
+    // --- NGO用のRPCメソッド群（最新規格に修正） ---
 
     // 1. クライアントからサーバーへ「音を鳴らして」とお願いするRPC
-    [ServerRpc(RequireOwnership = false)] // 所有権を持たないクライアントからの実行を許可
+    [Rpc(SendTo.Server, RequireOwnership = false)]
     private void RequestPlaySeServerRpc(SeName name)
     {
         // サーバーがそれを受け取り、全クライアントに「鳴らせ！」と命令を送る
         PlaySeRpc(name);
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, RequireOwnership = false)]
     private void RequestPlayBgmServerRpc(BgmName name)
     {
         PlayBgmRpc(name);
@@ -158,7 +174,6 @@ public class NetWorkAudioManager : NetworkBehaviour
     [Rpc(SendTo.Everyone)] // 参加している全員（自分含む）の画面で実行される
     private void PlaySeRpc(SeName name)
     {
-        // 最終的に全員のローカルで実際に再生される
         PlayLocal(name);
     }
 

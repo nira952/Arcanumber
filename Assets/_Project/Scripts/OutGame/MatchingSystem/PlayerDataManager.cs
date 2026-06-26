@@ -20,7 +20,7 @@ public class PlayerDataManager : NetworkBehaviour
     private readonly NetworkList<PlayerNetworkData> _allPlayerData = new();
     public NetworkList<PlayerNetworkData> AllPlayerData => _allPlayerData;
 
-
+    [SerializeField] private List<string> previewAllPlayerNames = new List<string>();
 
 
     private void Awake()
@@ -70,6 +70,16 @@ public class PlayerDataManager : NetworkBehaviour
         return false;
     }
 
+    /// <summary>
+    /// ロビー内の総人数を取得する
+    /// </summary>
+    public int GetLobbyPlayerCount()
+    {
+        Debug.Log($"[PlayerDataManager] 現在のロビー人数: {_allPlayerData.Count}");
+
+        return _allPlayerData.Count;
+    }
+
     // ==========================================
     // 【サーバー専用】データをセットする処理
     // ==========================================
@@ -77,18 +87,38 @@ public class PlayerDataManager : NetworkBehaviour
     /// <summary>
     /// 【ホスト専用】ゲーム開始直前に、確定したロビーの情報をまとめてセットする
     /// </summary>
-    public void Server_BuildAndSyncPlayerData(System.Collections.Generic.List<PlayerNetworkData> finalizedList)
+    public void Server_BuildAndSyncPlayerData(List<PlayerNetworkData> finalizedList)
     {
         if (!IsServer) return;
 
         _allPlayerData.Clear();
+
+        // 重複チェック用のハッシュセットを用意
+        var addedClientIds = new HashSet<ulong>();
+
         foreach (var data in finalizedList)
         {
+            // すでに同じClientIdが追加されている場合はスキップ（2重登録を防止）
+            if (addedClientIds.Contains(data.ClientId))
+            {
+                Debug.LogWarning($"[PlayerDataManager] 重複したClientIdを発見したためスキップしました: {data.ClientId} (Name: {data.PlayerName})");
+                continue;
+            }
+
             _allPlayerData.Add(data);
+            addedClientIds.Add(data.ClientId); // 追加済みリストに登録
+        }
+
+        // デバッグ用に、現在の全プレイヤー名をリストに格納しておく
+        previewAllPlayerNames.Clear();
+        foreach (var data in _allPlayerData)
+        {
+            previewAllPlayerNames.Add(data.PlayerName.ToString());
         }
 
         Debug.Log($"[PlayerDataManager] {_allPlayerData.Count}人分のプレイヤーデータを確定・同期しました。");
     }
+
 
     /// <summary>
     /// 【ホスト専用】ロビー待機中、接続人数が変わるたびに現在のメンバー名リストを全クライアントへ即時同期する
@@ -113,6 +143,13 @@ public class PlayerDataManager : NetworkBehaviour
                 PlayerName = pName
             });
             index++;
+        }
+
+        // デバッグ用に、現在の全プレイヤー名をリストに格納しておく
+        previewAllPlayerNames.Clear();
+        foreach (var data in _allPlayerData)
+        {
+            previewAllPlayerNames.Add(data.PlayerName.ToString());
         }
 
         Debug.Log($"[PlayerDataManager] ロビーの同期データを更新しました。現在人数: {_allPlayerData.Count}人");

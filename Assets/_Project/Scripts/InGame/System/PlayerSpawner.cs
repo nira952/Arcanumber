@@ -1,23 +1,44 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerSpawner : MonoBehaviour
+namespace nira.Demo
 {
-    [SerializeField] private Transform[] spawnPoints; // インデックス 0〜3 の初期位置
-
-    private void Start()
+    /// <summary>
+    /// NGOでのプレイヤー生成を行うクラス
+    /// </summary>
+    public class PlayerSpawner : NetworkBehaviour
     {
-        // ① 自分がこの部屋の「何番目のインデックスか」を取得
-        int myIndex = PlayerDataManager.Instance.GetMyLobbyIndex();
+        [SerializeField] private Transform[] spawnPoints; // インデックス 0〜3 の初期位置
+        [SerializeField] private DemoPlayer playerPrefab; // プレイヤーのプレハブ
 
-        if (myIndex != -1 && PlayerDataManager.Instance.TryGetPlayerData(myIndex, out var myData))
+        public override void OnNetworkSpawn()
         {
-            Debug.Log($"私はプレイヤー {myIndex}（名前: {myData.PlayerName}）です。");
+            // 自分がクライアントとして参加した時、サーバーへ生成をリクエストする
+            if (IsClient)
+            {
+                int myIndex = PlayerDataManager.Instance.GetMyLobbyIndex();
 
-            // ② 自分のインデックスに応じた初期位置にキャラクターを配置
-            Transform mySpawnPoint = spawnPoints[myIndex];
+                if (myIndex != -1 && PlayerDataManager.Instance.TryGetPlayerData(myIndex, out var myData))
+                {
+                    Debug.Log($"私はプレイヤー {myIndex}（名前: {myData.PlayerName}）です。生成をリクエストします。");
+                    RequestSpawnServerRpc(myIndex);
+                }
+            }
+        }
 
-            // ③ 自分の色をキャラクターのレンダラーに適用
-            // myCharacterRenderer.material.color = myData.SelectedColor;
+        [ServerRpc(RequireOwnership = false)]
+        private void RequestSpawnServerRpc(int index, ServerRpcParams rpcParams = default)
+        {
+            // ① サーバー側で指定のインデックスに応じた位置に生成
+            Transform spawnPoint = spawnPoints[index % spawnPoints.Length];
+            DemoPlayer spawnedPlayer = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+
+            // ② ネットワークオブジェクトとしてスポーンし、要求元のクライアントに所有権(Ownership)を渡す
+            var networkObj = spawnedPlayer.GetComponent<NetworkObject>();
+            networkObj.SpawnAsPlayerObject(rpcParams.Receive.SenderClientId);
+
+            // ③ サーバー側でプレイヤーの初期化処理
+            spawnedPlayer.Initialize(index);
         }
     }
 }
