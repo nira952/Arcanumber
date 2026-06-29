@@ -1,0 +1,375 @@
+fileFormatVersion: 2
+guid: d538e3ea14d529b4ea8fcb216e2eee12
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7654943936589192554
+    second: piyo_0
+  - first:
+      213: -2426564846566399426
+    second: piyo_1
+  - first:
+      213: -6003778279776159937
+    second: piyo_2
+  - first:
+      213: -5133185176875400266
+    second: piyo_3
+  - first:
+      213: -6912140110464568813
+    second: piyo_4
+  - first:
+      213: -4424896213245751323
+    second: piyo_5
+  - first:
+      213: -2231845744736319576
+    second: piyo_6
+  - first:
+      213: -3931037443955768108
+    second: piyo_7
+  - first:
+      213: -6348145762478492816
+    second: piyo_8
+  - first:
+      213: 7345132752988502672
+    second: piyo_9
+  - first:
+      213: -2447741673638248477
+    second: piyo_10
+  - first:
+      213: -3206040807390263198
+    second: piyo_11
+  - first:
+      213: -7251839091248168158
+    second: piyo_12
+  - first:
+      213: -2287258685714261084
+    second: piyo_13
+  - first:
+      213: -6156625807768049798
+    second: piyo_14
+  - first:
+      213: -6454128276297752108
+    second: piyo_15
+  - first:
+      213: -300630047388731896
+    second: piyo_16
+  - first:
+      213: -6189557560815923745
+    second: piyo_17
+  - first:
+      213: 7252677945381586558
+    second: piyo_18
+  - first:
+      213: 1423779681910407809
+    second: piyo_19
+  - first:
+      213: 2041518769217294905
+    second: piyo_20
+  - first:
+      213: 6610032143179493543
+    second: piyo_21
+  - first:
+      213: 38360392743010644
+    second: piyo_22
+  - first:
+      213: -7237735839328183216
+    second: piyo_23
+  - first:
+      213: 1079735067702844346
+    second: piyo_24
+  - first:
+      213: -3833869135150688427
+    second: piyo_25
+  - first:
+      213: -686376349357288899
+    second: piyo_26
+  - first:
+      213: 6321425247636099018
+    second: piyo_27
+  - first:
+      213: 5808490681294468570
+    second: piyo_28
+  - first:
+      213: 6472242645449723555
+    second: piyo_29
+  - first:
+      213: 667998606656197469
+    second: piyo_30
+  - first:
+      213: 3527425073816767849
+    second: piyo_31
+  - first:
+      213: -6999805262147495002
+    second: piyo_32
+  - first:
+      213: 655601120766440942
+    second: piyo_33
+  - first:
+      213: 3262105410187386200
+    second: piyo_34
+  - first:
+      213: -472500215895068824
+    second: piyo_35
+  - first:
+      213: -5518540280881128760
+    second: piyo_36
+  - first:
+      213: -6650226809066956861
+    second: piyo_37
+  - first:
+      213: 7822312064064984787
+    second: piyo_38
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 1
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: piyo_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6ddde3e3f2db3a60800000000000000
+      internalID: 7654943936589192554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: piyo_1
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e32a5f7e02c135ed0800000000000000
+      internalID: -2426564846566399426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: piyo_2
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f377cb3c67b4eaca0800000000000000
+      internalID: -6003778279776159937
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: piyo_3
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 0
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b38a06474343c8b0800000000000000
+      internalID: -5133185176875400266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: piyo_4
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 0
+        width: 192
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 312b70e01352310a0800000000000000
+      internalID: -6912140110464568813
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 344c83f84c42b5e4ab23bc45cf3627f0
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      piyo_0: 7654943936589192554
+      piyo_1: -2426564846566399426
+      piyo_2: -6003778279776159937
+      piyo_3: -5133185176875400266
+      piyo_4: -6912140110464568813
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

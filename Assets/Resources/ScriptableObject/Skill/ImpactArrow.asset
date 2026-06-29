@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48a52c8393e405541b0e2a1a25cca85f, type: 3}
+  m_Name: ImpactArrow
+  m_EditorClassIdentifier: 
+  skillNo: 1
+  skillName: "\u8CAB\u901A\u77E2"
+  skillEx: "\u8CAB\u901A\u3059\u308B\u77E2\u3092\u653E\u3064"
+  skillSp: {fileID: -7833500475299556938, guid: 8e572dbcc06d8684287bbaf0da369a97, type: 3}
+  target: 1
+  sCategory: 0
+  atk: 10
+  keepTime: 0
+  delayTime: 0
+  coolTime: 5
+  effectAnimation: {fileID: 141368539886289127, guid: 89bbac8a5004fd646b3461fa92a573cf, type: 3}
+  se: {fileID: 0}
+  effect:
+    effect: {fileID: 0}
+    isDisplay: 0
+    time: 0
+    value: 0

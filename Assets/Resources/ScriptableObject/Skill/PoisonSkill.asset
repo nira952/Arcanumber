@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48a52c8393e405541b0e2a1a25cca85f, type: 3}
+  m_Name: PoisonSkill
+  m_EditorClassIdentifier: 
+  skillNo: 8
+  skillName: "\u6BD2\u9B54\u6CD5"
+  skillEx: "\u3042\u3066\u305F\u76F8\u624B\u306B\u6BD2\u3092\u4ED8\u4E0E\u3059\u308B"
+  skillSp: {fileID: -7235994593216829218, guid: 50200c8e5ce5a0d428eec250894c1fa3, type: 3}
+  target: 3
+  sCategory: 0
+  atk: 0
+  keepTime: 0
+  delayTime: 0.8
+  coolTime: 30
+  effectAnimation: {fileID: 2355479593251735817, guid: 19f9b7f66eec9334fa729c5867155849, type: 3}
+  se: {fileID: 0}
+  effect:
+    effect: {fileID: 11400000, guid: be9bfa08e7762e54abd918d654082957, type: 2}
+    isDisplay: 1
+    time: 10
+    value: 2

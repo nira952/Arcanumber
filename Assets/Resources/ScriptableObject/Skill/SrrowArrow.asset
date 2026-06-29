@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48a52c8393e405541b0e2a1a25cca85f, type: 3}
+  m_Name: SrrowArrow
+  m_EditorClassIdentifier: 
+  skillNo: 2
+  skillName: "\u920D\u8DB3\u77E2"
+  skillEx: "\u3042\u3066\u305F\u76F8\u624B\u3092\u9045\u304F\u3059\u308B"
+  skillSp: {fileID: 1134423379193299356, guid: 11036e13e8f16f5449b2436508528466, type: 3}
+  target: 1
+  sCategory: 0
+  atk: 10
+  keepTime: 0
+  delayTime: 0
+  coolTime: 5
+  effectAnimation: {fileID: 3666633204459433281, guid: 064543472f269f949b696c39a698585c, type: 3}
+  se: {fileID: 0}
+  effect:
+    effect: {fileID: 11400000, guid: 3852bc3f55849bf4c9800a320ef3c9bd, type: 2}
+    isDisplay: 1
+    time: 5
+    value: 0.2
