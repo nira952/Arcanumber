@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,7 +7,6 @@ using UnityEngine.UI;
 public class TitleUIManager : MonoBehaviour
 {
     [SerializeField] private GameObject titlePanel;
-
 
     [SerializeField] private GameObject privateMatchPanel;
 
@@ -109,6 +109,9 @@ public class TitleUIManager : MonoBehaviour
 
         if (titlePanel != null) 
             titlePanel.SetActive(true); 
+
+
+        CurtainManager.Instance.OpenAsync().Forget();
     }
 
     public void OnClickExitTitlePanel(GameObject panel)
