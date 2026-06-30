@@ -23,17 +23,25 @@ public class PlayerDataManager : NetworkBehaviour
     [SerializeField] private List<string> previewAllPlayerNames = new List<string>();
 
 
+    // --- ローカルスキル ----
+
+    [SerializeField] private Skill[] mySkills = new Skill[4]; // スキル
+
+    [SerializeField] private Arcana myArcana;   // アルカナ
+
+
     private void Awake()
     {
-        if (Instance == null)
+        // もし既にインスタンスが存在していれば、重複防止のために警告を出すか破棄する
+        if (Instance != null && Instance != this)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            Debug.LogWarning($"[PlayerDataManager] 既にインスタンスが存在するため、重複したものを破棄します。");
+            Destroy(this);
+            return;
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+
+        // 自分自身をインスタンスとして登録
+        Instance = this;
     }
 
     // ==========================================
@@ -69,6 +77,25 @@ public class PlayerDataManager : NetworkBehaviour
         resultData = default;
         return false;
     }
+
+    /// <summary>
+    /// 自分のスキルを取得する
+    /// </summary>
+    /// <returns></returns>
+    public Skill[] GetMySkills()
+    {
+        return mySkills;
+    }
+
+    /// <summary>
+    /// 自分のアルカナを取得する
+    /// </summary>
+    /// <returns></returns>
+    public Arcana GetMyArcana()
+    {
+        return myArcana;
+    }
+
 
     /// <summary>
     /// ロビー内の総人数を取得する
@@ -157,8 +184,34 @@ public class PlayerDataManager : NetworkBehaviour
 
 
     // ==========================================
-    // ✍️ 【ローカル専用】名前をセットする処理
+    // ✍️ 【ローカル専用】データをセットするメソッド群
     // ==========================================
+
+
+    /// <summary>
+    /// ローカルスキルを設定する
+    /// </summary>
+    /// <param name="skills"></param>
+    public void SetLocalSkills(Skill[] skills)
+    {
+        if (skills == null || skills.Length != 4)
+        {
+            Debug.LogError("[PlayerDataManager] スキル配列の長さが不正です。4つのスキルを設定してください。");
+            return;
+        }
+
+        mySkills = skills;
+    }
+
+    /// <summary>
+    /// ローカルアルカナを設定する
+    /// </summary>
+    /// <param name="arcana"></param>
+    public void SetLocalArcana(Arcana arcana)
+    {
+        myArcana = arcana;
+    }
+
 
     /// <summary>
     /// ネットワーク接続前：ローカルに保存されている名前をロードする
