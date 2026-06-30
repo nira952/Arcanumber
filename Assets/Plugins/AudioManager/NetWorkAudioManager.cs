@@ -18,8 +18,8 @@ public class NetWorkAudioManager : NetworkBehaviour
         }
     }
 
-    [SerializeField] private AudioSetting audioData;
-    [SerializeField] private AudioMixer audioMixer;
+    private AudioSetting audioData;
+    private AudioMixer audioMixer;
 
     [Header("Settings")]
     public int maxSeSources = 10;
@@ -29,23 +29,17 @@ public class NetWorkAudioManager : NetworkBehaviour
 
     private void Awake()
     {
-        if (instance == null)
+        // もし既にインスタンスが存在していれば、重複防止のために警告を出すか破棄する
+        if (instance != null && instance != this)
         {
-            instance = this;
-            // 単体のDontDestroyOnLoadだけでなく、NGOのネットワーク管理下で生存させる
-            DontDestroyOnLoad(gameObject);
-        }
-        else if (instance != this)
-        {
-            Destroy(gameObject);
+            Debug.LogWarning($"[NetWorkAudioManager] 既にインスタンスが存在するため、重複したものを破棄します。");
+            Destroy(this);
             return;
         }
 
-        if (audioData == null || audioMixer == null)
-        {
-            Debug.LogWarning("オーディオデータ、またはAudioMixerが参照できません");
-            return;
-        }
+        // 自分自身をインスタンスとして登録
+        instance = this;
+
 
         InitAudioSources();
     }
@@ -64,6 +58,17 @@ public class NetWorkAudioManager : NetworkBehaviour
 
     private void InitAudioSources()
     {
+        // AudioSettingとAudioMixerをResourcesフォルダからロード
+        audioData = Resources.Load<AudioSetting>("AudioSettings/AudioSetting");
+        audioMixer = Resources.Load<AudioMixer>("AudioSettings/AudioMixer");
+
+
+        if (audioData == null || audioMixer == null)
+        {
+            Debug.LogWarning("オーディオデータ、またはAudioMixerが参照できません");
+            return;
+        }
+
         AudioMixerGroup[] bgmGroups = audioMixer.FindMatchingGroups("Master/BGM");
         AudioMixerGroup[] seGroups = audioMixer.FindMatchingGroups("Master/SE");
 

@@ -32,15 +32,16 @@ public class PlayerDataManager : NetworkBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
+        // もし既にインスタンスが存在していれば、重複防止のために警告を出すか破棄する
+        if (Instance != null && Instance != this)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            Debug.LogWarning($"[PlayerDataManager] 既にインスタンスが存在するため、重複したものを破棄します。");
+            Destroy(this);
+            return;
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+
+        // 自分自身をインスタンスとして登録
+        Instance = this;
     }
 
     // ==========================================

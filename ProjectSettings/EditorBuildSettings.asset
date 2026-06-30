@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Game.unity
     guid: 79db70511ae2e78468074b598bbd454e
+  - enabled: 1
+    path: Assets/_Project/Scenes/ArcanaSelect.unity
+    guid: dbfef29f7805ae54c87700fb2f22beba
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
