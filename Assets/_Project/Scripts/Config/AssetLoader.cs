@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -14,12 +15,17 @@ public static class AssetLoader
     public static List<Skill> LoadAllSkills()
     {
         // Resources/ScriptableObject/Skill 以下の全Skillをロード
-        return new List<Skill>(Resources.LoadAll<Skill>(SKILL_PATH));
+        return new List<Skill>(Resources.LoadAll<Skill>(SKILL_PATH))
+                    .OrderBy(e => e.GetSkillNo())
+                    .ToList();
     }
 
     public static List<Arcana> LoadAllArcanas()
     {
         // Resources/ScriptableObject/Arcana 以下の全Arcanaをロード
-        return new List<Arcana>(Resources.LoadAll<Arcana>(ARCANA_PATH));
+        return new List<Arcana>(Resources.LoadAll<Arcana>(ARCANA_PATH))
+                    .OrderBy(e => e.GetArcanaListID())
+                    .ThenByDescending(e => e.GetIsFront())
+                    .ToList();
     }
 }

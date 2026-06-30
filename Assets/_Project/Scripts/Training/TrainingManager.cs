@@ -68,15 +68,10 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
     void LoadAsset()
     {
         //アルカナを並べ替える
-        allArcana = AssetLoader.LoadAllArcanas()
-                    .OrderBy(e => e.GetArcanaListID())
-                    .ThenByDescending(e => e.GetIsFront())
-                    .ToList();
+        allArcana = AssetLoader.LoadAllArcanas();
 
         //スキルを入れ替える
-        allSkill = AssetLoader.LoadAllSkills()
-                    .OrderBy(e => e.GetSkillNo())
-                    .ToList();
+        allSkill = AssetLoader.LoadAllSkills();
     }
 
     /// <summary>
