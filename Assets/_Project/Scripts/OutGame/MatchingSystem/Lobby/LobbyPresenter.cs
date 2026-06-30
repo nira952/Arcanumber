@@ -235,6 +235,8 @@ public class LobbyPresenter : IDisposable
 
                 await StartClientWaitAsync(_myLocalPlayerId, linkedToken, true, targetIp);
 
+                Debug.Log($"[Presenter] LANクライアントとして接続成功: {targetIp}");
+
                 _view.UpdateRoomName($"IP : {targetIp}");
                 _view.HideLoading();
                 _view.ShowRoomPanel();
@@ -289,6 +291,8 @@ public class LobbyPresenter : IDisposable
         while (!token.IsCancellationRequested && !_isHost && _isLanMode)
         {
             if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsClient) break;
+
+            Debug.Log($"[Presenter] LANクライアントの待機ループ実行中... 接続数: {NetworkManager.Singleton.ConnectedClientsIds.Count}");
 
             // 表示枠を一旦リセットして待機状態にする
             _view.UpdatePlayerList("待機中...", 1);
