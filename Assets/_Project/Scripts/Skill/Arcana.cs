@@ -86,6 +86,9 @@ public class Arcana : ScriptableObject
             //塔
             (ArcanaList.Tower, true) => new Arcana16TowerFront(),
             (ArcanaList.Tower, false) => new Arcana16TowerBack(),
+            //星
+            (ArcanaList.Star, true) => new Arcana17StarFront(),
+            (ArcanaList.Star, false) => new Arcana17StarBack(),
 
             _ => null
         };
