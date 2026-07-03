@@ -23,8 +23,14 @@ public class Arcana17StarBack : ArcanaLogic
     public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //ランダムな効果を持った星が流れてくる
     private Color[] starColors =
-        {
-        };
+    {
+        Color.red,
+        Color.blue,
+        Color.green,
+        Color.yellow,
+        Color.cyan,
+        Color.magenta
+    };
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
         //攻撃力減少、防御力減少、速度減少、毒、スキル使用禁止
