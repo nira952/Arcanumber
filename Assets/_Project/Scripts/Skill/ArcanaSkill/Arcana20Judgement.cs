@@ -8,7 +8,6 @@ public class Arcana20JudgementFront : ArcanaLogic
     {
 
     }
-
 }
 
 public class Arcana20JudgementBack : ArcanaLogic
