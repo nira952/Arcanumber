@@ -65,6 +65,7 @@ public class NetworkSessionModel
         bool isSuccess = NetworkManager.Singleton.StartHost();
         if (isSuccess)
         {
+            Debug.Log($"[NGO] LANホストを開始しました。IP: {ipAddress}, Port: {port}");
             PlayerIdToClientIdMap[hostPlayerId] = NetworkManager.Singleton.LocalClientId;
             ClientIdToPlayerNameMap[NetworkManager.Singleton.LocalClientId] = playerName; // ホスト自身の名前を登録
         }

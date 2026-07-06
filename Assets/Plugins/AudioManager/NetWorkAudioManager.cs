@@ -60,7 +60,7 @@ public class NetWorkAudioManager : NetworkBehaviour
     {
         // AudioSettingとAudioMixerをResourcesフォルダからロード
         audioData = Resources.Load<AudioSetting>("AudioSettings/AudioSetting");
-        audioMixer = Resources.Load<AudioMixer>("AudioSettings/AudioMixer");
+        audioMixer = Resources.Load<AudioMixer>("AudioSettings/MainAudioMixer");
 
 
         if (audioData == null || audioMixer == null)
