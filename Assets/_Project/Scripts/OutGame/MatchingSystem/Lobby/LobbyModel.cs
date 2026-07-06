@@ -111,7 +111,8 @@ public class LobbyModel
             (ushort)allocation.RelayServer.Port,
             allocation.AllocationIdBytes,
             allocation.Key,
-            allocation.ConnectionData
+            allocation.ConnectionData,
+            true
         );
 
         string playerName = PlayerDataManager.Instance.LocalPlayerName;
@@ -172,7 +173,8 @@ public class LobbyModel
             joinAllocation.AllocationIdBytes,
             joinAllocation.Key,
             joinAllocation.ConnectionData,
-            joinAllocation.HostConnectionData
+            joinAllocation.HostConnectionData,
+            true
         );
 
         _onLobbyUpdated.OnNext(CurrentLobby);

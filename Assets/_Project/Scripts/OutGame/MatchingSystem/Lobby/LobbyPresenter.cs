@@ -63,13 +63,6 @@ public class LobbyPresenter : IDisposable
             (HandleMatchAsync(LobbyModel.MatchTypeCasual)).Forget()
         ).AddTo(_disposables);
 
-        _view.OnLanHostRequested.Subscribe(_ => HandleLanMatchAsync(true).Forget()).AddTo(_disposables);
-
-        _view.OnLanJoinRequested.Subscribe(_ => HandleLanMatchAsync(false).Forget()).AddTo(_disposables);
-
-        _view.OnCancelRequested.Subscribe(_ => HandleCancelOrLeaveAsync().Forget()).AddTo(_disposables);
-        _view.OnNextSceneRequested.Subscribe(_ => HandleStartGameAsync().Forget()).AddTo(_disposables);
-
         _lobbyModel.OnLobbyUpdated.Subscribe(lobby => UpdateLobbyUI(lobby)).AddTo(_disposables);
     }
 
@@ -177,10 +170,25 @@ public class LobbyPresenter : IDisposable
                 _networkModel.StartHostRelay(_myLocalPlayerId, PlayerDataManager.Instance.LocalPlayerName);
                 _lobbyModel.HeartbeatLobbyAsync(linkedToken).Forget();
                 SpawnPlayerDataManager();
+
+                // 同期イベント
+                NetworkManager.Singleton.OnClientConnectedCallback += _ => {
+                    PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
+                };
+                NetworkManager.Singleton.OnClientDisconnectCallback += _ => {
+                    PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
+                };
+                PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
+
+                // ホスト用のオンライン監視ループを起動
+                OnlinePollingLoopAsync(linkedToken).Forget();
             }
             else
             {
                 await StartClientWaitAsync(_myLocalPlayerId, linkedToken);
+
+                // クライアント用のオンライン監視ループを起動
+                OnlineClientPollingLoopAsync(linkedToken).Forget();
             }
 
             _lobbyModel.StartLobbyPollingLoopAsync(linkedToken).Forget();
@@ -191,133 +199,42 @@ public class LobbyPresenter : IDisposable
     }
 
     // ==========================================
-    // 🏫 LANマッチ処理 (ローカルIP)
+    // 🌐 待機画面の更新ループ (オンライン専用)
     // ==========================================
-    private async UniTask HandleLanMatchAsync(bool isStartingAsHost)
+
+    // 【ホスト用】オンライン時の状態監視ループ
+    private async UniTask OnlinePollingLoopAsync(CancellationToken token)
     {
-        _isHost = isStartingAsHost;
-        _view.SetUIStateOnMatchingStart();
-        _view.ShowLoading("LAN接続中...");
-
-        _matchCts?.Cancel();
-        _matchCts = new CancellationTokenSource();
-        var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_matchCts.Token, _destroyToken).Token;
-
-        try
+        while (!token.IsCancellationRequested && _isHost && !_isLanMode)
         {
-            if (_isHost)
+            if (NetworkManager.Singleton != null && _lobbyModel.CurrentLobby != null)
             {
-                string myIp = _networkModel.GetLocalIPAddress();
-                _networkModel.StartHostLAN(_myLocalPlayerId, PlayerDataManager.Instance.LocalPlayerName, myIp);
-                SpawnPlayerDataManager();
-
-                // ホスト専用：クライアントが接続・切断したときにPlayerDataManagerのリストを更新・同期する
-                NetworkManager.Singleton.OnClientConnectedCallback += _ => {
-                    PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
-                };
-                NetworkManager.Singleton.OnClientDisconnectCallback += _ => {
-                    PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
-                };
-
-                // 初回（自分自身だけがいる状態）のデータを一度同期
-                PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
-
-                _view.UpdateRoomName($"IP : {myIp}");
-                _view.HideLoading();
-                _view.ShowRoomPanel();
-
-                LanPollingLoopAsync(linkedToken).Forget();
-            }
-            else
-            {
-                string targetIp = _view.TargetIPInputFieldText.Trim();
-                if (string.IsNullOrEmpty(targetIp)) throw new Exception("IPアドレスを入力してください");
-
-                await StartClientWaitAsync(_myLocalPlayerId, linkedToken, true, targetIp);
-
-                Debug.Log($"[Presenter] LANクライアントとして接続成功: {targetIp}");
-
-                _view.UpdateRoomName($"IP : {targetIp}");
-                _view.HideLoading();
-                _view.ShowRoomPanel();
-
-                // ゲスト側の画面更新ループを回す
-                LanClientPollingLoopAsync(linkedToken).Forget();
-            }
-        }
-        catch (Exception e) { HandleMatchError(e); }
-    }
-
-    // ==========================================
-    // 待機画面の更新ループ (LAN専用)
-    // ==========================================
-
-    // 【ホスト用】NGOの接続数を監視し、送られてきた名前を表示する
-    private async UniTask LanPollingLoopAsync(CancellationToken token)
-    {
-        while (!token.IsCancellationRequested && _isHost && _isLanMode)
-        {
-            int connectedCount = NetworkManager.Singleton.ConnectedClientsIds.Count;
-            _view.UpdatePlayerList(PlayerDataManager.Instance.LocalPlayerName + " (ホスト)", 1);
-
-            if (connectedCount >= MinPlayersToStart)
-            {
-                string guestName = "接続中...";
-                foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
-                {
-                    if (clientId != NetworkManager.Singleton.LocalClientId &&
-                        _networkModel.ClientIdToPlayerNameMap.TryGetValue(clientId, out var name))
-                    {
-                        guestName = name;
-                    }
-                }
-
-                _view.UpdatePlayerList(guestName, MinPlayersToStart);
-                _view.SetNextSceneButtonActive(true);
-            }
-            else
-            {
-                _view.UpdatePlayerList("待機中...", MinPlayersToStart);
-                _view.SetNextSceneButtonActive(false);
+                // UIを最新のロビー情報とNGO接続情報で強制更新する
+                UpdateLobbyUI(_lobbyModel.CurrentLobby);
             }
 
-            await UniTask.Delay(1000, cancellationToken: token);
+            await UniTask.Delay(1000, cancellationToken: token); // 1秒ごとに更新
         }
     }
 
-    // 【ゲスト用】自分の参加状態を画面に反映させる
-    private async UniTask LanClientPollingLoopAsync(CancellationToken token)
+    // 【ゲスト用】オンライン時の状態監視ループ
+    private async UniTask OnlineClientPollingLoopAsync(CancellationToken token)
     {
-        while (!token.IsCancellationRequested && !_isHost && _isLanMode)
+        while (!token.IsCancellationRequested && !_isHost && !_isLanMode)
         {
             if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsClient) break;
 
-            Debug.Log($"[Presenter] LANクライアントの待機ループ実行中... 接続数: {NetworkManager.Singleton.ConnectedClientsIds.Count}");
-
-            // 表示枠を一旦リセットして待機状態にする
-            _view.UpdatePlayerList("待機中...", 1);
-            _view.UpdatePlayerList("待機中...", MinPlayersToStart);
-
-            // 💡 ホストから同期されてきているNetworkList（AllPlayerData）をそのままUIに投影する
-            foreach (var data in PlayerDataManager.Instance.AllPlayerData)
+            if (_lobbyModel.CurrentLobby != null)
             {
-                string suffix = "";
-                if (data.ClientId == NetworkManager.Singleton.LocalClientId)
-                {
-                    suffix = " (あなた)";
-                }
-                else if (data.LobbyIndex == 0) // 通常インデックス0がホスト
-                {
-                    suffix = " (ホスト)";
-                }
-
-                // LobbyIndexは0始まりなので、UI用に+1する
-                _view.UpdatePlayerList(data.PlayerName + suffix, data.LobbyIndex + 1);
+                // ゲスト側も1秒ごとに画面情報を強制更新
+                UpdateLobbyUI(_lobbyModel.CurrentLobby);
             }
 
-            await UniTask.Delay(1000, cancellationToken: token);
+            await UniTask.Delay(1000, cancellationToken: token); // 1秒ごとに更新
         }
     }
+
+
     // ==========================================
     // 共通処理群
     // ==========================================
@@ -344,6 +261,8 @@ public class LobbyPresenter : IDisposable
             NetworkManager.Singleton.OnClientConnectedCallback -= OnConnected;
             throw new Exception("StartClientに失敗。");
         }
+
+        Debug.Log($"[Presenter] クライアントとして接続開始: LAN={isLan}, IP={ip}, PlayerId={playerId}, Name={myName}");
 
         var winner = await UniTask.WhenAny(
             tcs.Task.AttachExternalCancellation(token),
@@ -419,6 +338,11 @@ public class LobbyPresenter : IDisposable
     }
 
 
+    public void HandleCancelOrLeave()
+    {
+        HandleCancelOrLeaveAsync().Forget();
+    }
+
     private async UniTask HandleCancelOrLeaveAsync()
     {
         _view.DisableCancelButton();
@@ -430,6 +354,11 @@ public class LobbyPresenter : IDisposable
         _view.ResetMatchUI();
         _view.HideRoomPanel();
         _view.HideLoading();
+    }
+
+    public void StartGame()
+    {
+        HandleStartGameAsync().Forget();
     }
 
     // 💡 ゲームシーンへの遷移処理（オンライン・LAN共通）

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-
+[RequireComponent(typeof(NetworkObject))]
 public class PlayerDataManager : NetworkBehaviour
 {
     public static PlayerDataManager Instance { get; private set; }
@@ -17,7 +17,11 @@ public class PlayerDataManager : NetworkBehaviour
 
 
     // ホストがデータを確定させ、全クライアントへ自動同期するリスト
-    private readonly NetworkList<PlayerNetworkData> _allPlayerData = new();
+    // 💡 引数に NetworkVariableReadPermission.Everyone を指定する
+    private readonly NetworkList<PlayerNetworkData> _allPlayerData =
+        new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+
     public NetworkList<PlayerNetworkData> AllPlayerData => _allPlayerData;
 
     [SerializeField] private List<string> previewAllPlayerNames = new List<string>();
@@ -43,6 +47,24 @@ public class PlayerDataManager : NetworkBehaviour
         // 自分自身をインスタンスとして登録
         Instance = this;
     }
+
+    private void Start()
+    {
+        // ホスト（サーバー）が起動したタイミングで自動的にネットワークに登録する
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnServerStarted += () =>
+            {
+                var no = this.gameObject.GetComponent<NetworkObject>();
+                if (no != null && !no.IsSpawned)
+                {
+                    no.Spawn();
+                    Debug.Log("[PlayerDataManager] サーバー起動を検知し、自動Spawnしました。");
+                }
+            };
+        }
+    }
+
 
     // ==========================================
     // プレイヤーがデータを取得するための便利なメソッド群
@@ -182,6 +204,101 @@ public class PlayerDataManager : NetworkBehaviour
         Debug.Log($"[PlayerDataManager] ロビーの同期データを更新しました。現在人数: {_allPlayerData.Count}人");
     }
 
+    // ==========================================
+    // 【サーバー専用】クライアントから送られてきたスキル番号をNetworkListに適用する
+    // ==========================================
+
+    /// <summary>
+    /// 【ホスト専用】指定されたClientIdのプレイヤーデータを探し、
+    /// スキル情報を上書きして全クライアントへ同期する
+    /// </summary>
+    public void Server_UpdatePlayerSkills(ulong clientId, int[] selectedSkillNos)
+    {
+        if (!IsServer) return;
+
+        // 全体のNetworkList内から、送ってきたClientIdと一致するインデックスを探す
+        for (int i = 0; i < _allPlayerData.Count; i++)
+        {
+            if (_allPlayerData[i].ClientId == clientId)
+            {
+                // 構造体は値型なので、一旦ローカルにコピーして取り出す
+                PlayerNetworkData data = _allPlayerData[i];
+
+                // 先ほどの int[] から、引数で渡された Skill[] の疑似データを作って構造体にセットする
+                // （PlayerNetworkData.SetSkill が型として Skill[] を要求しているため、疑似オブジェクトの配列を作ります）
+                Skill[] tempSkillArray = new Skill[selectedSkillNos.Length];
+                for (int j = 0; j < selectedSkillNos.Length; j++)
+                {
+                    // 空のSkillを作成し、内部のスキル番号だけを一致させる
+                    Skill dummySkill = ScriptableObject.CreateInstance<Skill>();
+                }
+
+                data.SetSkillFromIds(selectedSkillNos);
+
+                // NetworkListの内容を上書き更新し全プレイヤーに自動同期
+                _allPlayerData[i] = data;
+
+                Debug.Log($"[Server] ClientId: {clientId} のスキルデータを構造体に書き込み、同期しました。");
+                break;
+            }
+        }
+    }
+
+    // ==========================================
+    // 【サーバー専用】クライアントから送られてきたアルカナデータをNetworkListに適用する
+    // ==========================================
+
+    /// <summary>
+    /// 【ホスト専用】指定されたClientIdのプレイヤーデータを探し、アルカナ情報を上書きして全クライアントへ同期する
+    /// </summary>
+    public void Server_UpdatePlayerArcana(ulong clientId, ArcanaList selectedArcana)
+    {
+        if (!IsServer) return;
+
+        // 全体のNetworkList内から、送ってきたClientIdと一致するインデックスを探す
+        for (int i = 0; i < _allPlayerData.Count; i++)
+        {
+            if (_allPlayerData[i].ClientId == clientId)
+            {
+                // 構造体を取り出す（値型なのでコピーされる）
+                PlayerNetworkData data = _allPlayerData[i];
+
+                // アルカナ情報を上書き
+                data.arcana = selectedArcana;
+
+                // NetworkListの内容を上書き更新（これで全プレイヤーに自動同期される）
+                _allPlayerData[i] = data;
+
+                Debug.Log($"[Server] ClientId: {clientId} のアルカナデータを【{selectedArcana}】に更新し、同期しました。");
+                break;
+            }
+        }
+    }
+
+    // ==========================================
+    // 【サーバー専用】クライアントの準備状態を更新する
+    // ==========================================
+
+    /// <summary>
+    /// 【ホスト専用】指定されたClientIdの準備完了状態を上書きする
+    /// </summary>
+    public void Server_SetPlayerReady(ulong clientId, bool isReady)
+    {
+        if (!IsServer) return;
+
+        for (int i = 0; i < _allPlayerData.Count; i++)
+        {
+            if (_allPlayerData[i].ClientId == clientId)
+            {
+                PlayerNetworkData data = _allPlayerData[i];
+                data.IsReady = isReady;
+                _allPlayerData[i] = data; // NetworkListを更新（全クライアントへ即時同期）
+
+                Debug.Log($"[Server] ClientId: {clientId} の準備状態を {isReady} に更新しました。");
+                break;
+            }
+        }
+    }
 
     // ==========================================
     // ✍️ 【ローカル専用】データをセットするメソッド群
@@ -194,9 +311,9 @@ public class PlayerDataManager : NetworkBehaviour
     /// <param name="skills"></param>
     public void SetLocalSkills(Skill[] skills)
     {
-        if (skills == null || skills.Length != 4)
+        if (skills == null || skills.Length != 5)
         {
-            Debug.LogError("[PlayerDataManager] スキル配列の長さが不正です。4つのスキルを設定してください。");
+            Debug.LogError("[PlayerDataManager] スキル配列の長さが不正です。5つのスキルを設定してください。");
             return;
         }
 
