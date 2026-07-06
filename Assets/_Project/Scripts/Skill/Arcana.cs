@@ -89,7 +89,19 @@ public class Arcana : ScriptableObject
             //星
             (ArcanaList.Star, true) => new Arcana17StarFront(),
             (ArcanaList.Star, false) => new Arcana17StarBack(),
-
+            //月
+            (ArcanaList.Moon, true) => new Arcana18MoonFront(),
+            (ArcanaList.Moon, false) => new Arcana18MoonBack(),
+            //太陽
+            (ArcanaList.Sun, true) => new Arcana19SunFront(),
+            (ArcanaList.Sun, false) => new Arcana19SunBack(),
+            //審判
+            (ArcanaList.Judgement, true) => new Arcana20JudgementFront(),
+            (ArcanaList.Judgement, false) => new Arcana20JudgementBack(),
+            //世界
+            (ArcanaList.World, true) => new Arcana21WorldFront(),
+            (ArcanaList.World, false) => new Arcana21WorldBack(),
+            //ない場合
             _ => null
         };
     }

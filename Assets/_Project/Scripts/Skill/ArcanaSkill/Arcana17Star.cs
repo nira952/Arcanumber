@@ -1,6 +1,13 @@
+// ========================================================
+// 星：Star
+// ========================================================
+
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// 星（正位置）
+/// </summary>
 public class Arcana17StarFront : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.Command;
@@ -18,24 +25,19 @@ public class Arcana17StarFront : ArcanaLogic
     }
 }
 
+/// <summary>
+/// 星（逆位置）
+/// </summary>
 public class Arcana17StarBack : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.Command;
-    //ランダムな効果を持った星が流れてくる
-    private Color[] starColors =
-    {
-        Color.red,
-        Color.blue,
-        Color.green,
-        Color.yellow,
-        Color.cyan,
-        Color.magenta
-    };
+    //無敵
+    private float keepTime = 5f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
-        //攻撃力減少、防御力減少、速度減少、毒、スキル使用禁止
-        //ジャンプ禁止、スタン、ダメージ、移動反転
-        
+        Effect e = EffectRegistry.Get(EffectList.Invincible, true);
+        EffectAbility ea = new EffectAbility(e, true, keepTime, -1f);
+        player.SetHaveEffect(ea.Clone());
     }
 
 }

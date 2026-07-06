@@ -84,7 +84,7 @@ public class EffectAbility
     /// <summary>
     /// 毒ダメージの経過
     /// </summary>
-    public bool CheckPoisonDamage()
+    public bool CheckDamageInterval()
     {
         //まだ一度もダメージを与えていないなら、基準時間をセット
         if (lastDamageTime < 0)
@@ -129,5 +129,7 @@ public enum EffectList
     [InspectorName("魅了")] Charm,
     [InspectorName("回復スティール")] HealSteal,
     [InspectorName("皇帝の威厳")] EnperorAura,
-    [InspectorName("魂吸")] AtkHeal
+    [InspectorName("魂吸")] AtkHeal,
+    [InspectorName("次元移動")] WallSwap,
+    [InspectorName("太陽")] SunBurn
 }

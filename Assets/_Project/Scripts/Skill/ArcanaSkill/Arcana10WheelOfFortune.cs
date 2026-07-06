@@ -1,9 +1,9 @@
-using UnityEngine;
-using static Unity.Burst.Intrinsics.X86.Avx;
-
 // ========================================================
 // 運命の輪：Wheel of Fortune
 // ========================================================
+
+using UnityEngine;
+using static Unity.Burst.Intrinsics.X86.Avx;
 
 /// <summary>
 /// 運命の輪（正位置）

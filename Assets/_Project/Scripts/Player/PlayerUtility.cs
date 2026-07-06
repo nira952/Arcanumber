@@ -65,6 +65,8 @@ public static class PlayerUtility
         EffectDurationUpdate(player);
         //持続ダメージ用
         ApplyPoisonDamage(player);
+        //太陽用
+        CheckAndApplyRoofDamage(player);
 
         PlayerController controller = player.GetPlayerController();
         if (controller == null) return;
@@ -124,12 +126,28 @@ public static class PlayerUtility
             Effect effectData = e.GetEffect();
             if (effectData == null) continue;
             // 毒効果があり、かつ1秒経過したタイミングなら
-            if (effectData.GetEffectList() == EffectList.Poison && e.CheckPoisonDamage())
-            {
-
+            if (effectData.GetEffectList() == EffectList.Poison && e.CheckDamageInterval())
                 FinalDamage(player, e.GetValue());
-            }
         }
+    }
+
+    /// <summary>
+    /// 太陽のダメージメソッド
+    /// </summary>
+    public static void CheckAndApplyRoofDamage(NetworkPlayer player)
+    {
+        //太陽のデバフを取得
+        EffectAbility sunEffect = player.GetHaveEffect().Find(e => e.GetEffect().GetEffectList() == EffectList.SunBurn);
+        //エフェクトがない
+        if (sunEffect == null || sunEffect.GetEffect().GetIsUp() != false) return;
+
+        //屋根判定
+        Vector2 pos = player.transform.position;
+        bool isUnderRoof = Physics2D.Raycast(pos + Vector2.up * 0.1f, Vector2.up, 50f, LayerMask.GetMask("Ground")).collider != null;
+
+        //屋根がなく、かつ1秒経過しているならダメージ
+        if (!isUnderRoof && sunEffect.CheckDamageInterval())
+            FinalDamage(player, sunEffect.GetValue());
     }
 
     /// <summary>
