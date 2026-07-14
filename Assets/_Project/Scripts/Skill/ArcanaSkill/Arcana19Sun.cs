@@ -32,8 +32,16 @@ public class Arcana19SunFront : ArcanaLogic
 public class Arcana19SunBack : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
-    //あなたはスターだ
+    //スタンする
+    private float keepTime = 3f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
+        List<NetworkPlayer> others = PlayerUtility.GetOtherPlayers(player);
+        foreach (NetworkPlayer other in others)
+        {
+            Effect e = EffectRegistry.Get(EffectList.Stun, false);
+            EffectAbility effect = new EffectAbility(e, false, keepTime, -1);
+            other.SetHaveEffect(effect);
+        }
     }
 }
