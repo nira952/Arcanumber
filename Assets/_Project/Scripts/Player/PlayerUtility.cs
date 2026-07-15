@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -8,6 +9,11 @@ public static class PlayerUtility
 {
     //プレイヤーをまとめる辞書
     private static Dictionary<int, NetworkPlayer> playerCache = new Dictionary<int, NetworkPlayer>();
+
+    /// <summary>
+    /// 全プレイヤーを返す
+    /// </summary>
+    public static List<NetworkPlayer> GetAllPlyer => playerCache.Values.ToList();
 
     /// <summary>
     /// プレイヤーを追加する処理

@@ -15,7 +15,7 @@ MonoBehaviour:
   aList: 15
   arcanaImage: {fileID: 0}
   isFront: 1
-  arcanaEx: "HP\u304C\uFF10\u306B\u306A\u3063\u3066\u3082\u3057\u3070\u3089\u304F\u751F\u304D\u6B8B\u308B\u30AB\u30FC\u30C9"
+  arcanaEx: "\uFF0A\uFF0A\uFF0A\uFF0A\uFF0A\uFF0A"
   aCategory: 3
   coolTime: -1
   effectPrefab: {fileID: 0}

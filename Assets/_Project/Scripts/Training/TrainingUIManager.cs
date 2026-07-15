@@ -116,7 +116,7 @@ public class TrainingUIManager : SingletonMonoBehaviour<TrainingUIManager>
             if (i < skills.Length)
                 myHaveSImg[i].sprite = skills[i].GetSprite();
             else
-                // スキルがない場合は画像を非表示にするなどの処理
+                //スキルがない場合は画像を非表示にするなどの処理
                 myHaveSImg[i].gameObject.SetActive(false);
         }
     }

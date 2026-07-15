@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 27976173c2b084145b4b7c682a9c2bda, type: 3}
-  m_Name: Arcana19SunFront
+  m_Name: Arcana21WorldFront
   m_EditorClassIdentifier: 
-  aList: 19
+  aList: 21
   arcanaImage: {fileID: 0}
   isFront: 1
-  arcanaEx: "\u3068\u3063\u3066\u3082\u71B1\u304F\u306A\u308B\u30AB\u30FC\u30C9"
-  aCategory: 3
-  coolTime: 45
+  arcanaEx: "\u4E8C\u6BB5\u30B8\u30E3\u30F3\u30D7\u304C\u3067\u304D\u308B\u30AB\u30FC\u30C9"
+  aCategory: 1
+  coolTime: 0
   effectPrefab: {fileID: 0}
   se: {fileID: 0}

@@ -33,6 +33,9 @@ public class GameCameraManager : SingletonMonoBehaviour<GameCameraManager>
         UpdateCameraPriorities();
     }
 
+    /// <summary>
+    /// 優先度の切り替え
+    /// </summary>
     private void UpdateCameraPriorities()
     {
         //ズームの状態に応じてカメラの優先度を切り替え

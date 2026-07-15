@@ -2,6 +2,9 @@ using UnityEngine;
 
 public static class ActionHandler
 {
+    /// <summary>
+    /// 近接攻撃の攻撃用メソッド
+    /// </summary>
     public static void ExecuteAttack(NetworkPlayer player)
     {
         //攻撃ができるか
@@ -11,6 +14,9 @@ public static class ActionHandler
         player.GetArcana().ExecuteArcanaEffect(ASkillCategory.SkillEffect, player);
     }
 
+    /// <summary>
+    /// スキル変更用のメソッド
+    /// </summary>
     public static void ExecuteSkillChange(NetworkPlayer player, int direction)
     {
         //現在の skillNo を取得
@@ -34,20 +40,24 @@ public static class ActionHandler
             player.GetPlayerController().GetAimCursor()
                 .SelectAim(player.GetNoSkill().GetAimSelect());
 
+        //UIを変更する
         BattleUIManager.Instance.SkillFrameChange(player);
     }
 
+    /// <summary>
+    /// スキル発動用のメソッド
+    /// </summary>
     public static void ExecuteSkill(NetworkPlayer player)
     {
         //スキルが発動できるか
         if (PlayerUtility.HaveEffect(player, EffectList.Silence, false))
-        {
             return;
-        }
 
         //スキルホッパーの更新
         int currentNo = player.GetSkillNo();
         int actionIndex = PlayerUtility.GetCoolTimeIndex(currentNo);
+
+        //クールタイムの場合
         if (!player.IsActionReady(actionIndex))
         {
             Debug.Log($"枠 {currentNo} (配列位置: {actionIndex}) はクールタイム中だよ！");
@@ -56,8 +66,8 @@ public static class ActionHandler
 
         if (currentNo == GameConfig.SKILL_HOPPER_MAX)
         {
+            //アルカナスキルの発動
             player.GetArcana().ExecuteArcanaEffect(ASkillCategory.Command, player);
-
             //Arcanaデータが持っているクールタイムを設定
             player.StartActionCoolTime(5, player.GetArcana().GetCoolTime());
         }
@@ -67,8 +77,9 @@ public static class ActionHandler
             Skill currentSkill = player.GetNoSkill();
             if (currentSkill != null)
             {
+                //スキルの発動
                 SkillManager.Instance.RequestSkill(player);
-
+                //クールタイム処理
                 player.StartActionCoolTime(actionIndex, currentSkill.GetCoolTime());
             }
         }
