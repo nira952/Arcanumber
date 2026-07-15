@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -81,8 +80,8 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
     {
         NetworkPlayer p = GetPlayer(playerNum);
 
-        p.ResetToInitialState();
-        p.SetSkillNo(0);
+        p.ResetToInitialState();    //ステータスをリセットする
+        p.SetSkillNo(0);    //最初のスキルに戻す
 
         //UIとエイムをその状態に合わせて再構築
         BattleUIManager.Instance.Initialize(all, 0);
@@ -95,6 +94,7 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
         BattleUIManager.Instance.SkillFrameChange(p);
     }
 
+    //ゲッター
     public NetworkPlayer GetPlayer(int num) => all[num];
     public NetworkPlayer[] GetNetworkPlayers() => all;
     public List<Arcana> GetArcanas() => allArcana;

@@ -18,6 +18,7 @@ public class BattleUIManager : SingletonMonoBehaviour<BattleUIManager>
     [SerializeField] private GameObject[] effectBlock;
     [SerializeField] private GameObject effectPrefab;
 
+    //入っているバフ、デバフの辞書
     private Dictionary<(int playerId, EffectAbility effect), GameObject> activeEffectIcons = new();
 
     [Header("スキル関係")]
@@ -56,6 +57,7 @@ public class BattleUIManager : SingletonMonoBehaviour<BattleUIManager>
     /// </summary>
     void SkillUIInitialize(NetworkPlayer player)
     {
+        //クールタイムを元に戻す
         for (int i = 0; i < skillBlocks.Length; i++)
         {
             if (i < player.GetSkill().Count())
@@ -65,6 +67,7 @@ public class BattleUIManager : SingletonMonoBehaviour<BattleUIManager>
             }
         }
 
+        //スキルのスプライトを変更
         Skill[] pSkills = player.GetSkill();
         for (int i = 0; i < pSkills.Length; i++)
         {
@@ -106,6 +109,7 @@ public class BattleUIManager : SingletonMonoBehaviour<BattleUIManager>
         Arcana playerArcana = player.GetArcana();
         if (playerArcana != null && arcanaUIIndex < skillBlocks.Length)
         {
+            //クールタイムを更新
             float currentCoolTime = player.GetSkillCoolTime(5);
             float maxCoolTime = playerArcana.GetCoolTime();
 
@@ -172,6 +176,7 @@ public class BattleUIManager : SingletonMonoBehaviour<BattleUIManager>
         foreach(EffectAbility e  in eList)
             RemoveStatusUI(player, e);
     }
+
     /// <summary>
     /// 削除用メソッド
     /// </summary>

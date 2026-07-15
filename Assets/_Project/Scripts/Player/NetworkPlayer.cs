@@ -24,9 +24,10 @@ public class NetworkPlayer : MonoBehaviour
 
     /// ダメージを受けたときのイベント（NetworkPlayer, ダメージ量）
     public static event System.Action<NetworkPlayer, float> OnTakeDamageEvent;
-    /// 回復したときのイベント（NetworkPlayer, 回復量）
-    //public static event System.Action<NetworkPlayer, float> OnHealedEvent;
 
+    /// <summary>
+    /// 初期化
+    /// </summary>
     public void Initialize(bool isLocalPlayer)
     {
         //リセット処理
@@ -37,6 +38,9 @@ public class NetworkPlayer : MonoBehaviour
             InitializeLocalSettings();
     }
 
+    /// <summary>
+    /// ローカル用の初期化
+    /// </summary>
     private void InitializeLocalSettings()
     {
         ChangeColor();
