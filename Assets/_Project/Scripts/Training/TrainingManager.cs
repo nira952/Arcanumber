@@ -67,7 +67,7 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
     void LoadAsset()
     {
         //アルカナを並べ替える
-        allArcana = AssetLoader.LoadAllArcanas();
+        allArcana = LoadManager.Instance.GetArcanas;
 
         //スキルを入れ替える
         allSkill = AssetLoader.LoadAllSkills();

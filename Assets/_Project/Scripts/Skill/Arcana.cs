@@ -1,4 +1,6 @@
 using NaughtyAttributes;
+using NPOI.SS.Formula.Functions;
+using NPOI.SS.UserModel;
 using UnityEngine;
 
 /// <summary>
@@ -7,26 +9,26 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewArcana", menuName = "ScriptableObjects/ArcanaData")]
 public class Arcana : ScriptableObject
 {
-    [Label("アルカナ")][SerializeField] ArcanaList aList;
-    [Label("アルカナの画像")][SerializeField] Sprite arcanaImage;
-    [Label("正位置かどうか")][SerializeField] bool isFront;
-    [Label("アルカナスキルの説明")][TextArea(3, 10)][SerializeField] string arcanaEx;
+    [ReadOnly][Label("アルカナ")][SerializeField] ArcanaList aList;
+    [ReadOnly][Label("アルカナの画像")][SerializeField] Sprite arcanaImage;
+    [ReadOnly][Label("正位置かどうか")][SerializeField] bool isFront;
+    [ReadOnly][Label("アルカナスキルの説明")][TextArea(3, 10)][SerializeField] string arcanaEx;
     [ReadOnly][Label("発動条件")][SerializeField] ASkillCategory aCategory;
-    [Label("クールタイム")][SerializeField] float coolTime;
-    [Label("エフェクト")]public GameObject effectPrefab;
-    [Label("効果音")]public AudioClip se;
+    [ReadOnly][Label("クールタイム")][SerializeField] float coolTime;
+    [ReadOnly][Label("エフェクト")]public GameObject effectPrefab;
+    [ReadOnly][Label("効果音")]public AudioClip se;
 
     //アルカナの効果を入れるためのクラス
     private ArcanaLogic arcanaLogic;
 
-    private void OnValidate()
-    {
-        //アルカナの効果を変える
-        SetupLogic();
-        //自動的にカテゴリーを入れる
-        if (arcanaLogic != null)
-            aCategory = arcanaLogic.GetCategory();
-    }
+    //private void OnValidate()
+    //{
+    //    //アルカナの効果を変える
+    //    SetupLogic();
+    //    //自動的にカテゴリーを入れる
+    //    if (arcanaLogic != null)
+    //        aCategory = arcanaLogic.GetCategory();
+    //}
 
     /// <summary>
     /// アルカナカテゴリーからロジックを入れる
@@ -107,11 +109,63 @@ public class Arcana : ScriptableObject
     }
 
     /// <summary>
+    /// アルカナに数値を入れるメソッド
+    /// </summary>
+    public void LoadFromExcel(IRow row)
+    {
+        //各列の値を計算結果として取得
+        string idStr = LoadManager.Instance.GetCellValueCalculated(row.GetCell(0)); //ID
+        string posStr = LoadManager.Instance.GetCellValueCalculated(row.GetCell(1));    //位置
+        string catStr = LoadManager.Instance.GetCellValueCalculated(row.GetCell(3));    //発動条件
+        string coolStr = LoadManager.Instance.GetCellValueCalculated(row.GetCell(4));   //クールタイム
+
+        //変換処理
+        if (int.TryParse(idStr, out int id)) this.aList = (ArcanaList)id;
+        if (int.TryParse(posStr, out int pos)) this.isFront = (pos == 1);
+        if (int.TryParse(catStr, out int cat)) this.aCategory = (ASkillCategory)cat;
+        if (float.TryParse(coolStr, out float cTime)) this.coolTime = cTime;
+
+        //残りの文字列系
+        //エフェクト
+        string effectName = LoadManager.Instance.GetCellValueCalculated(row.GetCell(5));
+        this.effectPrefab = !string.IsNullOrEmpty(effectName) ? Resources.Load<GameObject>(effectName) : null;
+        // 効果音
+        string seName = LoadManager.Instance.GetCellValueCalculated(row.GetCell(6));
+        this.se = !string.IsNullOrEmpty(seName) ? Resources.Load<AudioClip>(seName) : null;
+        // 説明
+        this.arcanaEx = LoadManager.Instance.GetCellValueCalculated(row.GetCell(7));
+
+        //ロジック更新
+        string logicClassName = LoadManager.Instance.GetCellValueCalculated(row.GetCell(8));
+        this.arcanaLogic = CreateInstanceFromName(logicClassName);
+
+        if (arcanaLogic != null)
+            this.aCategory = arcanaLogic.GetCategory();
+    }
+
+    /// <summary>
+    /// ArcanaLogicを探す処理
+    /// </summary>
+    private ArcanaLogic CreateInstanceFromName(string className)
+    {
+        foreach (var assembly in System.AppDomain.CurrentDomain.GetAssemblies())
+        {
+            System.Type type = assembly.GetType(className);
+            if (type != null && typeof(ArcanaLogic).IsAssignableFrom(type))
+            {
+                return (ArcanaLogic)System.Activator.CreateInstance(type);
+            }
+        }
+        Debug.LogError($"【エラー】クラス名 '{className}' が見つからないか、ArcanaLogicを継承していません！");
+        return null;
+    }
+
+    /// <summary>
     /// アルカナ発動
     /// </summary>
     public void ExecuteArcanaEffect(ASkillCategory currentCategory, NetworkPlayer player)
     {
-        //ロジックが入っているか確認    
+        // それでもnullなら諦める
         if (arcanaLogic == null) return;
 
         if (aCategory == currentCategory)
@@ -163,6 +217,8 @@ public class Arcana : ScriptableObject
     /**
     * --------- セッター ---------
     */
+
+    public void SetArcanaEx(string arcanaEx) => this.arcanaEx = arcanaEx;
     public void SetASkillCategory(ASkillCategory category) { aCategory = category; }
 
 }
@@ -201,9 +257,7 @@ public enum ArcanaList
 /// </summary>
 public enum ASkillCategory
 {
-    [InspectorName("攻撃")] ATK,
     [InspectorName("スタート時に発動")] StartEffect,
-    [InspectorName("時間で発動")] TimeEffect,
     [InspectorName("ボタンを押すことで発動")] Command,
     [InspectorName("スキル発動に合わせて発動")] SkillEffect,
     [InspectorName("ダメージを受けたときに発動")] DamageEffect,
