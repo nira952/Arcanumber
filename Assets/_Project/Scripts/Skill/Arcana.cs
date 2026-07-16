@@ -257,9 +257,7 @@ public enum ArcanaList
 /// </summary>
 public enum ASkillCategory
 {
-    [InspectorName("攻撃")] ATK,
     [InspectorName("スタート時に発動")] StartEffect,
-    [InspectorName("時間で発動")] TimeEffect,
     [InspectorName("ボタンを押すことで発動")] Command,
     [InspectorName("スキル発動に合わせて発動")] SkillEffect,
     [InspectorName("ダメージを受けたときに発動")] DamageEffect,
