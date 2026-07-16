@@ -14,7 +14,7 @@ public static class AssetLoader
 
     public static List<Skill> LoadAllSkills()
     {
-        // Resources/ScriptableObject/Skill 以下の全Skillをロード
+        //Resources/ScriptableObject/Skill 以下の全Skillをロード
         return new List<Skill>(Resources.LoadAll<Skill>(SKILL_PATH))
                     .OrderBy(e => e.GetSkillNo())
                     .ToList();

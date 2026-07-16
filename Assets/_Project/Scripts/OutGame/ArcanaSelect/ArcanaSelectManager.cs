@@ -53,7 +53,7 @@ public class ArcanaSelectManager : NetworkBehaviour
 
     private void Start()
     {
-        arcanaDatabase = AssetLoader.LoadAllArcanas();
+        arcanaDatabase = LoadManager.Instance.GetArcanas;
         if (IsServer) SetupGamePositions();
 
         // 【R3による監視】ホスト（サーバー）のみ、全員が準備完了になったかを NetworkList から毎フレーム監視する
