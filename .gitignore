@@ -113,6 +113,8 @@ Assets/Demos/Demo_*.meta
 
 # Nugetファイルの削除
 Assets/NuGet/
+Assets/NuGet.meta
 Assets/Packages/
+Assets/Packages.meta
 Assets/packages.config
 
