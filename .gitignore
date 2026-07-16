@@ -121,4 +121,6 @@ Assets/Packages.meta
 Assets/packages.config
 Assets/packages.config.meta
 
-
+# プラグインの追加（Asset）
+Assets/Cainos/
+Assets/Cainos.meta
