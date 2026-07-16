@@ -110,3 +110,9 @@ Assets/Demos/Demo_*/
 
 # 各自の実験用Demoフォルダの「.metaファイル」も無視
 Assets/Demos/Demo_*.meta
+
+# Nugetファイルの削除
+Assets/NuGet/
+Assets/Packages/
+Assets/packages.config
+
