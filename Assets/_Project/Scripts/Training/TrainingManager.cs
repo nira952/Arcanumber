@@ -12,9 +12,12 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
 
     int pNum = 0;    //プレイヤーの番号
 
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        LoadManager.Instance.LoadExcel();
+
         Initialise();
         TrainingUIManager.Instance.Initialize();
     }

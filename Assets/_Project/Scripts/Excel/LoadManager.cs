@@ -20,10 +20,9 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
 
     void Start()
     {
-        LoadExcel();
     }
 
-    void LoadExcel()
+    public void LoadExcel()
     {
         //ファイルが存在しない場合中止
         if (!File.Exists(filePath)) return;
@@ -76,7 +75,7 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
     /// </summary>
     public Arcana GetData(int id, bool pos)
     {
-        // LinqのFirstOrDefaultを使って検索
+        //LinqのFirstOrDefaultを使って検索
         return arcanaList.FirstOrDefault(a => a.GetArcanaListID() == id && a.GetIsFront() == pos);
     }
 
