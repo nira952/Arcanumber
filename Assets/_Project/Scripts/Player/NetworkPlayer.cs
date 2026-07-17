@@ -11,7 +11,7 @@ public class NetworkPlayer : MonoBehaviour
     [SerializeField] PlayerStatus status = new PlayerStatus();    //プレイヤーステータス
     [SerializeField] float nowHp;  //現在のHP
     [SerializeField] int nowJump = 0;   //現在のジャンプの回数
-    [SerializeField] Arcana arcana;  //持っているアルカナスキル
+    Arcana arcana;  //持っているアルカナスキル
     [SerializeField] Skill[] skillList = new Skill[4];  //持っているスキルリスト
     [SerializeField] private float[] currentCoolTimes = new float[6];   //クールタイムの管理用変数
     private float attackCoolTimeDuration = 0.5f; //通常攻撃のクールタイムの時間
@@ -112,9 +112,12 @@ public class NetworkPlayer : MonoBehaviour
     {
         // ステータスを新品に入れ替える
         status = new PlayerStatus();
-        //クールタイムリセット
+        //NULLだったら愚者（逆）を入れる
+        if (arcana == null)
+            arcana = LoadManager.Instance.GetData(0, false);
+            //クールタイムリセット
         for (int i = 0; i < currentCoolTimes.Length; i++)
-            currentCoolTimes[i] = 0f;
+        currentCoolTimes[i] = 0f;
         //エフェクトリセット
         haveEffect.Clear();
         //一番最初に発動するアルカナスキル

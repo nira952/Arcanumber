@@ -7,50 +7,77 @@ using UnityEngine;
 
 public class LoadManager : SingletonMonoBehaviour<LoadManager>
 {
-    //パスの場所
-    private string filePath = Application.dataPath + "/_Project/Excel/ArcanaData.xlsx";
-    private int sheetNumber = 1;    //シートの番号
+    //アルカナデータ
+    private string arcanaFilePath = Application.dataPath + "/_Project/Excel/ArcanaData.xlsx";
+    private int arcanaSheetNumber = 1;    //シートの番号
+    private IWorkbook arcanaWorkbook; //Excelファイル
+    private ISheet arcanaSheet;   //シート
+    private IFormulaEvaluator arcanaEvaluator;    //計算機
 
-    private IWorkbook workbook; //Excelファイル
-    private ISheet sheet;   //シート
-    private IFormulaEvaluator evaluator;    //計算機
+    //スキルデータ
+    private string skillFilePath = Application.dataPath + "/_Project/Excel/SkillData.xltm";
+    private int skillSheetNumber = 0;    //シートの番号
+    private IWorkbook skillWorkbook; //Excelファイル
+    private ISheet skillSheet;   //シート
+    private IFormulaEvaluator skillEvaluator;    //計算機
 
     //データ保管
     private List<Arcana> arcanaList = new List<Arcana>();
+    private List<Skill> skillList = new List<Skill>();
 
-    void Start()
+    public void Initialize() 
     {
-        LoadExcel();
+        ArcanaLoadExcel();
     }
 
-    void LoadExcel()
+    /// <summary>
+    /// アルカナデータをロードする
+    /// </summary>
+    public void ArcanaLoadExcel()
     {
         //ファイルが存在しない場合中止
-        if (!File.Exists(filePath)) return;
+        if (!File.Exists(arcanaFilePath)) return;
 
         //ファイルを開くモード
-        using FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        using FileStream fs = new FileStream(arcanaFilePath, FileMode.Open, FileAccess.Read);
         //ファイルを読み込んで使う
-        workbook = new XSSFWorkbook(fs);
+        arcanaWorkbook = new XSSFWorkbook(fs);
         //シートを選択する
-        sheet = workbook.GetSheetAt(sheetNumber);
+        arcanaSheet = arcanaWorkbook.GetSheetAt(arcanaSheetNumber);
         //計算器を作成
-        evaluator = workbook.GetCreationHelper().CreateFormulaEvaluator();
+        arcanaEvaluator = arcanaWorkbook.GetCreationHelper().CreateFormulaEvaluator();
 
-        SetDictionary();
+        ArcanaSetDictionary();
+    }
+
+    void SkillLoadExcel()
+    {
+        //ファイルが存在しない場合中止
+        if (!File.Exists(skillFilePath)) return;
+
+        //ファイルを開くモード
+        using FileStream fs = new FileStream(skillFilePath, FileMode.Open, FileAccess.Read);
+        //ファイルを読み込んで使う
+        skillWorkbook = new XSSFWorkbook(fs);
+        //シートを選択する
+        skillSheet = skillWorkbook.GetSheetAt(skillSheetNumber);
+        //計算器を作成
+        skillEvaluator = skillWorkbook.GetCreationHelper().CreateFormulaEvaluator();
+
+        SkillSetDictionary();
     }
 
     /// <summary>
     /// 辞書登録
     /// </summary>
-    void SetDictionary()
+    void ArcanaSetDictionary()
     {
         //リストをクリア（リロード時の二重登録を防ぐ）
         arcanaList.Clear();
 
-        for (int i = 1; i <= sheet.LastRowNum; i++)
+        for (int i = 1; i <= arcanaSheet.LastRowNum; i++)
         {
-            IRow row = sheet.GetRow(i);
+            IRow row = arcanaSheet.GetRow(i);
             if (row == null) continue;
 
             //ScriptableObjectのインスタンスを作成
@@ -71,21 +98,33 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
             .ToList();
     }
 
+    void SkillSetDictionary()
+    {
+        skillList.Clear();
+
+        for (int i = 1; i <= skillSheet.LastRowNum; i++)
+        {
+            IRow row = skillSheet.GetRow(i);
+            if (row == null) continue;
+
+            //ScriptableObjectのインスタンスを作成
+            var data = ScriptableObject.CreateInstance<Skill>();
+
+            //Excelの行データから値を流し込む
+            data.LoadFromExcel(row);
+            //リストに入れる
+            skillList.Add(data);
+
+        }
+    }
+
     /// <summary>
     /// IDと位置を指定してデータを取得
     /// </summary>
     public Arcana GetData(int id, bool pos)
     {
-        // LinqのFirstOrDefaultを使って検索
+        //LinqのFirstOrDefaultを使って検索
         return arcanaList.FirstOrDefault(a => a.GetArcanaListID() == id && a.GetIsFront() == pos);
-    }
-
-    /// <summary>
-    /// 全データを取得
-    /// </summary>
-    public List<Arcana> GetAllArcanas()
-    {
-        return arcanaList;
     }
 
     /// <summary>
@@ -94,7 +133,7 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
     public string GetCell(int rowIndex, int cellIndex)
     {
         //行の選択
-        IRow row = sheet.GetRow(rowIndex);
+        IRow row = arcanaSheet.GetRow(rowIndex);
 
         if (row == null) return "";
         //セルの検索
@@ -113,7 +152,7 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
         // 数式なら計算結果を取得
         if (cell.CellType == CellType.Formula)
         {
-            CellValue value = evaluator.Evaluate(cell);
+            CellValue value = arcanaEvaluator.Evaluate(cell);
             // 値の型に合わせて変換
             return value.CellType switch
             {
@@ -124,6 +163,23 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
         }
         // 数式でなければ通常のToString
         return cell.ToString();
+    }
+
+    /// <summary>
+    /// 文字列を安全に指定した型に変換するメソッド
+    /// </summary>
+    public T ParseValue<T>(string value, T defaultValue = default)
+    {
+        if (string.IsNullOrEmpty(value)) return defaultValue;
+        try
+        {
+            if (typeof(T).IsEnum) return (T)System.Enum.Parse(typeof(T), value);
+            return (T)System.Convert.ChangeType(value, typeof(T));
+        }
+        catch
+        {
+            return defaultValue;
+        }
     }
 
     public List<Arcana> GetArcanas => arcanaList;

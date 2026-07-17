@@ -2,25 +2,19 @@ using UnityEngine;
 
 public class Bullet : MagicObject
 {
-    private float speed = 10f;  //スピード
+    private float speed = 10f;
     private float damage = 0.5f;
-    /// <summary>
-    /// 初期設定
-    /// </summary>
-    public override void Initialize(int charaNo, Skill skill, Vector2 pos)
+
+    //スキルとして登録しないのであれば、独自の初期化メソッド名でOK
+    public void InitializeBullet(int charaNo, Vector2 pos)
     {
-        this.haveCharaNo = charaNo;
-        this.dmg = damage;
-        //弾の移動速度などを設定
-        SetMovement(true, speed, false, false);
+        //親の初期化を呼び出す
+        base.Initialize(charaNo, pos, damage, speed, false, 0);
     }
 
     protected override void OnHit(NetworkPlayer target)
     {
-        //ターゲットにダメージを与える処理
         target.TakeDamage(dmg);
-
-        //弾なら当たったら自分を消す
         Destroy(gameObject);
     }
 }

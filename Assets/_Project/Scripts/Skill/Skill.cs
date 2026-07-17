@@ -1,4 +1,5 @@
 using NaughtyAttributes;
+using NPOI.SS.UserModel;
 using UnityEngine;
 
 /// <summary>
@@ -18,9 +19,41 @@ public class Skill : ScriptableObject
     [Label("持続時間")][SerializeField] float keepTime;
     [Label("待機時間")][SerializeField] float delayTime;
     [Label("クールタイム")][SerializeField] float coolTime;
+    [Label("移動速度")][SerializeField] float moveSpeed;
+    [Label("貫通")][SerializeField] bool isPenetrate;
+    [Label("反射回数")][SerializeField] int reflectCount;
     [Label("スキルオブジェクト")][SerializeField] GameObject effectAnimation;
     [Label("効果音")][SerializeField] AudioClip se;
     [Label("付与するエフェクト")][SerializeField] EffectAbility effect;
+
+    /// <summary>
+    /// Excelで入力した値を代入
+    /// </summary>
+    public void LoadFromExcel(IRow row)
+    {
+        //ヘルパー関数でロードを簡略化
+        string Get(int i) => LoadManager.Instance.GetCellValueCalculated(row.GetCell(i));
+        var lm = LoadManager.Instance;
+
+        //数値・Enumの変換
+        this.skillNo = lm.ParseValue<int>(Get(0));
+        this.skillName = Get(1);
+        this.target = lm.ParseValue<AimSelect>(Get(2));
+        this.sCategory = lm.ParseValue<SkillCategory>(Get(3));
+        this.atk = lm.ParseValue<float>(Get(4));
+        this.coolTime = lm.ParseValue<float>(Get(5));
+        this.keepTime = lm.ParseValue<float>(Get(6));
+        this.delayTime = lm.ParseValue<float>(Get(7));
+        this.moveSpeed = lm.ParseValue<float>(Get(8));
+        this.isPenetrate = (Get(9) == "1"); // 1がTrue
+        this.reflectCount = lm.ParseValue<int>(Get(10));
+        this.skillEx = Get(15);
+
+        //リソースロード（パスが空ならnullを代入）
+        this.skillSp = !!string.IsNullOrEmpty(Get(11)) ? Resources.Load<Sprite>(Get(11)) : null;
+        this.effectAnimation = !string.IsNullOrEmpty(Get(11)) ? Resources.Load<GameObject>(Get(12)) : null;
+        this.se = !string.IsNullOrEmpty(Get(12)) ? Resources.Load<AudioClip>(Get(13)) : null;
+    }
 
     /**
      * --------- ゲッター ---------
@@ -35,6 +68,9 @@ public class Skill : ScriptableObject
     public float GetKeepTime() {  return keepTime; }
     public float GetDelayTime() {  return delayTime; }
     public float GetCoolTime() {  return coolTime; }
+    public float GetMoveSpeed() { return moveSpeed; }
+    public bool GetIsPenetrate() { return isPenetrate; }
+    public int GetReflectCount() { return reflectCount; }
     public GameObject GetEffectAnimation() {  return effectAnimation; }
     public AudioClip GetSe() { return se; }
     public EffectAbility GetEffect() {  return effect; }

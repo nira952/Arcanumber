@@ -12,9 +12,12 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
 
     int pNum = 0;    //プレイヤーの番号
 
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        LoadManager.Instance.ArcanaLoadExcel();
+
         Initialise();
         TrainingUIManager.Instance.Initialize();
     }
@@ -70,7 +73,7 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
         allArcana = LoadManager.Instance.GetArcanas;
 
         //スキルを入れ替える
-        allSkill = AssetLoader.LoadAllSkills();
+        allSkill = AssetLoader.Instance.LoadAllSkills;
     }
 
     /// <summary>

@@ -5,8 +5,6 @@ public class NormalSkillObj : MagicObject
     public override void Initialize(int charaNo, Skill skill, Vector2 pos)
     {
         base.Initialize(charaNo, skill, pos);
-        //普通
-        SetMovement(false, 0f, false, true);
         // 最後に位置と回転を確定させる
         SetupPositionAndRotation(pos);
     }
