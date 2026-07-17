@@ -5,27 +5,15 @@ using UnityEngine;
 /// <summary>
 /// 各スクリプタブルオブジェクトのリスト化
 /// </summary>
-public static class AssetLoader
+public class AssetLoader : SingletonMonoBehaviour<AssetLoader>
 {
-    // スキルの収集場所
-    private const string SKILL_PATH = "ScriptableObject/Skill";
-    // アルカナの収集場所
-    private const string ARCANA_PATH = "ScriptableObject/Arcana";
+    private List<Arcana> arcanaList = new List<Arcana>();
+    private List<Skill> skillList = new List<Skill>();
+    private List<EffectAbility> effectList = new List<EffectAbility>();
 
-    public static List<Skill> LoadAllSkills()
-    {
-        //Resources/ScriptableObject/Skill 以下の全Skillをロード
-        return new List<Skill>(Resources.LoadAll<Skill>(SKILL_PATH))
-                    .OrderBy(e => e.GetSkillNo())
-                    .ToList();
-    }
+    public List<Arcana> LoadAllArcanas => arcanaList;
 
-    public static List<Arcana> LoadAllArcanas()
-    {
-        // Resources/ScriptableObject/Arcana 以下の全Arcanaをロード
-        return new List<Arcana>(Resources.LoadAll<Arcana>(ARCANA_PATH))
-                    .OrderBy(e => e.GetArcanaListID())
-                    .ThenByDescending(e => e.GetIsFront())
-                    .ToList();
-    }
+    public List<Skill> LoadAllSkills => skillList;
+    public List<EffectAbility> effectAbilities => effectList;
+
 }

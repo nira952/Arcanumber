@@ -12,7 +12,6 @@ public class TranpSkill : MagicObject
     {
         base.Initialize(charaNo, skill, pos);
 
-        SetMovement(false, 0f, false, true);
         SetupPositionAndRotation(pos);
 
         // ネットワーク制御を外したため、ここで直接実行

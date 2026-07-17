@@ -21,124 +21,27 @@ public class Arcana : ScriptableObject
     //アルカナの効果を入れるためのクラス
     private ArcanaLogic arcanaLogic;
 
-    //private void OnValidate()
-    //{
-    //    //アルカナの効果を変える
-    //    SetupLogic();
-    //    //自動的にカテゴリーを入れる
-    //    if (arcanaLogic != null)
-    //        aCategory = arcanaLogic.GetCategory();
-    //}
-
-    /// <summary>
-    /// アルカナカテゴリーからロジックを入れる
-    /// </summary>
-    private void SetupLogic()
-    {
-        arcanaLogic = (aList, isFront) switch
-        {
-            //愚者
-            (ArcanaList.Fool, true) => new Arcana00FoolFront(),
-            (ArcanaList.Fool, false) => new Arcana00FoolBack(),
-            //魔術師
-            (ArcanaList.Magician, true) => new Arcana01MagicianFront(),
-            (ArcanaList.Magician, false) => new Arcana01MagicianBack(),
-            //女教皇
-            (ArcanaList.HighPriestess, true) => new Arcana02HighPriestessFront(),
-            (ArcanaList.HighPriestess, false) => new Arcana02HighPriestessBack(),
-            //女帝
-            (ArcanaList.Empress, true) => new Arcana03EmpressFront(),
-            (ArcanaList.Empress, false) => new Arcana03EmpressBack(),
-            //皇帝
-            (ArcanaList.Emperor, true) => new Arcana04EmperorFront(),
-            (ArcanaList.Emperor, false) => new Arcana04EmperorBack(),
-            //教皇
-            (ArcanaList.Hierophant, true) => new Arcana05HierophantFront(),
-            (ArcanaList.Hierophant, false) => new Arcana05HierophantBack(),
-            //恋人
-            (ArcanaList.Lovers, true) => new Arcana06LoversFront(),
-            (ArcanaList.Lovers, false) => new Arcana06LoversBack(),
-            //戦車
-            (ArcanaList.Chariot, true) => new Arcana07ChariotFront(),
-            (ArcanaList.Chariot, false) => new Arcana07ChariotBack(),
-            //力
-            (ArcanaList.Strength, true) => new Arcana08StrengthFront(),
-            (ArcanaList.Strength, false) => new Arcana08StrengthBack(),
-            //隠者
-            (ArcanaList.Hermit, true) => new Arcana09HermitFront(),
-            (ArcanaList.Hermit, false) => new Arcana09HermitBack(),
-            //運命の輪
-            (ArcanaList.WheelOfFortune, true) => new Arcana10WheelOfFortuneFront(),
-            (ArcanaList.WheelOfFortune, false) => new Arcana10WheelOfFortuneBack(),
-            //正義
-            (ArcanaList.Justice, true) => new Arcana11JusticeFront(),
-            (ArcanaList.Justice, false) => new Arcana11JusticeBack(),
-            //つるされた男
-            (ArcanaList.HangedMan, true) => new Arcana12HangedManFront(),
-            (ArcanaList.HangedMan, false) => new Arcana12HangedManBack(),
-            //死神
-            (ArcanaList.Death, true) => new Arcana13DeathFront(),
-            (ArcanaList.Death, false) => new Arcana13DeathBack(),
-            //節制
-            (ArcanaList.Temperance, true) => new Arcana14TemperanceFront(),
-            (ArcanaList.Temperance, false) => new Arcana14TemperanceBack(),
-            //悪魔
-            (ArcanaList.Devil, true) => new Arcana15DevilFront(),
-            (ArcanaList.Devil, false) => new Arcana15DevilBack(),
-            //塔
-            (ArcanaList.Tower, true) => new Arcana16TowerFront(),
-            (ArcanaList.Tower, false) => new Arcana16TowerBack(),
-            //星
-            (ArcanaList.Star, true) => new Arcana17StarFront(),
-            (ArcanaList.Star, false) => new Arcana17StarBack(),
-            //月
-            (ArcanaList.Moon, true) => new Arcana18MoonFront(),
-            (ArcanaList.Moon, false) => new Arcana18MoonBack(),
-            //太陽
-            (ArcanaList.Sun, true) => new Arcana19SunFront(),
-            (ArcanaList.Sun, false) => new Arcana19SunBack(),
-            //審判
-            (ArcanaList.Judgement, true) => new Arcana20JudgementFront(),
-            (ArcanaList.Judgement, false) => new Arcana20JudgementBack(),
-            //世界
-            (ArcanaList.World, true) => new Arcana21WorldFront(),
-            (ArcanaList.World, false) => new Arcana21WorldBack(),
-            //ない場合
-            _ => null
-        };
-    }
-
     /// <summary>
     /// アルカナに数値を入れるメソッド
     /// </summary>
     public void LoadFromExcel(IRow row)
     {
-        //各列の値を計算結果として取得
-        string idStr = LoadManager.Instance.GetCellValueCalculated(row.GetCell(0)); //ID
-        string posStr = LoadManager.Instance.GetCellValueCalculated(row.GetCell(1));    //位置
-        string catStr = LoadManager.Instance.GetCellValueCalculated(row.GetCell(3));    //発動条件
-        string coolStr = LoadManager.Instance.GetCellValueCalculated(row.GetCell(4));   //クールタイム
+        //ラムダ式で呼び出しを短縮
+        string Get(int i) => LoadManager.Instance.GetCellValueCalculated(row.GetCell(i));
+        var lm = LoadManager.Instance;
 
-        //変換処理
-        if (int.TryParse(idStr, out int id)) this.aList = (ArcanaList)id;
-        if (int.TryParse(posStr, out int pos)) this.isFront = (pos == 1);
-        if (int.TryParse(catStr, out int cat)) this.aCategory = (ASkillCategory)cat;
-        if (float.TryParse(coolStr, out float cTime)) this.coolTime = cTime;
+        this.aList = lm.ParseValue<ArcanaList>(Get(0));
+        this.isFront = (lm.ParseValue<int>(Get(1)) == 1);
+        this.aCategory = lm.ParseValue<ASkillCategory>(Get(3));
+        this.coolTime = lm.ParseValue<float>(Get(4));
 
-        //残りの文字列系
-        //エフェクト
-        string effectName = LoadManager.Instance.GetCellValueCalculated(row.GetCell(5));
-        this.effectPrefab = !string.IsNullOrEmpty(effectName) ? Resources.Load<GameObject>(effectName) : null;
-        // 効果音
-        string seName = LoadManager.Instance.GetCellValueCalculated(row.GetCell(6));
-        this.se = !string.IsNullOrEmpty(seName) ? Resources.Load<AudioClip>(seName) : null;
-        // 説明
-        this.arcanaEx = LoadManager.Instance.GetCellValueCalculated(row.GetCell(7));
+        //リソース系
+        this.effectPrefab = !string.IsNullOrEmpty(Get(5)) ? Resources.Load<GameObject>(Get(5)) : null;
+        this.se = !string.IsNullOrEmpty(Get(6)) ? Resources.Load<AudioClip>(Get(6)) : null;
+        this.arcanaEx = Get(7);
 
         //ロジック更新
-        string logicClassName = LoadManager.Instance.GetCellValueCalculated(row.GetCell(8));
-        this.arcanaLogic = CreateInstanceFromName(logicClassName);
-
+        this.arcanaLogic = CreateInstanceFromName(Get(8));
         if (arcanaLogic != null)
             this.aCategory = arcanaLogic.GetCategory();
     }

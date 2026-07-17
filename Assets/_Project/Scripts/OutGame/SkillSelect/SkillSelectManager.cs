@@ -170,7 +170,7 @@ public class SkillSelectManager : NetworkBehaviour
     /// </summary>
     private void InitializeSkillList()
     {
-        allSkills = AssetLoader.LoadAllSkills();
+        allSkills = AssetLoader.Instance.LoadAllSkills;
 
         foreach (Transform child in skillButtonParent)
         {

@@ -5,8 +5,6 @@ public class ImpactArrow : MagicObject
     public override void Initialize(int charaNo, Skill skill, Vector2 pos)
     {
         base.Initialize(charaNo, skill, pos);
-        //貫通
-        SetMovement(true, 10f, false, false);
         // 最後に位置と回転を確定させる
         SetupPositionAndRotation(pos);
     }
