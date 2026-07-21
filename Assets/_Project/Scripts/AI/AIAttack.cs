@@ -33,11 +33,11 @@ public class AIAttack : MonoBehaviour
         GameObject s = Instantiate(skill.GetEffectAnimation());
         s.transform.position = pos.position;
         MagicObject magic = s.GetComponent<MagicObject>();
-        magic.Initialize(aiPlayer.GetNetworkId(), skill, pos.position);
+        //magic.Initialize(aiPlayer.GetNetworkId(), skill, pos.position);
 
         float directionX = transform.localScale.x;
 
-        magic.SetupPositionAndRotation(pos.position);
+        //magic.SetupPositionAndRotation(pos.position);
 
         //AIが左向きの場合、回転を180度反転させる
         if (directionX < 0)

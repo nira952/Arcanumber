@@ -28,6 +28,7 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
     public void Initialize() 
     {
         ArcanaLoadExcel();
+        SkillLoadExcel();
     }
 
     /// <summary>
@@ -84,11 +85,10 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
             var data = ScriptableObject.CreateInstance<Arcana>();
 
             //Excelの行データから値を流し込む
-            data.LoadFromExcel(row);
+            data.LoadFromExcel(row, arcanaEvaluator);
             //リストに入れる
             arcanaList.Add(data);
             
-            Debug.Log($"登録完了: {data.GetArcanaName} (位置: {(data.GetIsFront() ? "正" : "逆")})");
         }
 
         //並び変える
@@ -96,6 +96,9 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
             .OrderBy(e => e.GetArcanaListID())
             .ThenByDescending(e => e.GetIsFront())
             .ToList();
+
+        //全体に入れる
+        AssetLoader.Instance.SetArcanaList(arcanaList);
     }
 
     void SkillSetDictionary()
@@ -107,15 +110,26 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
             IRow row = skillSheet.GetRow(i);
             if (row == null) continue;
 
+            string rawNo = GetCellValueCalculated(row.GetCell(0), skillEvaluator);
+            Debug.Log($"{i}行目のスキル番号: [{rawNo}]");
+
             //ScriptableObjectのインスタンスを作成
             var data = ScriptableObject.CreateInstance<Skill>();
 
             //Excelの行データから値を流し込む
-            data.LoadFromExcel(row);
+            data.LoadFromExcel(row, skillEvaluator);
             //リストに入れる
             skillList.Add(data);
 
         }
+
+        //並び変える
+        skillList = skillList
+            .OrderBy(e => e.GetSkillNo())
+            .ToList();
+
+        //全体に入れる
+        AssetLoader.Instance.SetSkillList(skillList);
     }
 
     /// <summary>
@@ -128,40 +142,24 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
     }
 
     /// <summary>
-    /// セルの中身をかえすメソッド
-    /// </summary>
-    public string GetCell(int rowIndex, int cellIndex)
-    {
-        //行の選択
-        IRow row = arcanaSheet.GetRow(rowIndex);
-
-        if (row == null) return "";
-        //セルの検索
-        ICell cell = row.GetCell(cellIndex);
-
-        return GetCellValueCalculated(cell);
-    }
-
-    /// <summary>
     /// セルの種類を判定して、数式なら結果を、それ以外なら値を返すメソッド
     /// </summary>
-    public string GetCellValueCalculated(ICell cell)
+    public string GetCellValueCalculated(ICell cell, IFormulaEvaluator evaluator)
     {
         if (cell == null) return "";
 
         // 数式なら計算結果を取得
         if (cell.CellType == CellType.Formula)
         {
-            CellValue value = arcanaEvaluator.Evaluate(cell);
-            // 値の型に合わせて変換
+            // 渡された正しい計算機を使う
+            CellValue value = evaluator.Evaluate(cell);
             return value.CellType switch
             {
                 CellType.Numeric => value.NumberValue.ToString(),
                 CellType.Boolean => value.BooleanValue.ToString(),
-                _ => value.StringValue // 文字列など
+                _ => value.StringValue
             };
         }
-        // 数式でなければ通常のToString
         return cell.ToString();
     }
 

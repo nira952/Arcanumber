@@ -11,10 +11,9 @@ public class Arcana13DeathFront : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.SkillEffect;
     //攻撃を降るたびにダメージを受け、攻撃力を上げる
-    private float damage = 1f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
-        player.TakeDamage(damage);
+        player.TakeDamage(sourceArcana.GetKeepValue());
         player.GetPlayerStatus().SetAtk(player.GetPlayerStatus().GetAtk() * 1.05f);
     }
 }

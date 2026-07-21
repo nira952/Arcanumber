@@ -27,7 +27,6 @@ public class Arcana09HermitBack : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //トラップ設置
-    private const float timeInterval = 15f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
     public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -36,7 +35,7 @@ public class Arcana09HermitBack : ArcanaLogic
             GameObject trap = GameObject.Instantiate(
                 sourceArcana.GetEffectPrefab());
             trap.transform.position = player.transform.position;
-            yield return new WaitForSeconds(timeInterval);
+            yield return new WaitForSeconds(sourceArcana.GetKeepValue());
         }
     }
 }

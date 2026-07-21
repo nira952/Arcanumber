@@ -11,10 +11,9 @@ public class Arcana08StrengthFront : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //攻撃力が上がる
-    public const float attackValue = 1.2f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
-        float newAttack = player.GetPlayerStatus().GetAtk() * attackValue;
+        float newAttack = player.GetPlayerStatus().GetAtk() * sourceArcana.GetKeepValue();
         player.GetPlayerStatus().SetAtk(newAttack);
     }
 }
@@ -26,11 +25,12 @@ public class Arcana08StrengthBack : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.DamageEffect;
     //等価交換
-    public const float damageValue = 0.05f;
     private NetworkPlayer _owner;
+    private Arcana sArcana;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
         _owner = player;
+        sArcana = sourceArcana;
         NetworkPlayer.OnTakeDamageEvent += OnDamageReceived;
     }
     private void OnDamageReceived(NetworkPlayer target, float damage)
@@ -45,13 +45,13 @@ public class Arcana08StrengthBack : ArcanaLogic
         switch (choice)
         {
             case 0:
-                status.SetAtk(status.GetAtk() + damageValue * damage);
+                status.SetAtk(status.GetAtk() + sArcana.GetKeepValue() * damage);
                 break;
             case 1:
-                status.SetDef(status.GetDef() + damageValue * damage);
+                status.SetDef(status.GetDef() + sArcana.GetKeepValue() * damage);
                 break;
             case 2:
-                status.SetSpeed(status.GetSpeed() + damageValue * damage);
+                status.SetSpeed(status.GetSpeed() + sArcana.GetKeepValue() * damage);
                 _owner.GetPlayerController().SetMoveSpeed(status.GetSpeed());
                 break;
         }

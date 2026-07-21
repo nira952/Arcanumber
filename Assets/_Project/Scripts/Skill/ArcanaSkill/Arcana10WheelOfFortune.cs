@@ -60,12 +60,11 @@ public class Arcana10WheelOfFortuneFront : ArcanaLogic
 public class Arcana10WheelOfFortuneBack : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.Command;
-    private float noJumpDuration = 10f;
     //ジャンプができないようにする
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
         Effect e = EffectRegistry.Get(EffectList.NoJump, false);
-        EffectAbility ea = new EffectAbility(e, true, noJumpDuration, 0);
+        EffectAbility ea = new EffectAbility(e, true, sourceArcana.GetKeepValue(), 0);
         //自分以外にかける
         PlayerUtility.ApplyEffectToOthers(player, ea);
     }

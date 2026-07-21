@@ -1,5 +1,4 @@
 using NaughtyAttributes;
-using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using UnityEngine;
 
@@ -15,6 +14,7 @@ public class Arcana : ScriptableObject
     [ReadOnly][Label("アルカナスキルの説明")][TextArea(3, 10)][SerializeField] string arcanaEx;
     [ReadOnly][Label("発動条件")][SerializeField] ASkillCategory aCategory;
     [ReadOnly][Label("クールタイム")][SerializeField] float coolTime;
+    [ReadOnly][Label("持続数値")][SerializeField] float keepValue;
     [ReadOnly][Label("エフェクト")]public GameObject effectPrefab;
     [ReadOnly][Label("効果音")]public AudioClip se;
 
@@ -24,24 +24,25 @@ public class Arcana : ScriptableObject
     /// <summary>
     /// アルカナに数値を入れるメソッド
     /// </summary>
-    public void LoadFromExcel(IRow row)
+    public void LoadFromExcel(IRow row, IFormulaEvaluator evaluator)
     {
         //ラムダ式で呼び出しを短縮
-        string Get(int i) => LoadManager.Instance.GetCellValueCalculated(row.GetCell(i));
+        string Get(int i) => LoadManager.Instance.GetCellValueCalculated(row.GetCell(i), evaluator);
         var lm = LoadManager.Instance;
 
         this.aList = lm.ParseValue<ArcanaList>(Get(0));
         this.isFront = (lm.ParseValue<int>(Get(1)) == 1);
         this.aCategory = lm.ParseValue<ASkillCategory>(Get(3));
         this.coolTime = lm.ParseValue<float>(Get(4));
+        this.keepValue = lm.ParseValue<float>(Get(5));
 
         //リソース系
-        this.effectPrefab = !string.IsNullOrEmpty(Get(5)) ? Resources.Load<GameObject>(Get(5)) : null;
-        this.se = !string.IsNullOrEmpty(Get(6)) ? Resources.Load<AudioClip>(Get(6)) : null;
-        this.arcanaEx = Get(7);
+        this.effectPrefab = !string.IsNullOrEmpty(Get(6)) ? Resources.Load<GameObject>(Get(6)) : null;
+        this.se = !string.IsNullOrEmpty(Get(7)) ? Resources.Load<AudioClip>(Get(7)) : null;
+        this.arcanaEx = Get(8);
 
         //ロジック更新
-        this.arcanaLogic = CreateInstanceFromName(Get(8));
+        this.arcanaLogic = CreateInstanceFromName(Get(9));
         if (arcanaLogic != null)
             this.aCategory = arcanaLogic.GetCategory();
     }
@@ -112,6 +113,7 @@ public class Arcana : ScriptableObject
     public string GetArcanaEX() => arcanaEx;
     public ASkillCategory GetASkillCategory() => aCategory;
     public float GetCoolTime() => coolTime;
+    public float GetKeepValue() => keepValue;
     public GameObject GetEffectPrefab() => effectPrefab;
     public Animator GetAnimation() => effectPrefab != null ? effectPrefab.GetComponent<Animator>() : null;
     public AudioClip GetSE() => se;

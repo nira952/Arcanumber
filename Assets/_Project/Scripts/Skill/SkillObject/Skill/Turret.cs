@@ -57,7 +57,7 @@ public class Turret : MonoBehaviour
         Bullet bulletScript = b.GetComponent<Bullet>();
         if (bulletScript != null)
             //初期化する
-            bulletScript.Initialize(haveNo, null, b.transform.position);
+            bulletScript.InitializeBullet(haveNo, b.transform.position);
     }
 
    public void SetHaveNo(int no) { haveNo = no; }

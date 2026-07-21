@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TranpSkill : MagicObject
+public class TranpSkill : SkillObject
 {
     // 通常の変数に変更
     private int syncedDmg = 0;
@@ -8,13 +8,8 @@ public class TranpSkill : MagicObject
     [SerializeField] private GameObject cardObj;
     [SerializeField] private Sprite[] cardSprites;
 
-    public override void Initialize(int charaNo, Skill skill, Vector2 pos)
+    private void Start()
     {
-        base.Initialize(charaNo, skill, pos);
-
-        SetupPositionAndRotation(pos);
-
-        // ネットワーク制御を外したため、ここで直接実行
         RollTranp();
     }
 

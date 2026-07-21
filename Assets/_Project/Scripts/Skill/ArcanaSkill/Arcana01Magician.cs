@@ -25,11 +25,10 @@ public class Arcana01MagicianFront : ArcanaLogic
 public class Arcana01MagicianBack : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.Command;
-    private int monsterNum = 3; //召喚物の数
     //自分のサポートをしてくれる敵を召喚する
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
-        for (int i = 0; i < monsterNum; i++)
+        for (int i = 0; i < (int)sourceArcana.GetKeepValue(); i++)
         {
             GameObject monster = GameObject.Instantiate(sourceArcana.GetEffectPrefab());
             monster.transform.position = player.transform.position;

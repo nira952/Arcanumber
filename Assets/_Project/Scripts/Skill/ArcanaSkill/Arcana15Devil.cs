@@ -24,7 +24,6 @@ public class Arcana15DevilBack : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //デバフ・バフをすべて解除し、その数だけ攻撃力を上げる
-    private float numValue = 0.05f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
         //デバフ、バフの数を数える
@@ -34,7 +33,7 @@ public class Arcana15DevilBack : ArcanaLogic
         player.GetHaveEffect().Clear();
         //数だけ攻撃力を上げる
         player.GetPlayerStatus().SetAtk(
-            player.GetPlayerStatus().GetAtk() + player.GetPlayerStatus().GetAtk() * efeNum * numValue);
+            player.GetPlayerStatus().GetAtk() + player.GetPlayerStatus().GetAtk() * efeNum * sourceArcana.GetKeepValue());
     }
 }
 

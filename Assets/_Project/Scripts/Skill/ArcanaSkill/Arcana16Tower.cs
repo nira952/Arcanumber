@@ -29,12 +29,11 @@ public class Arcana16TowerBack : ArcanaLogic
     public override ASkillCategory GetCategory() => ASkillCategory.SkillEffect;
     //５０％の確率で同じスキルが発動する
     private float time = 3f;
-    private float success = 0.5f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
     public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
     {
         int sNo = player.GetSkillNo();
-        if (Random.value <= success)
+        if (Random.value <= sourceArcana.GetKeepValue())
         {
             yield return new WaitForSeconds(time);
             SkillManager.Instance.RequestSkill(player, sNo);

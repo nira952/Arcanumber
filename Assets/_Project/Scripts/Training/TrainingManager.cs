@@ -16,7 +16,7 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        LoadManager.Instance.ArcanaLoadExcel();
+        LoadManager.Instance.Initialize();
 
         Initialise();
         TrainingUIManager.Instance.Initialize();
@@ -70,7 +70,7 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
     void LoadAsset()
     {
         //アルカナを並べ替える
-        allArcana = LoadManager.Instance.GetArcanas;
+        allArcana = AssetLoader.Instance.LoadAllArcanas;
 
         //スキルを入れ替える
         allSkill = AssetLoader.Instance.LoadAllSkills;

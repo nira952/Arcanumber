@@ -12,7 +12,6 @@ public class Arcana03EmpressFront : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //自然回復
-    public const int healValue = 1;
     public const float timeInterval = 5f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
     public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
@@ -20,7 +19,7 @@ public class Arcana03EmpressFront : ArcanaLogic
         while (true)
         {
             yield return new WaitForSeconds(timeInterval);
-            PlayerUtility.FinalHeal(player, healValue);
+            PlayerUtility.FinalHeal(player, sourceArcana.GetKeepValue());
         }
     }
 }
@@ -32,7 +31,6 @@ public class Arcana03EmpressBack : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //ランダムな効果
-    public const float timeInterval = 20f;
     public EffectAbility randomEffect;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
     public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
@@ -56,11 +54,11 @@ public class Arcana03EmpressBack : ArcanaLogic
             if (masterEffect != null)
             {
                 //レジストリから得たマスターデータを元に、能力インスタンスを生成
-                randomEffect = new EffectAbility(masterEffect, true, timeInterval, finalNum);
+                randomEffect = new EffectAbility(masterEffect, true, sourceArcana.GetKeepValue(), finalNum);
                 player.SetHaveEffect(randomEffect.Clone()); 
             }
 
-            yield return new WaitForSeconds(timeInterval - GetVisualDuration(sourceArcana));
+            yield return new WaitForSeconds(sourceArcana.GetKeepValue() - GetVisualDuration(sourceArcana));
         }
     }
 }
