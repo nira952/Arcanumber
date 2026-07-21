@@ -9,10 +9,9 @@ public class Arcana00FoolFront : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //HP‚ð1.3”{‚É‚·‚é
-    public const float hpValue = 1.3f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
-        float newHp = player.GetPlayerStatus().GetMaxHp() * hpValue;
+        float newHp = player.GetPlayerStatus().GetMaxHp() * sourceArcana.GetKeepValue();
         player.GetPlayerStatus().SetMaxHp(newHp);
     }
 }

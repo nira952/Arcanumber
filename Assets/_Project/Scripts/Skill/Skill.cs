@@ -29,10 +29,10 @@ public class Skill : ScriptableObject
     /// <summary>
     /// Excelで入力した値を代入
     /// </summary>
-    public void LoadFromExcel(IRow row)
+    public void LoadFromExcel(IRow row, IFormulaEvaluator evaluator)
     {
         //ヘルパー関数でロードを簡略化
-        string Get(int i) => LoadManager.Instance.GetCellValueCalculated(row.GetCell(i));
+        string Get(int i) => LoadManager.Instance.GetCellValueCalculated(row.GetCell(i), evaluator);
         var lm = LoadManager.Instance;
 
         //数値・Enumの変換
@@ -45,13 +45,13 @@ public class Skill : ScriptableObject
         this.keepTime = lm.ParseValue<float>(Get(6));
         this.delayTime = lm.ParseValue<float>(Get(7));
         this.moveSpeed = lm.ParseValue<float>(Get(8));
-        this.isPenetrate = (Get(9) == "1"); // 1がTrue
+        this.isPenetrate = (Get(9) == "1"); //1がTrue
         this.reflectCount = lm.ParseValue<int>(Get(10));
         this.skillEx = Get(15);
 
         //リソースロード（パスが空ならnullを代入）
-        this.skillSp = !!string.IsNullOrEmpty(Get(11)) ? Resources.Load<Sprite>(Get(11)) : null;
-        this.effectAnimation = !string.IsNullOrEmpty(Get(11)) ? Resources.Load<GameObject>(Get(12)) : null;
+        this.skillSp = !string.IsNullOrEmpty(Get(11)) ? Resources.Load<Sprite>(Get(11)) : null;
+        this.effectAnimation = !string.IsNullOrEmpty(Get(12)) ? Resources.Load<GameObject>(Get(12)) : null;
         this.se = !string.IsNullOrEmpty(Get(12)) ? Resources.Load<AudioClip>(Get(13)) : null;
     }
 

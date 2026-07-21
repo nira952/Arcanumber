@@ -8,12 +8,11 @@
 public class Arcana04EmperorFront : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.Command;
-    public const float silenceDuration = 15f;    //スキルの効果時間
     //スキルを使用禁止にする
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
        Effect e = EffectRegistry.Get(EffectList.Silence, false);
-       EffectAbility ea = new EffectAbility(e, false, silenceDuration, 0);
+       EffectAbility ea = new EffectAbility(e, false, sourceArcana.GetKeepValue(), 0);
        //とりあえず自分にかける
        player.SetHaveEffect(ea.Clone());
     }

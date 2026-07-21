@@ -15,7 +15,7 @@ public class Arcana11JusticeFront : ArcanaLogic
     {
         List<NetworkPlayer> list = PlayerUtility.GetOtherPlayers(player);
         foreach (NetworkPlayer p in list)
-            p.TakeDamage(15);
+            p.TakeDamage(sourceArcana.GetKeepValue());
     }
 }
 
@@ -26,11 +26,10 @@ public class Arcana11JusticeBack : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //半分のダメージを返す（カウンター）
-    private int timeValue = 10;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
         Effect e = EffectRegistry.Get(EffectList.Counter, true);
-        EffectAbility ea = new EffectAbility(e, true, timeValue, -1f);
+        EffectAbility ea = new EffectAbility(e, true, sourceArcana.GetKeepValue(), -1f);
         player.SetHaveEffect(ea.Clone());
     }
 }

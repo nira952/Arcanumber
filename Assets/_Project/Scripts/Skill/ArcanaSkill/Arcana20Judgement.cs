@@ -17,7 +17,6 @@ public class Arcana20JudgementBack : ArcanaLogic
     //銃弾の雨が降る
     public float length = 15f;  //範囲
     Vector2 pos = new Vector2(0, 7.5f);
-    public float duration = 3f;     //降らせる時間
     public float spawnInterval = 0.03f; //銃弾を出す間隔
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -27,7 +26,7 @@ public class Arcana20JudgementBack : ArcanaLogic
     {
         float elapsed = 0f;
 
-        while (elapsed < duration)
+        while (elapsed < sourceArcana.GetKeepValue())
         {
             //範囲内でランダムなX
             float randomX = Random.Range(-length / 2f, length / 2f);

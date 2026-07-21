@@ -12,7 +12,6 @@ public class Arcana19SunFront : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //晴れ日和
-    private float keepTime = 15f;
     private float numValue = 0.5f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -20,7 +19,7 @@ public class Arcana19SunFront : ArcanaLogic
         foreach (NetworkPlayer other in others)
         {
             Effect e = EffectRegistry.Get(EffectList.SunBurn, false);
-            EffectAbility effect = new EffectAbility(e, false, keepTime, numValue);
+            EffectAbility effect = new EffectAbility(e, false, sourceArcana.GetKeepValue(), numValue);
             other.SetHaveEffect(effect);
         }
     }
@@ -33,14 +32,13 @@ public class Arcana19SunBack : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //スタンする
-    private float keepTime = 3f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
         List<NetworkPlayer> others = PlayerUtility.GetOtherPlayers(player);
         foreach (NetworkPlayer other in others)
         {
             Effect e = EffectRegistry.Get(EffectList.Stun, false);
-            EffectAbility effect = new EffectAbility(e, false, keepTime, -1);
+            EffectAbility effect = new EffectAbility(e, false, sourceArcana.GetKeepValue(), -1);
             other.SetHaveEffect(effect);
         }
     }
