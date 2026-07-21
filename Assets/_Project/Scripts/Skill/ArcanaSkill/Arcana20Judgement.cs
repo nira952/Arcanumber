@@ -38,7 +38,7 @@ public class Arcana20JudgementBack : ArcanaLogic
             Bullet magic = obj.GetComponent<Bullet>();
             if (magic != null)
                 //初期化
-                magic.Initialize(player.GetNetworkId(), null, spawnPos);
+                magic.InitializeBullet(player.GetNetworkId(), spawnPos);
 
             //次の弾までの待機時間
             yield return new WaitForSeconds(spawnInterval);

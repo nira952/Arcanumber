@@ -45,7 +45,7 @@ public class AimCursor : MonoBehaviour
         UpdateMousePosition();
         //ロックオンモードの場合のみ、毎フレーム一番近い敵を追いかける
         Vector3? targetPos = null;
-        if (_currentMode == AimSelect.LockOn)
+        if (_currentMode == AimSelect.LookOn)
         {
             _lockOnTarget = GetNearestEnemyOnScreen();
             if (_lockOnTarget != null)
@@ -71,20 +71,15 @@ public class AimCursor : MonoBehaviour
         _lockOnTarget = null;
         switch (aim)
         {
-            case AimSelect.Proximity:
+            case AimSelect.Direction:
                 _currentRadius = GameConfig.PROX_RADIUS;
-                _useLerp = false;
-                _useRadiusLimit = true;
-                break;
-            case AimSelect.LongDistance:
-                _currentRadius = GameConfig.LONG_RADIUS;
                 _useLerp = false;
                 _useRadiusLimit = true;
                 break;
             case AimSelect.AutoFollow:
                 // デフォルト値のまま
                 break;
-            case AimSelect.LockOn:
+            case AimSelect.LookOn:
                 _lockOnTarget = GetNearestEnemyOnScreen();
                 _useLerp = false;
                 break;
@@ -164,7 +159,7 @@ public class AimCursor : MonoBehaviour
     /// </summary>
     public NetworkPlayer GetLockOnNetworkPlayer()
     {
-        if (_currentMode != AimSelect.LockOn || _lockOnTarget == null)
+        if (_currentMode != AimSelect.LookOn || _lockOnTarget == null)
             return null;
 
         if (_lockOnTarget.TryGetComponent(out NetworkPlayer targetPlayer))
@@ -209,9 +204,9 @@ public class AimCursor : MonoBehaviour
 /// </summary>
 public enum AimSelect
 {
-    [InspectorName("近距離")] Proximity,
-    [InspectorName("遠距離")] LongDistance,
+    [InspectorName("方向選択")]Direction,
     [InspectorName("ホーミング")] AutoFollow,
-    [InspectorName("ターゲット指定")] LockOn,
-    [InspectorName("ターゲット指定なし")] None
+    [InspectorName("ターゲット指定")] LookOn,
+    [InspectorName("ターゲット指定なし")] LookOff,
+    [InspectorName("標準無し")] None
 }

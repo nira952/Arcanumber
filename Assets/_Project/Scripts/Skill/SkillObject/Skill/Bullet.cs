@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Bullet : MagicObject
+public class Bullet : EnvironmentObject
 {
     private float speed = 10f;
     private float damage = 0.5f;

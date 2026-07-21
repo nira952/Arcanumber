@@ -5,13 +5,6 @@ using UnityEngine;
 /// </summary>
 public class TrapObject : MagicObject
 {
-    public override void Initialize(int charaNo, Skill skill, Vector2 pos)
-    {
-        base.Initialize(charaNo, skill, pos);
-        // 最後に位置と回転を確定させる
-        SetupPositionAndRotation(pos);
-    }
-
     protected override void OnHit(NetworkPlayer target)
     {
         NetworkPlayer player = PlayerUtility.FindPlayerByNo(haveCharaNo);

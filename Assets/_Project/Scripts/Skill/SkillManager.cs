@@ -62,7 +62,7 @@ public class SkillManager : SingletonMonoBehaviour<SkillManager>
     /// </summary>
     GameObject MagicStartSpawn(NetworkPlayer player, Skill skill, Vector2 pos, float delayTime)
     {
-        if (skill.GetAimSelect() == AimSelect.LockOn)
+        if (skill.GetAimSelect() == AimSelect.LookOn)
         {
             GameObject mStart = Instantiate(player.GetMagicStart());
             mStart.transform.position = pos;
@@ -108,7 +108,7 @@ public class SkillManager : SingletonMonoBehaviour<SkillManager>
         //生成したスキルオブジェクトの位置をプレイヤーの位置にする
         skillObj.transform.position = player.gameObject.transform.position;
         //スクリプトをアタッチする
-        MagicObject magic = skillObj.GetComponent<MagicObject>();
+        SkillObject magic = skillObj.GetComponent<SkillObject>();
         magic.Initialize(player.GetNetworkId(), skill, pos);
     }
 
