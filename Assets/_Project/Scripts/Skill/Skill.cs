@@ -47,7 +47,18 @@ public class Skill : ScriptableObject
         this.moveSpeed = lm.ParseValue<float>(Get(8));
         this.isPenetrate = (Get(9) == "1"); //1がTrue
         this.reflectCount = lm.ParseValue<int>(Get(10));
-        this.skillEx = Get(15);
+        this.skillEx = Get(18);
+
+        //Effectの変換
+        if (System.Enum.TryParse(Get(14), true, out EffectList targetEnum))
+        {
+            this.effect = new EffectAbility(
+                EffectRegistry.Get(targetEnum, lm.ParseValue<int>(Get(15)) == 1),
+                true,
+                lm.ParseValue<float>(Get(16)),
+                lm.ParseValue<float>(Get(17)));
+            Debug.Log("見つけたよ");
+        }
 
         //リソースロード（パスが空ならnullを代入）
         this.skillSp = !string.IsNullOrEmpty(Get(11)) ? Resources.Load<Sprite>(Get(11)) : null;
@@ -84,5 +95,5 @@ public enum SkillCategory
 {
     [InspectorName("通常攻撃")] Attack,
     [InspectorName("回復")] Heal,
-    [InspectorName("バフ付与")] EffectionBuff
+    [InspectorName("バフ付与")] Effection
 }

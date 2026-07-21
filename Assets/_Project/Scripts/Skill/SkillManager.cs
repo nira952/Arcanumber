@@ -86,7 +86,7 @@ public class SkillManager : SingletonMonoBehaviour<SkillManager>
             case SkillCategory.Attack:
                 SkillObjectSpawn(player, skill, pos);
                 break;
-            case SkillCategory.EffectionBuff:
+            case SkillCategory.Effection:
                 EffectBuffPlayer(player, skill);
                 break;
             default:
