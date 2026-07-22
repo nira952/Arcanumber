@@ -19,4 +19,21 @@ public class AssetLoader : SingletonMonoBehaviour<AssetLoader>
     public List<Skill> LoadAllSkills => skillList;
     public List<EffectAbility> effectAbilities => effectList;
 
+
+    /// <summary>
+    /// 条件に合うアルカナを探す
+    /// </summary>
+    public Arcana GetArcana(ArcanaList no, bool front)
+    {
+        return arcanaList.FirstOrDefault(e => (ArcanaList)e.GetArcanaListID() == no
+            && e.GetIsFront() == front);
+    }
+
+    /// <summary>
+    /// 条件に合うスキルを探す
+    /// </summary>
+    public Skill GetSkill(int skillNo)
+    {
+        return skillList.FirstOrDefault(e => e.GetSkillNo() == skillNo);
+    }
 }

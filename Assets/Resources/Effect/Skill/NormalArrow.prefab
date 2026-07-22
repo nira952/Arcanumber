@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 2942975443391766743}
   - component: {fileID: 7813260722349527389}
   - component: {fileID: 4886118238359803437}
-  - component: {fileID: 8829068505154018332}
   - component: {fileID: -2497113096921803380}
+  - component: {fileID: 879275376949444730}
   m_Layer: 0
   m_Name: NormalArrow
   m_TagString: Untagged
@@ -138,19 +138,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &8829068505154018332
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 141368539886289127}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d061b3b9ad5576f41ba0f88717f6f908, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!61 &-2497113096921803380
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -197,3 +184,15 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.16524133, y: 0.053366274}
   m_EdgeRadius: 0
+--- !u!114 &879275376949444730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 141368539886289127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1619579118a294d4d938e6f63c6adcab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

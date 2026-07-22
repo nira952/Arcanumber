@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5817294566909068454}
   - component: {fileID: 1612936991810077963}
   - component: {fileID: 3389311387658314239}
-  - component: {fileID: -6201151277449108720}
+  - component: {fileID: -2689879075497409836}
   m_Layer: 0
   m_Name: SrowArrow
   m_TagString: Untagged
@@ -184,7 +184,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.16524133, y: 0.053366274}
   m_EdgeRadius: 0
---- !u!114 &-6201151277449108720
+--- !u!114 &-2689879075497409836
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -193,6 +193,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 3666633204459433281}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac27f467a1d00ce408d0861f19c5a9e5, type: 3}
+  m_Script: {fileID: 11500000, guid: 1619579118a294d4d938e6f63c6adcab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
