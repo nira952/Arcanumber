@@ -6,10 +6,10 @@ using UnityEngine;
 /// </summary>
 public abstract class MagicObject : MonoBehaviour
 {
-    protected int haveCharaNo;    // 出したキャラクターNo
-    protected float dmg;          // ダメージ
-    protected float keepTime;     // 持続時間
-    protected Animator animator;  // アニメーター
+    protected int haveCharaNo;    //出したキャラクターNo
+    protected float dmg;          //ダメージ
+    protected float keepTime;     //持続時間
+    protected Animator animator;  //アニメーター
     protected EffectAbility effect;    //付与するエフェクト
 
     protected List<int> hitList = new List<int>();
@@ -64,8 +64,7 @@ public abstract class MagicObject : MonoBehaviour
             if (isPenetrate) return;
             if (reflectCount > 0)
             {
-                reflectCount--;
-                transform.right = -transform.right;
+                HandleReflect(collision);
                 return;
             }
 
@@ -80,6 +79,39 @@ public abstract class MagicObject : MonoBehaviour
             targetMinion.TakeDamage();
             if (!isPenetrate) Destroy(gameObject);
         }
+
+        if(collision.tag == "Wall" ||  collision.tag == "Ground")
+        {
+            if (reflectCount > 0)
+            {
+                HandleReflect(collision);
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 反射処理を行う
+    /// </summary>
+    private void HandleReflect(Collider2D collision)
+    {
+        if (reflectCount <= 0) return;
+
+        reflectCount--;
+
+        //自身の位置から相手のコライダー上で一番近い点を取得
+        Vector2 hitPoint = collision.ClosestPoint(transform.position);
+
+        //衝突点から自分の中心へ向かうベクトル
+        Vector2 normal = ((Vector2)transform.position - hitPoint).normalized;
+
+        //もし近すぎてnormalがゼロベクトルになってしまった場合
+        if (normal == Vector2.zero)
+            normal = -transform.right;
+
+        //反射計算を行う
+        Vector2 reflectDir = Vector2.Reflect(transform.right, normal);
+        transform.right = reflectDir;
     }
 
     protected abstract void OnHit(NetworkPlayer target);

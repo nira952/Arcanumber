@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6781946141280015212}
   - component: {fileID: 8469144484730508218}
   m_Layer: 0
-  m_Name: Deffbuff
+  m_Name: DeffBuff
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

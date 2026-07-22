@@ -33,7 +33,17 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
 
         //自分が操作しているプレイヤーだけの処理
         foreach (NetworkPlayer p in all)
+        {
+            if(p.GetNetworkId() == pNum)
+            {
+                p.SetArcana(AssetLoader.Instance.GetArcana(ArcanaList.Fool, false));
+                for(int i = 0; i < 4; i++)
+                {
+                    p.SetSkill(AssetLoader.Instance.GetSkill(i + 1), i);
+                }
+            }
             p.Initialize(p.GetNetworkId() == pNum);
+        }
 
         BattleUIManager.Instance.Initialize(all, pNum);
         //ダメージエフェクト（アクション）の登録

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NormalSkillObj : MagicObject
+public class NormalSkillObj : SkillObject
 {
     protected override void OnHit(NetworkPlayer target)
     {

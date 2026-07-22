@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 5632080172246222878}
   - component: {fileID: 3295271936883593935}
   - component: {fileID: -6826841981451150137}
-  - component: {fileID: 6226135144017492189}
   - component: {fileID: 8237473635962487598}
   m_Layer: 0
   m_Name: Poison
@@ -138,19 +137,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &6226135144017492189
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2355479593251735817}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1619579118a294d4d938e6f63c6adcab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!61 &8237473635962487598
 BoxCollider2D:
   m_ObjectHideFlags: 0
