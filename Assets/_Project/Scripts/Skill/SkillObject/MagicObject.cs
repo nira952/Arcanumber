@@ -6,10 +6,10 @@ using UnityEngine;
 /// </summary>
 public abstract class MagicObject : MonoBehaviour
 {
-    protected int haveCharaNo;    // 出したキャラクターNo
-    protected float dmg;          // ダメージ
-    protected float keepTime;     // 持続時間
-    protected Animator animator;  // アニメーター
+    protected int haveCharaNo;    //出したキャラクターNo
+    protected float dmg;          //ダメージ
+    protected float keepTime;     //持続時間
+    protected Animator animator;  //アニメーター
     protected EffectAbility effect;    //付与するエフェクト
 
     protected List<int> hitList = new List<int>();
