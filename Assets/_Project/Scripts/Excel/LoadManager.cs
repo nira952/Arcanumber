@@ -117,7 +117,6 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
             if (row == null) continue;
 
             string rawNo = GetCellValueCalculated(row.GetCell(0), skillEvaluator);
-            Debug.Log($"{i}行目のスキル番号: [{rawNo}]");
 
             //ScriptableObjectのインスタンスを作成
             var data = ScriptableObject.CreateInstance<Skill>();
