@@ -25,7 +25,6 @@ public class TitleUIManager : MonoBehaviour
   [SerializeField] private Button lanHostPanelButton;
 
     // --- ボタンのクリックイベントをObservableとして公開 ---
-
     public Observable<Unit> OnOpenPrivateMatchPanelRequested => privateMatchPanelButton.OnClickAsObservable();
 
     public Observable<Unit> OnOpenCasualMatchPanelRequested => casualMatchPanelButton.OnClickAsObservable();
@@ -39,21 +38,19 @@ public class TitleUIManager : MonoBehaviour
     private void Start()
     {
         // 最初はすべてのパネルを非表示にする
-        CloseAllPanel();
+        CloseAllPanels();
         SettingObservable();
 
-        OpenTitlePanel();
+        titlePanel.SetActive(true);
     }
 
     private void SettingObservable()
     {
 
-        // 名前設定ボタンがクリックされたときの処理
         OnOpenPrivateMatchPanelRequested
             .Subscribe(_ =>
             {
-                CloseAllPanel();
-                OpenPrivateMatchPanel();
+                ChangeCurtainPanel(privateMatchPanel).Forget();
             })
             .AddTo(_disposables);
 
@@ -61,39 +58,48 @@ public class TitleUIManager : MonoBehaviour
         OnOpenCasualMatchPanelRequested
             .Subscribe(_ =>
             {
-                CloseAllPanel();
-                OpenCasualMatchPanel();
-            })
-            .AddTo(_disposables);
+                ChangeCurtainPanel(casualMatchPanel).Forget();
 
-        // プライベートマッチパネルを開くボタン処理
-        OnOpenPrivateMatchPanelRequested
-            .Subscribe(_ =>
-            {
-                CloseAllPanel();
-                OpenPrivateMatchPanel();
             })
             .AddTo(_disposables);
 
         OnOpenLanHostPanelRequested
             .Subscribe(_ =>
             {
-                CloseAllPanel();
-                OpenLanHostPanel();
+                ChangeCurtainPanel(lanHostPanel).Forget();
+
             })
             .AddTo(_disposables);
 
         OnOpenLanJoinPanelRequested
             .Subscribe(_ =>
             {
-                CloseAllPanel();
-                OpenLanJoinPanel();
+                ChangeCurtainPanel(lanJoinPanel).Forget();
+
             })
             .AddTo(_disposables);
 
     }
 
-    public void CloseAllPanel()
+    public async UniTask ChangeCurtainPanel(GameObject openPanel,GameObject closePanel = null)
+    {
+        // カーテンが閉じるまで待つ
+        await CurtainManager.Instance.CloseAsync();
+
+        // もし閉じるパネルが指定されていれば、それを非表示にする
+        if (closePanel != null) { closePanel.SetActive(false); }
+
+        // 全てのパネルを閉じる
+        CloseAllPanels();
+
+        openPanel.SetActive(true);
+
+        CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
+
+    }
+
+
+    private void CloseAllPanels()
     {
         if (titlePanel != null) titlePanel.SetActive(false);
         if (privateMatchPanel != null) privateMatchPanel.SetActive(false);
@@ -101,38 +107,12 @@ public class TitleUIManager : MonoBehaviour
         if (lanJoinPanel != null) lanJoinPanel.SetActive(false);
         if (lanHostPanel != null) lanHostPanel.SetActive(false);
 
-    }
 
-    public void OpenTitlePanel() 
-    { 
-        CloseAllPanel();
-
-        if (titlePanel != null) 
-            titlePanel.SetActive(true); 
-
-
-        CurtainManager.Instance.OpenAsync().Forget();
     }
 
     public void OnClickExitTitlePanel(GameObject panel)
     {
-        if (panel != null) panel.SetActive(false);
-        if (titlePanel != null) titlePanel.SetActive(true);
-    }
-
-    public void OpenPrivateMatchPanel() { if (privateMatchPanel != null) privateMatchPanel.SetActive(true); }
-
-    public void OpenCasualMatchPanel() { if (casualMatchPanel != null) casualMatchPanel.SetActive(true); }
-
-    public void OpenLanJoinPanel() { if (lanJoinPanel != null) lanJoinPanel.SetActive(true); }
-
-
-    public void OpenLanHostPanel() { if (lanHostPanel != null) lanHostPanel.SetActive(true); }
-
-
-    public void ClosePanel(GameObject panel)
-    {
-        if (panel != null) panel.SetActive(false);
+        ChangeCurtainPanel(titlePanel, panel).Forget();
     }
 
 }

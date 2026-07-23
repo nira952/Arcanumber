@@ -70,22 +70,22 @@ public class LobbyPresenter : IDisposable
     {
         try
         {
-            _view.ShowLoading("サービスに接続中...");
+            CurtainManager.Instance.UpdateLoadingMessage("サービスに接続中...");
             await _lobbyModel.InitializeServicesAsync(_destroyToken);
+
+            CurtainManager.Instance.UpdateLoadingMessage("接続完了！");
 
             // ログイン成功したらUGSのIDを優先使用
             _myLocalPlayerId = AuthenticationService.Instance.PlayerId;
-            _view.HideLoading();
             _view.EnableJoinButton();
         }
         catch (Exception e)
         {
             // 学校などでブロックされた場合ここに来る（フェイルセーフ）
             Debug.LogWarning($"[Presenter] UGS接続エラー(LANのみ可): {e.Message}");
-            _view.UpdateLoadingMessage("オフラインモードです\n(LAN接続のみ使用可能)");
+            CurtainManager.Instance.UpdateLoadingMessage("オフラインモードです\n(LAN接続のみ使用可能)");
             await UniTask.Delay(2000, cancellationToken: _destroyToken);
 
-            _view.HideLoading();
             _view.EnableJoinButton(); // エラーでもLAN用にボタンは解放する
         }
     }
@@ -117,8 +117,11 @@ public class LobbyPresenter : IDisposable
         }
 
         _isHost = false;
+        // カーテンを閉じる
+        await CurtainManager.Instance.CloseAsync("マッチング中...", GetType().Name);
+
         _view.SetUIStateOnMatchingStart();
-        _view.ShowLoading("マッチング中...");
+
 
         _matchCts?.Cancel();
         _matchCts = new CancellationTokenSource();
@@ -192,8 +195,10 @@ public class LobbyPresenter : IDisposable
             }
 
             _lobbyModel.StartLobbyPollingLoopAsync(linkedToken).Forget();
-            _view.HideLoading();
+
             _view.ShowRoomPanel();
+
+            CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
         }
         catch (Exception e) { HandleMatchError(e); }
     }
@@ -278,7 +283,7 @@ public class LobbyPresenter : IDisposable
         Debug.LogError($"[Presenter] マッチングエラー: {e.Message}");
         _networkModel.Shutdown();
         _view.ResetMatchUI();
-        _view.HideLoading();
+        CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
     }
 
     // オンライン(UGS)モード時のUI更新ロジック
@@ -345,6 +350,8 @@ public class LobbyPresenter : IDisposable
 
     private async UniTask HandleCancelOrLeaveAsync()
     {
+        CurtainManager.Instance.UpdateLoadingMessage("キャンセル中...");
+        
         _view.DisableCancelButton();
         _matchCts?.Cancel();
 
@@ -352,8 +359,6 @@ public class LobbyPresenter : IDisposable
         _networkModel.Shutdown();
 
         _view.ResetMatchUI();
-        _view.HideRoomPanel();
-        _view.HideLoading();
     }
 
     public void StartGame()
@@ -402,11 +407,14 @@ public class LobbyPresenter : IDisposable
 
         PlayerDataManager.Instance.Server_BuildAndSyncPlayerData(finalizedList);
 
-        _view.ShowLoading("シーンを移動します");
+        await CurtainManager.Instance.CloseAsync("シーンを移動します", GetType().Name);
         await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: _destroyToken);
-        _view.HideLoading();
 
         GameSceneManager.Instance.LoadNetworkScene(_nextSceneName);
+
+
+        CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
+
     }
 
     public void Dispose()

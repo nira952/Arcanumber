@@ -2,11 +2,16 @@ using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement; // 追加: デバッグ時のローカルシーン遷移用
 using R3;
 using Cysharp.Threading.Tasks;
 
 public class ArcanaSelectManager : NetworkBehaviour
 {
+    [Header("Debug Settings")]
+    [SerializeField, Tooltip("オンにするとインターネット通信なし（オフライン）で動作します")]
+    private bool isDebugMode = false;
+
     // アルカナの構造体（NGO通信用）
     public struct ArcanaCard : INetworkSerializable, IEquatable<ArcanaCard>
     {
@@ -34,71 +39,109 @@ public class ArcanaSelectManager : NetworkBehaviour
     private const int CardsPerPlayer = 5;
     private const int TotalUniqueCards = 22;
 
-    // 各プレイヤー（ClientId）に割り当てられたカードリスト（サーバー保持）
     private Dictionary<ulong, List<ArcanaCard>> _playerAllocations = new Dictionary<ulong, List<ArcanaCard>>();
-
-    // クライアント自身が引いたカードの保持用
     private List<ArcanaCard> _myCards = new List<ArcanaCard>();
-
-    // AssetLoaderからロードしたアルカナデータのリスト
     private List<Arcana> arcanaDatabase = new List<Arcana>();
 
-    [Header("UI References")]
-    [SerializeField] private GameObject arcanaUiPanel;       // カードを表示するUIパネル等の参照
-    [SerializeField] private Transform cardDisplayParent;     // カードを表示する親オブジェクトのTransform参照
-    [SerializeField] private SelectCard cardPrefab;             // カードのプレハブ参照（UI表示用）
-    [SerializeField] private GameObject waitingOverlay;
+    [SerializeField] private ArcanaUIManager arcanaUIManager;
+    [SerializeField] private Sprite[] cardSprites = new Sprite[4];
+    [SerializeField] private Color[] glowColors = new Color[4]; // 0:赤, 1:青, 2:緑, 3:黄
 
+    private Arcana selectedArcana;
     private readonly CompositeDisposable _disposables = new();
 
     private void Start()
     {
         arcanaDatabase = AssetLoader.LoadAllArcanas();
-        if (IsServer) SetupGamePositions();
 
-        // 【R3による監視】ホスト（サーバー）のみ、全員が準備完了になったかを NetworkList から毎フレーム監視する
-        if (IsServer)
+        // -------------------------
+        // 通信初期化・サブスクライブ
+        // -------------------------
+        if (!isDebugMode)
         {
-            // NetworkListの変化イベントをObservable化して購読（R3の機能）
-            Observable.FromEvent<NetworkList<PlayerNetworkData>.OnListChangedDelegate, NetworkListEvent<PlayerNetworkData>>(
-                h => (ev) => h(ev),
-                h => PlayerDataManager.Instance.AllPlayerData.OnListChanged += h,
-                h => PlayerDataManager.Instance.AllPlayerData.OnListChanged -= h
-            )
-            .Subscribe(_ =>
+            if (IsServer) SetupGamePositions();
+
+            if (IsServer)
             {
-                CheckAllPlayersReadyAndTransition().Forget(); 
-            })
-            .AddTo(_disposables);
+                Observable.FromEvent<NetworkList<PlayerNetworkData>.OnListChangedDelegate, NetworkListEvent<PlayerNetworkData>>(
+                    h => (ev) => h(ev),
+                    h => PlayerDataManager.Instance.AllPlayerData.OnListChanged += h,
+                    h => PlayerDataManager.Instance.AllPlayerData.OnListChanged -= h
+                )
+                .Subscribe(_ => CheckAllPlayersReadyAndTransition().Forget())
+                .AddTo(_disposables);
+            }
         }
-    }
-    private void OnDestroy()
-    {
-        _disposables.Dispose(); // メモリリーク防止
-    }
-
-    private void OnCardSelected(Arcana selectedArcana)
-    {
-        // 1. ローカルに保存
-        if (PlayerDataManager.Instance != null)
+        else
         {
-            PlayerDataManager.Instance.SetLocalArcana(selectedArcana);
+            Debug.Log("[ArcanaSelectManager] DebugModeが有効です。オフラインで動作します。");
         }
 
-        // 2. アルカナIDをサーバーへ通知
-        SubmitSelectedArcanaServerRpc(selectedArcana.GetArcanaListID());
+        // UIManagerの初期化 (デバッグ時はデフォルトで0番とするなどの配慮)
+        int myLobbyIndex = isDebugMode ? 0 : PlayerDataManager.Instance.GetMyLobbyIndex();
+        Sprite myBackSprite = cardSprites[Mathf.Clamp(myLobbyIndex, 0, cardSprites.Length - 1)];
+        Color myGlowColor = glowColors[Mathf.Clamp(myLobbyIndex, 0, glowColors.Length - 1)];
+        arcanaUIManager.Initialize(myBackSprite, myGlowColor);
 
-        // 3. 画面を待機中状態にする
-        if (arcanaUiPanel != null) arcanaUiPanel.SetActive(false);
-        if (waitingOverlay != null) waitingOverlay.SetActive(true);
+        // --- R3によるUIイベントの結合 ---
+        arcanaUIManager.OnCardSelected
+            .Subscribe(HandleCardSelected)
+            .AddTo(_disposables);
 
-        // 4. サーバーへ「自分は準備完了（待機中）になった」と通知
-        SetReadyStatusServerRpc(true);
+        arcanaUIManager.OnSelectCardSubmit
+            .Subscribe(_ => SubmitCardSetting())
+            .AddTo(_disposables);
+
+        arcanaUIManager.OnAnimationStarted
+            .Subscribe(_ => CardOpen())
+            .AddTo(_disposables);
+
     }
 
-    /// <summary>
-    /// クライアントからサーバーへ、自身の準備状態を伝えるRPC
-    /// </summary>
+
+    // Viewから流れてきたArcanaデータを受け取る
+    private void HandleCardSelected(Arcana arcana)
+    {
+        // 選択解除時（arcana == null）にアクセスしてエラーになるのを防ぐ
+        if (arcana != null)
+        {
+            if (!isDebugMode && PlayerDataManager.Instance != null)
+            {
+                PlayerDataManager.Instance.SetLocalArcana(arcana);
+            }
+        }
+
+        selectedArcana = arcana;
+    }
+
+    // 確定ボタンのロジック
+    private void SubmitCardSetting()
+    {
+        if (selectedArcana == null) return; // 選択されていない場合のフェールセーフ
+
+        CurtainManager.Instance.CloseAsync("待機中", GetType().Name, duration: 0.5f).Forget();
+
+        if (isDebugMode)
+        {
+            // デバッグ時は直接ローカルで遷移処理を呼ぶ
+            DebugTransitionAsync().Forget();
+        }
+        else
+        {
+            SubmitSelectedArcanaServerRpc(selectedArcana.GetArcanaListID());
+            SetReadyStatusServerRpc(true);
+        }
+    }
+
+    // --- デバッグ用：オフライン時のシーン遷移モック ---
+    private async UniTaskVoid DebugTransitionAsync()
+    {
+        Debug.Log("[DebugMode] 確定されました。1秒後にローカルで SkillSelectScene に移行します。");
+        await UniTask.Delay(TimeSpan.FromSeconds(1.0f));
+        SceneManager.LoadSceneAsync("SkillSelect");
+    }
+
+    // クライアントからサーバーへ自身の準備状態を伝えるRPC
     [ServerRpc(RequireOwnership = false)]
     private void SetReadyStatusServerRpc(bool isReady, ServerRpcParams rpcParams = default)
     {
@@ -109,33 +152,23 @@ public class ArcanaSelectManager : NetworkBehaviour
         }
     }
 
-    /// <summary>
-    /// 【サーバー専用】全員が準備完了しているか確認し、完了していればUniTaskで安全にシーン遷移する
-    /// </summary>
+    // 【サーバー専用】全員が準備完了しているか確認し、完了していれば遷移
     private async UniTaskVoid CheckAllPlayersReadyAndTransition()
     {
         var playerDataList = PlayerDataManager.Instance.AllPlayerData;
-
-        // 部屋に誰もいない、またはデータがまだ構築されていない時は無視
         if (playerDataList.Count == 0) return;
 
-        // 全員が IsReady == true かどうかをチェック
         foreach (var player in playerDataList)
         {
             if (!player.IsReady)
             {
-                // 一人でも準備ができていなければ処理を中断
                 Debug.Log("[Server] まだ全員が準備完了ではありません。");
                 return;
             }
         }
 
         Debug.Log("[Server] 全プレイヤーが準備完了になりました。1秒後に SkillSelectScene に移行します。");
-
-        // 連打やチラつき防止のため、UniTaskでほんの少しだけディレイを入れる（任意）
         await UniTask.Delay(TimeSpan.FromSeconds(1.0f));
-
-        // NGOのSceneManagerを使って、同期を保ったまま全クライアントを指定シーンへ強制遷移
         GameSceneManager.Instance.LoadNetworkScene("SkillSelect");
     }
 
@@ -162,7 +195,33 @@ public class ArcanaSelectManager : NetworkBehaviour
         }
     }
 
-    public void OnCardOpenButtonPressed() => RequestCardDrawServerRpc();
+    public void CardOpen()
+    {
+        if (isDebugMode)
+        {
+            // デバッグ時はサーバーへ問い合わせず、ローカルでカードを生成して表示する
+            GenerateDebugCards();
+        }
+        else
+        {
+            RequestCardDrawServerRpc();
+        }
+    }
+
+    // --- デバッグ用：オフライン時のカード生成モック ---
+    private void GenerateDebugCards()
+    {
+        _myCards.Clear();
+        for (int i = 0; i < CardsPerPlayer; i++)
+        {
+            int cardId = UnityEngine.Random.Range(0, TotalUniqueCards);
+            bool isFace = UnityEngine.Random.value > 0.5f;
+            _myCards.Add(new ArcanaCard(cardId, isFace));
+        }
+
+        Sprite backSprite = cardSprites[0]; // デバッグ用として0番を使用
+        arcanaUIManager.BuildCardsUI(_myCards, arcanaDatabase, backSprite);
+    }
 
     [ServerRpc(RequireOwnership = false)]
     private void RequestCardDrawServerRpc(ServerRpcParams rpcParams = default)
@@ -183,51 +242,29 @@ public class ArcanaSelectManager : NetworkBehaviour
     private void TargetSendCardsClientRpc(ArcanaCard[] assignedCards, ClientRpcParams rpcParams = default)
     {
         _myCards = new List<ArcanaCard>(assignedCards);
-        DisplayCardsUI();
+        Sprite backSprite = cardSprites[PlayerDataManager.Instance.GetMyLobbyIndex()];
+        arcanaUIManager.BuildCardsUI(_myCards, arcanaDatabase, backSprite);
     }
 
-    private void DisplayCardsUI()
-    {
-        if (arcanaUiPanel != null) arcanaUiPanel.SetActive(true);
-        foreach (Transform child in cardDisplayParent) Destroy(child.gameObject);
-
-        foreach (var card in _myCards)
-        {
-            Arcana arcanaData = FindArcanaData((ArcanaList)card.CardId, card.IsFace);
-            if (arcanaData == null) continue;
-
-            SelectCard cardPrefabInstance = Instantiate(cardPrefab, cardDisplayParent);
-            cardPrefabInstance.cardNameText.text = arcanaData.GetArcanaName;
-            cardPrefabInstance.faceText.text = arcanaData.GetIsFront() ? "正位置" : "逆位置";
-            cardPrefabInstance.setButton.onClick.AddListener(() => OnCardSelected(arcanaData));
-        }
-    }
-
-
-    /// <summary>
-    /// クライアントからサーバーへ、確定したアルカナの種類を送信するRPC
-    /// </summary>
+    // クライアントからサーバーへ、確定したアルカナの種類を送信するRPC
     [ServerRpc(RequireOwnership = false)]
     private void SubmitSelectedArcanaServerRpc(int arcanaId, ServerRpcParams rpcParams = default)
     {
         ulong clientId = rpcParams.Receive.SenderClientId;
-
         if (PlayerDataManager.Instance != null)
         {
-            // PlayerDataManager 側のサーバー同期処理を呼び出す
             PlayerDataManager.Instance.Server_UpdatePlayerArcana(clientId, (ArcanaList)arcanaId);
         }
-    }
-
-    private Arcana FindArcanaData(ArcanaList listType, bool isFront)
-    {
-        if (arcanaDatabase == null) return null;
-        return arcanaDatabase.Find(arcana => arcana.GetArcanaListID() == (int)listType && arcana.GetIsFront() == isFront);
     }
 
     private void Shuffle(List<int> list)
     {
         int n = list.Count;
         while (n > 1) { n--; int k = UnityEngine.Random.Range(0, n + 1); int value = list[k]; list[k] = list[n]; list[n] = value; }
+    }
+
+    private void OnDestroy()
+    {
+        _disposables.Dispose();
     }
 }

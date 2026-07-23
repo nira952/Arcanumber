@@ -63,9 +63,14 @@ public class NetWorkAudioManager : NetworkBehaviour
         audioMixer = Resources.Load<AudioMixer>("AudioSettings/MainAudioMixer");
 
 
-        if (audioData == null || audioMixer == null)
+        if (audioData == null)
         {
-            Debug.LogWarning("オーディオデータ、またはAudioMixerが参照できません");
+            if (audioMixer == null)
+            {
+                Debug.LogWarning("AudioMixerが参照できません");
+            }
+            Debug.LogWarning("オーディオデータが参照できません");
+            
             return;
         }
 
