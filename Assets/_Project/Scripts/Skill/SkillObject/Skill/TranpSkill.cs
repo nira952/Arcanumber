@@ -2,8 +2,7 @@ using UnityEngine;
 
 public class TranpSkill : SkillObject
 {
-    // 通常の変数に変更
-    private int syncedDmg = 0;
+    private int syncedDmg = 0;  //ダメージ
 
     [SerializeField] private GameObject cardObj;
     [SerializeField] private Sprite[] cardSprites;
@@ -15,10 +14,10 @@ public class TranpSkill : SkillObject
 
     void RollTranp()
     {
-        // 運があるかどうか
+        //運があるかどうか
         bool hasLuck = PlayerUtility.HaveEffect(PlayerUtility.FindPlayerByNo(haveCharaNo), EffectList.Lacky, true);
 
-        // 確率テーブル
+        //確率テーブル
         int[] weights = hasLuck
             ? new int[] { 0, 1, 1, 3, 25, 70 }
             : new int[] { 80, 15, 3, 1, 1, 0 };
@@ -26,6 +25,7 @@ public class TranpSkill : SkillObject
         int totalWeight = 0;
         foreach (int w in weights) totalWeight += w;
 
+        //ダメージを決める
         int randomValue = Random.Range(0, totalWeight);
         int currentWeight = 0;
         int resultIndex = 0;
@@ -40,13 +40,16 @@ public class TranpSkill : SkillObject
             }
         }
 
-        // 変数にセット
+        //変数にセット
         syncedDmg = resultIndex;
 
-        // セット完了後、カードの更新処理を呼ぶ
+        //更新処理
         UpdateCard();
     }
 
+    /// <summary>
+    /// カードを更新
+    /// </summary>
     void UpdateCard()
     {
         if (syncedDmg < 0)
@@ -55,21 +58,20 @@ public class TranpSkill : SkillObject
             return;
         }
 
-        // 生成先を取得
+        //生成先を取得
         var player = PlayerUtility.FindPlayerByNo(haveCharaNo);
         if (player == null) return;
         Transform parentTransform = player.GetPlayerController().GetAimCursor().GetEfeUpperPos().transform;
 
-        // インスタンス化
+        //インスタンス化
         GameObject card = Instantiate(cardObj, parentTransform);
 
-        // SpriteRendererを取得
+        //SpriteRendererを取得
         SpriteRenderer sr = card.GetComponent<SpriteRenderer>();
-        if (sr != null && syncedDmg > 0 && syncedDmg < cardSprites.Length + 1) // インデックス範囲修正
-        {
+        if (sr != null && syncedDmg > 0 && syncedDmg < cardSprites.Length + 1)
             sr.sprite = cardSprites[syncedDmg - 1];
-        }
         
+        //カードを消す
 　      Destroy(card, 1.0f);
     }
 

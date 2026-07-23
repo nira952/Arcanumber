@@ -51,6 +51,9 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
         ArcanaSetDictionary();
     }
 
+    /// <summary>
+    /// スキルデータをロードする
+    /// </summary>
     void SkillLoadExcel()
     {
         //ファイルが存在しない場合中止
@@ -69,7 +72,7 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
     }
 
     /// <summary>
-    /// 辞書登録
+    /// アルカナの辞書登録
     /// </summary>
     void ArcanaSetDictionary()
     {
@@ -101,6 +104,9 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
         AssetLoader.Instance.SetArcanaList(arcanaList);
     }
 
+    /// <summary>
+    /// スキルの辞書登録
+    /// </summary>
     void SkillSetDictionary()
     {
         skillList.Clear();

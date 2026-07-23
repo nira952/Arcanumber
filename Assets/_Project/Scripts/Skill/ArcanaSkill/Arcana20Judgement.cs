@@ -4,10 +4,11 @@ using UnityEngine;
 public class Arcana20JudgementFront : ArcanaLogic
 {
     public override ASkillCategory GetCategory() => ASkillCategory.Command;
-    //当たると現在体力が２５％減る
+    //当たると現在体力が３０％減る
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
-
+        GameObject hpB = Object.Instantiate(sourceArcana.effectPrefab);
+        hpB.GetComponent<HpBullet>().InitializeBullet(player.GetNetworkId(), player.transform.position);
     }
 }
 
