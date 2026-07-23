@@ -20,10 +20,20 @@ public class AIPlayer : MonoBehaviour
 
     private bool isAIPlayer = false;
 
+    [Header("AIの個性設定")]
+    [SerializeField] private bool isHumanLike = false;
+    private float currentSpeed = 10f;
+
+    //滑らかな移動用の変数
+    private float targetSpeed = 0f;
+    private float currentVelocityX = 0f;
+
     void Start()
     {
-        enemy = GetComponent<NetworkPlayer>();
-        // 最初の状態をセット
+        if (TryGetComponent(out NetworkPlayer netPlayer))
+            enemy = netPlayer;
+
+        //最初の状態をセット
         ChangeState(AIState.IDLE);
     }
 
@@ -34,6 +44,7 @@ public class AIPlayer : MonoBehaviour
         {
             rb.linearVelocity = Vector2.zero;
             ChangeState(AIState.IDLE);
+            return;
         }
 
         TimerCount();
@@ -44,6 +55,10 @@ public class AIPlayer : MonoBehaviour
             case AIState.MOVE: UpdateMove(); break;
             case AIState.JUMP: UpdateJump(); break;
         }
+
+        //滑らかな加速
+        if (isHumanLike)
+            ApplyHumanMovement();
     }
 
     /// <summary>
@@ -51,7 +66,11 @@ public class AIPlayer : MonoBehaviour
     /// </summary>
     private void UpdateIdle()
     {
-        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        if (!isHumanLike)
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        else
+            targetSpeed = 0f;
+
         if (stateTimer <= 0) ChangeState(AIState.MOVE);
     }
 
@@ -62,10 +81,18 @@ public class AIPlayer : MonoBehaviour
     {
         if (!IsMove()) return;
 
-        rb.linearVelocity = new Vector2(moveDirection * moveSpeed, rb.linearVelocity.y);
+        if (!isHumanLike)
+            //ランダム移動
+            rb.linearVelocity = new Vector2(moveDirection * moveSpeed, rb.linearVelocity.y);
+        else
+            //滑らかな移動目標
+            targetSpeed = moveDirection * moveSpeed;
 
-        if (IsGrounded() && Random.value < 0.01f)
-            ChangeState(AIState.JUMP);
+        if (IsGrounded() && IsJump())
+        {
+            if (Random.value < 0.01f)
+                ChangeState(AIState.JUMP);
+        }
         else if (stateTimer <= 0)
             ChangeState(AIState.IDLE);
     }
@@ -75,16 +102,30 @@ public class AIPlayer : MonoBehaviour
     /// </summary>
     private void UpdateJump()
     {
-        if(!IsJump()) return;
-        if (IsGrounded())
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        ChangeState(AIState.MOVE);
+        //空中にいる間も横移動を維持
+        if (!isHumanLike)
+            rb.linearVelocity = new Vector2(moveDirection * moveSpeed, rb.linearVelocity.y);
+        else
+            targetSpeed = moveDirection * moveSpeed;
+
+        //時間を置いてから再び着地したらMOVEに
+        if (IsGrounded() && stateTimer <= -0.2f)
+            ChangeState(AIState.MOVE);
+    }
+
+    /// <summary>
+    /// 人間らしい滑らかな移動を適用する
+    /// </summary>
+    private void ApplyHumanMovement()
+    {
+        currentVelocityX = Mathf.Lerp(currentVelocityX, targetSpeed, Time.deltaTime * currentSpeed);
+        rb.linearVelocity = new Vector2(currentVelocityX, rb.linearVelocity.y);
     }
 
     /// <summary>
     /// 時間を減らすメソッド
     /// </summary>
-    void TimerCount() { stateTimer-= Time.deltaTime; }
+    void TimerCount() { stateTimer -= Time.deltaTime; }
 
     /// <summary>
     /// 地面についているかを確認するメソッド
@@ -106,7 +147,7 @@ public class AIPlayer : MonoBehaviour
         {
             case AIState.IDLE: EnterIdle(); break;
             case AIState.MOVE: EnterMove(); break;
-            case AIState.JUMP: break;
+            case AIState.JUMP: EnterJump(); break;
         }
     }
 
@@ -125,7 +166,7 @@ public class AIPlayer : MonoBehaviour
     {
         stateTimer = Random.Range(0.5f, 1.5f);
 
-        // 稀に方向転換するロジック
+        //方向転換するロジック
         if (Random.value < 0.3f)
             moveDirection *= -1;
         else
@@ -133,10 +174,21 @@ public class AIPlayer : MonoBehaviour
     }
 
     /// <summary>
+    /// ジャンプ状態に入った瞬間の処理
+    /// </summary>
+    private void EnterJump()
+    {
+        if (IsJump())
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        stateTimer = 0f;
+    }
+
+    /// <summary>
     /// 歩くことができる条件
     /// </summary>
     private bool IsMove()
     {
+        if (enemy == null) return true;
         return !PlayerUtility.HaveEffect(enemy, EffectList.Stun, false);
     }
 
@@ -145,11 +197,13 @@ public class AIPlayer : MonoBehaviour
     /// </summary>
     private bool IsJump()
     {
+        if (enemy == null) return true;
         return !(PlayerUtility.HaveEffect(enemy, EffectList.Stun, false)
             || PlayerUtility.HaveEffect(enemy, EffectList.NoJump, false));
     }
 
 
     public bool GetIsAIPlayer() => isAIPlayer;
-    public void SetIsAIPlayer(bool aIPlayer) { isAIPlayer =  aIPlayer; }
+    public void SetIsAIPlayer(bool aIPlayer) { isAIPlayer = aIPlayer; }
+    public void SetIsHumanLike(bool isHumanLike) { this.isHumanLike = isHumanLike; }
 }

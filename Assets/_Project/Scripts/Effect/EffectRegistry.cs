@@ -64,9 +64,10 @@ public class EffectRegistry : ScriptableObject
     {
         BuildDictionary();
     }
+
     public static Effect Get(EffectList type, bool isUp)
     {
-        //辞書が空なら、ここで強制的に初期化を試みる（安全策）
+        //辞書が空なら初期化
         if (effectDict.Count == 0)
             InitializeRegistry();
 
@@ -80,21 +81,21 @@ public class EffectRegistry : ScriptableObject
         return null;
     }
 
-    // ========================================================
-    // ボタンを押したらプロジェクト内から全自動で集める
-    // ========================================================
+    /// <summary>
+    /// ボタンを押したらプロジェクト内から全自動で集める
+    /// </summary>
     [Button("すべてのEffectアセットを自動収集する")]
     public void CollectAllEffects()
     {
 #if UNITY_EDITOR
         allEffects.Clear();
 
-        // プロジェクト内の「t:Effect」（Effect型のScriptableObject）のGUIDをすべて検索
+        //プロジェクト内の「t:Effect」をすべて検索
         string[] guids = AssetDatabase.FindAssets("t:Effect");
 
         foreach (string guid in guids)
         {
-            //GUIDから実際のアセットのパスを取得
+            //実際のアセットのパスを取得
             string assetPath = AssetDatabase.GUIDToAssetPath(guid);
             //アセットをロードしてリストに追加
             Effect fx = AssetDatabase.LoadAssetAtPath<Effect>(assetPath);
@@ -107,7 +108,7 @@ public class EffectRegistry : ScriptableObject
 
         //変更を保存してUnityに覚えさせる
         EditorUtility.SetDirty(this);
-        AssetDatabase.SaveAssets();
+        //AssetDatabase.SaveAssets();
 
         Debug.Log($"【完了】 {allEffects.Count} 個のEffectアセットを登録");
 #else

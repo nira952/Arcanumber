@@ -75,7 +75,7 @@ public class Arcana : ScriptableObject
         if (aCategory == currentCategory)
             arcanaLogic.Execute(player, this);
 
-        Debug.Log($"【アルカナ発動】{GetArcanaName}の効果が {currentCategory} のタイミングで発動しました。");
+        //Debug.Log($"【アルカナ発動】{GetArcanaName}の効果が {currentCategory} のタイミングで発動しました。");
     }
 
     /**

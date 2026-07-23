@@ -9,15 +9,12 @@ public class AssetLoader : SingletonMonoBehaviour<AssetLoader>
 {
     private List<Arcana> arcanaList = new List<Arcana>();
     private List<Skill> skillList = new List<Skill>();
-    private List<EffectAbility> effectList = new List<EffectAbility>();
 
     public void SetArcanaList(List<Arcana> arcanaList) => this.arcanaList = arcanaList;
     public void SetSkillList(List<Skill> skillList) => this.skillList = skillList;
-    public void SetEffectList(List<EffectAbility> effectList) => this.effectList = effectList;
 
     public List<Arcana> LoadAllArcanas => arcanaList;
     public List<Skill> LoadAllSkills => skillList;
-    public List<EffectAbility> effectAbilities => effectList;
 
 
     /// <summary>
