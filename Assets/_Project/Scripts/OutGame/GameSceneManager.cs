@@ -2,6 +2,15 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+public enum Scene
+{
+    Title,
+    ArcanaSelect,
+    SkillSelect,
+    Game
+}
+
+
 public class GameSceneManager : MonoBehaviour
 {
     public static GameSceneManager Instance { get; private set; }
@@ -61,6 +70,14 @@ public class GameSceneManager : MonoBehaviour
             Debug.LogWarning("[GameSceneManager] 自身がサーバー(ホスト)ではないため、ネットワーク遷移は無視されました。");
         }
     
+    }
+
+
+    public Scene GetCurrentScene()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+
+        return Scene.TryParse(sceneName, out Scene currentScene) ? currentScene : Scene.Title;
     }
 
     /// <summary>

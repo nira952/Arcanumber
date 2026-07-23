@@ -1,6 +1,6 @@
-using System.Threading;
-using UnityEngine;
+using Cysharp.Threading.Tasks;
 using R3;
+using UnityEngine;
 
 public class LobbyBootstrapper : MonoBehaviour
 {
@@ -13,8 +13,7 @@ public class LobbyBootstrapper : MonoBehaviour
     private LobbyModel _lobbyModel;
     private NetworkSessionModel _networkSessionModel;
 
-    // 💡 オンライン用とLAN用のPresenterを両方保持
-    private LobbyPresenter _onlinePresenter; // ※ここからLANのロジックは消去してください
+    private LobbyPresenter _onlinePresenter;
     private LanLobbyPresenter _lanPresenter;
 
     private bool _isLanMode = false; // 現在のモードを記録するフラグ
@@ -22,6 +21,36 @@ public class LobbyBootstrapper : MonoBehaviour
     private readonly CompositeDisposable _disposables = new();
 
     private void Start()
+    {
+        uiManager.OnSignInRequested.Subscribe(_ =>
+        {
+            Debug.Log("[LobbyBootstrapper] サインインリクエストを受信しました。");
+            TestConnectionAsync().Forget();
+
+        }).AddTo(_disposables);
+
+        TestConnectionAsync().Forget();
+    }
+
+    private async UniTaskVoid TestConnectionAsync()
+    {
+        
+        CurtainManager.Instance.UpdateLoadingMessage("インターネット接続を確認中...");
+
+        bool isConnected = await NetworkCheckUtility.CheckInternetConnectionAsync();
+        if (!isConnected)
+        {
+            uiManager.OpenSignInPanelInteractable();
+            Debug.LogWarning("[LobbyBootstrapper] インターネット接続が確認できませんでした。LANモードでのプレイを検討してください。");
+        }
+        else
+        {
+            Debug.Log("[LobbyBootstrapper] インターネット接続が確認できました。オンラインモードでのプレイが可能です。");
+            SettingLobby();
+        }
+    }
+
+    private void SettingLobby()
     {
         if (uiManager == null) return;
 
@@ -45,8 +74,10 @@ public class LobbyBootstrapper : MonoBehaviour
         }).AddTo(_disposables);
 
         SettingObservable();
+
     }
-   
+
+
     private void SettingObservable()
     {
         // 💡 スタートボタン（シーン遷移）のイベントをここで一括管理する

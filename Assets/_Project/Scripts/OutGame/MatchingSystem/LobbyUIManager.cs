@@ -1,7 +1,8 @@
+using Cysharp.Threading.Tasks;
 using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 /// <summary>
 /// MVPパターンのView。
@@ -13,10 +14,8 @@ public class LobbyUIManager : MonoBehaviour
     [Header("--- パネル ---")]
     [SerializeField] private GameObject mainPanel;
     [SerializeField] private GameObject roomPanel;
-    [SerializeField] private GameObject loadingPanel;
 
     [Header("--- メインメニュー UI ---")]
-    [SerializeField] private Button signInButton;
     [SerializeField] private Button joinCasualButton;
     [SerializeField] private Button joinPrivateButton;
     [SerializeField] private TMP_InputField roomCodeInput;    // UGS用合言葉
@@ -39,8 +38,12 @@ public class LobbyUIManager : MonoBehaviour
     [SerializeField] private Button leaveRoomButton;      // ロビー退出
 
     [Header("--- ローディングUI ---")]
-    [SerializeField] private TextMeshProUGUI loadingMessageText;
     [SerializeField] private Button cancelLoadingButton;
+
+    [Header("サインインUI")]
+    [SerializeField] private GameObject signInPanel; // サインインパネル
+    [SerializeField] private Button reConnectButton;  // 再接続ボタン
+    [SerializeField] private Button offLineButton; // オフラインモードで起動するボタン
 
     // ==========================================
     // Presenterへ通知するためのイベント（Subject）
@@ -87,7 +90,9 @@ public class LobbyUIManager : MonoBehaviour
     private void Awake()
     {
         // UIボタンのクリックイベントをR3のSubjectに変換して発火
-        signInButton.onClick.AddListener(() => _onSignInRequested.OnNext(Unit.Default));
+        reConnectButton.onClick.AddListener(() => _onSignInRequested.OnNext(Unit.Default));
+        offLineButton.onClick.AddListener(() => ChangeOffLineMode());
+
         joinCasualButton.onClick.AddListener(() => _onJoinCasualMatchRequested.OnNext(Unit.Default));
         joinPrivateButton.onClick.AddListener(() => _onJoinPrivateMatchRequested.OnNext(Unit.Default));
         startGameButton.onClick.AddListener(() => _onNextSceneRequested.OnNext(Unit.Default));
@@ -161,17 +166,32 @@ public class LobbyUIManager : MonoBehaviour
         if (localIpText != null) localIpText.text = $"IP: {ipAddress}";
     }
 
-    public void SetSignInButtonInteractable(bool isInteractable)
+    public void OpenSignInPanelInteractable()
     {
-        signInButton.interactable = isInteractable;
+        signInPanel.SetActive(true);
+
+        CurtainManager.Instance.HideLoadingMessage();
     }
 
     public void EnableJoinButton()
     {
         joinCasualButton.interactable = true;
         joinPrivateButton.interactable = true;
-        signInButton.gameObject.SetActive(false); // サインイン完了後は隠す
+        signInPanel.SetActive(false); // サインイン完了後は隠す
+
+        CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
+
     }
+
+    public void ChangeOffLineMode()
+    {
+        signInPanel.gameObject.SetActive(false);
+        lanModeToggle.isOn = true;
+
+        CurtainManager.Instance.UpdateLoadingMessage("オフラインモードで起動中...");
+        CurtainManager.Instance.OpenAsync(GetType().Name,1).Forget();
+    }
+
 
     public void DisableCancelButton()
     {
@@ -190,9 +210,6 @@ public class LobbyUIManager : MonoBehaviour
     {
         mainPanel.SetActive(true);
         roomPanel.SetActive(false);
-        loadingPanel.SetActive(false);
-
-        EnableJoinButton();
         if (lanModeToggle != null) lanModeToggle.interactable = true;
         cancelLoadingButton.interactable = true;
         leaveRoomButton.interactable = true;
@@ -203,30 +220,11 @@ public class LobbyUIManager : MonoBehaviour
         }
     }
 
-    // --- ロード画面 ---
-    public void ShowLoading(string message)
-    {
-        loadingPanel.SetActive(true);
-        UpdateLoadingMessage(message);
-        cancelLoadingButton.interactable = true;
-    }
-
-    public void HideLoading()
-    {
-        loadingPanel.SetActive(false);
-    }
-
-    public void UpdateLoadingMessage(string message)
-    {
-        if (loadingMessageText != null) loadingMessageText.text = message;
-    }
-
     // --- ルーム画面 ---
     public void ShowRoomPanel()
     {
         mainPanel.SetActive(false);
         roomPanel.SetActive(true);
-        loadingPanel.SetActive(false);
     }
 
     public void HideRoomPanel()

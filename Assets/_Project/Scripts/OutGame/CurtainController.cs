@@ -1,11 +1,17 @@
-using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Animator))]
 public class CurtainController : MonoBehaviour
 {
+    [Header("Loading Screen")]
+    [SerializeField] private TextMeshProUGUI loadingMessageText;
+
+    [SerializeField] private Image curtainImage;
+
     private Animator _animator;
 
     // アニメーションの状態名（AnimatorControllerのState名と一致させてください）
@@ -22,15 +28,20 @@ public class CurtainController : MonoBehaviour
     /// </summary>
     public async UniTask CloseAsync(CancellationToken token = default)
     {
+        // 1. Closeを再生（Animator側で自動遷移はさせず、Closeで止まるようにしておく）
         _animator.Play(CloseStateHash, 0, 0f);
 
-        // 💡 1フレーム待ってからアニメーション時間を取得（Play直後は前状態の長さが取れるため）
+        // カーテンが閉まったら、UIの操作をブロックするためにRaycastTargetを有効化
+        curtainImage.raycastTarget = true; 
+
         await UniTask.Yield(PlayerLoopTiming.Update, token);
 
-        // 再生が完了するまで待機
+        // 2. Closeがしっかり終了するまで待つ（状態が勝手に変わらないので確実に検知可能）
         await WaitAnimationCompleteAsync("Close", token);
-    }
 
+        // 3. 待ち終わったら、スクリプトから明示的にIdleに戻す
+        _animator.Play("CloseIdle", 0, 0f);
+    }
     /// <summary>
     /// カーテンを開ける（画面を見せる）
     /// </summary>
@@ -40,6 +51,11 @@ public class CurtainController : MonoBehaviour
         await UniTask.Yield(PlayerLoopTiming.Update, token);
 
         await WaitAnimationCompleteAsync("Open", token);
+
+        // カーテンが開いたら、UIの操作ブロックを解除
+        curtainImage.raycastTarget = false;
+
+        loadingMessageText.text = string.Empty;
     }
 
     // アニメーションが指定したStateかつ、NormalizedTimeが1（100%再生）になるまで待つ補助関数
@@ -58,4 +74,15 @@ public class CurtainController : MonoBehaviour
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
     }
+
+    public void UpdateLoadingMessage(string message)
+    {
+        if (loadingMessageText != null) loadingMessageText.text = message;
+    }
+
+    public void HideLoaingMessage()
+    {
+        if (loadingMessageText != null) loadingMessageText.text = string.Empty;
+    }
+
 }

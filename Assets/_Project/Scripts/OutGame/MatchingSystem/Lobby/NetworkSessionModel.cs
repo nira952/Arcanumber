@@ -104,6 +104,8 @@ public class NetworkSessionModel
     {
         try
         {
+            CurtainManager.Instance.UpdateLoadingMessage("マッチング成功！");
+
             // 💡 送られてきたPayloadを分解して、IDと名前に分ける
             string payloadStr = Encoding.UTF8.GetString(request.Payload);
             string[] parts = payloadStr.Split('|');

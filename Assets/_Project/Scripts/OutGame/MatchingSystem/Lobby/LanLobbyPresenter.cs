@@ -51,7 +51,7 @@ public class LanLobbyPresenter : IDisposable
     {
         _isHost = isStartingAsHost;
         _view.SetUIStateOnMatchingStart();
-        _view.ShowLoading("LAN接続中...");
+        await CurtainManager.Instance.CloseAsync("LAN接続中...", GetType().Name);
 
         _matchCts?.Cancel();
         _matchCts = new CancellationTokenSource();
@@ -65,7 +65,7 @@ public class LanLobbyPresenter : IDisposable
                 _networkModel.StartHostLAN(_myLocalPlayerId, PlayerDataManager.Instance.LocalPlayerName, myIp);
                 SpawnPlayerDataManager();
 
-                // 💡 参加・切断時フック（UI更新はOnListChanged側で行われるため、ここではデータの更新のみを行う）
+                //  参加・切断時フック（UI更新はOnListChanged側で行われるため、ここではデータの更新のみを行う）
                 NetworkManager.Singleton.OnClientConnectedCallback += _ => {
                     PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
                 };
@@ -76,10 +76,9 @@ public class LanLobbyPresenter : IDisposable
                 PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
 
                 _view.UpdateRoomName($"IP : {myIp}");
-                _view.HideLoading();
+                CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
                 _view.ShowRoomPanel();
 
-                // 💡 競合の原因だった LanPollingLoopAsync の呼び出しを削除
             }
             else
             {
@@ -89,7 +88,7 @@ public class LanLobbyPresenter : IDisposable
                 await StartClientWaitAsync(_myLocalPlayerId, linkedToken, true, targetIp);
 
                 _view.UpdateRoomName($"IP : {targetIp}");
-                _view.HideLoading();
+                CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
                 _view.ShowRoomPanel();
 
                 // 💡 競合の原因だった LanClientPollingLoopAsync の呼び出しを削除
@@ -136,7 +135,7 @@ public class LanLobbyPresenter : IDisposable
     {
         _networkModel.Shutdown();
         _view.ResetMatchUI();
-        _view.HideLoading();
+        CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
     }
 
     public void HandleCancelOrLeave()
@@ -146,12 +145,12 @@ public class LanLobbyPresenter : IDisposable
 
     private async UniTask HandleCancelOrLeaveAsync()
     {
+        CurtainManager.Instance.UpdateLoadingMessage("キャンセル中...");
+
         _view.DisableCancelButton();
         _matchCts?.Cancel();
         _networkModel.Shutdown();
         _view.ResetMatchUI();
-        _view.HideRoomPanel();
-        _view.HideLoading();
     }
 
     public void StartGame()
@@ -178,10 +177,11 @@ public class LanLobbyPresenter : IDisposable
         }
 
         PlayerDataManager.Instance.Server_BuildAndSyncPlayerData(finalizedList);
-        _view.ShowLoading("シーンを移動します");
+        await CurtainManager.Instance.CloseAsync("シーンを移動します", GetType().Name);
         await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: _destroyToken);
-        _view.HideLoading();
         GameSceneManager.Instance.LoadNetworkScene(_nextSceneName);
+
+        CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
     }
 
     /// <summary>
