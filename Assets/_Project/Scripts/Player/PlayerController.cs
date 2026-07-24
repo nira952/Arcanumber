@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -22,6 +23,10 @@ public class PlayerController : MonoBehaviour
     private bool isChangeMove = false;  //移動の反転ができるかどうか
     private bool isNomalAttack = false; //通常攻撃が振れるか
 
+    //水中管理用の変数
+    private bool isWater = false;   //水に入っているか
+    private float defaultGravityScale;  //水用のスケール
+
     //エイム
     [SerializeField] private AimCursor aim;
 
@@ -38,6 +43,8 @@ public class PlayerController : MonoBehaviour
     public void Initialize()
     {
         rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+            defaultGravityScale = rb.gravityScale;
     }
     
     /// <summary>
@@ -53,7 +60,12 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public bool PlayerPosUpdate()
     {
-        if (rb != null) rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
+        if (rb != null)
+        {
+            //水中のときは移動速度を少し落とす
+            float currentMoveSpeed = isWater ? moveSpeed * 0.5f : moveSpeed;
+            rb.linearVelocity = new Vector2(moveInput * currentMoveSpeed, rb.linearVelocity.y);
+        }
 
         // 設置判定を確認する
         return IsGrounded();
@@ -137,6 +149,25 @@ public class PlayerController : MonoBehaviour
     {
         if (!context.performed) return;
         OnSkillUseEvent?.Invoke();
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Water"))
+        {
+            isWater = true;
+            if (rb != null)
+                rb.gravityScale = defaultGravityScale * 0.15f; //重力を軽くしてプカプカ浮くように
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Water"))
+        {
+            isWater = false;
+            if (rb != null)
+                rb.gravityScale = defaultGravityScale; //元の重力に戻す
+        }
     }
 
 

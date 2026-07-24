@@ -185,5 +185,4 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
         }
     }
 
-    public List<Arcana> GetArcanas => arcanaList;
 }

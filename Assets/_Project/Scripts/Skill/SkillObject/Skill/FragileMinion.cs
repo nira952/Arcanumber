@@ -19,6 +19,9 @@ public class FragileMinion : MonoBehaviour
     private float moveSpeed = 3.0f; //移動速度
     private Transform target;   //ターゲット位置
 
+    [SerializeField] private Animator animator;          //アニメーター
+    [SerializeField] private SpriteRenderer spriteRenderer; //反転用
+
     public void Initialize(int playerNo)
     {
         ownerPlayerNo = playerNo;
@@ -29,12 +32,22 @@ public class FragileMinion : MonoBehaviour
         CountDown();
 
         target = FindTarget();
+
         //移動する
         if (target != null)
         {
             Vector3 direction = (target.position - transform.position).normalized;
             transform.position += direction * moveSpeed * Time.deltaTime;
+            
+            if (spriteRenderer != null)
+            {
+                if (direction.x > 0)
+                    spriteRenderer.flipX = false; //右向き
+                else if (direction.x < 0)
+                    spriteRenderer.flipX = true;  //左向き
+            }
         }
+
     }
 
     /// <summary>
@@ -119,6 +132,8 @@ public class FragileMinion : MonoBehaviour
 
             //攻撃時刻を更新
             lastAttackTime = Time.time;
+            if (animator != null)
+                animator.SetTrigger("Itching_Akita");
         }
     }
     public int GetwnerPlayerNo() => ownerPlayerNo;
