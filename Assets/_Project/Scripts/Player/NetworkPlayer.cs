@@ -22,7 +22,7 @@ public class NetworkPlayer : MonoBehaviour
     [SerializeField] PlayerController pController;    //持っているプレイヤーコントローラー
     [SerializeField] private GameObject magicStart; //予備動作用のオブジェクト
 
-    /// ダメージを受けたときのイベント（NetworkPlayer, ダメージ量）
+    //ダメージを受けたときのイベント（NetworkPlayer, ダメージ量）
     public static event System.Action<NetworkPlayer, float> OnTakeDamageEvent;
 
     /// <summary>
