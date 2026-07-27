@@ -7,6 +7,7 @@ using UnityEngine;
 public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
 {
     [SerializeField] private NetworkPlayer[] all;
+    [SerializeField] private MapManager mapManager;
     private List<Arcana> allArcana = new List<Arcana>();
     private List<Skill> allSkill = new List<Skill>();
 
@@ -17,6 +18,8 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
     void Start()
     {
         LoadManager.Instance.Initialize();
+        //マップ決定
+        mapManager.RamdomMapSelect();
 
         Initialise();
         TrainingUIManager.Instance.Initialize();

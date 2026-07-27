@@ -5729,8 +5729,8 @@ Transform:
   - {fileID: 1290007875}
   - {fileID: 1719726870}
   - {fileID: 1388005761}
-  - {fileID: 1614158999}
   - {fileID: 333634825}
+  - {fileID: 1614158999}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &241337190
@@ -8940,7 +8940,7 @@ GameObject:
   m_Component:
   - component: {fileID: 333634825}
   m_Layer: 0
-  m_Name: Stage4
+  m_Name: Stage3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28209,6 +28209,72 @@ Transform:
   - {fileID: 633921583}
   m_Father: {fileID: 695491048}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!21 &873295859
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Cainos/Interactive Pixel Water/Pixel Water
+  m_Shader: {fileID: 4800000, guid: fb2bece584ef8de46908093f3ebc0a23, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3000
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AmbientWaveMul: 1
+    - _BlurAmountDeep: 14
+    - _BlurAmountShallow: 8
+    - _DistortionScale: 0.6
+    - _DistortionSpeed: 1
+    - _DistortionStrength: 0.5
+    - _LightShaftDepth: 2
+    - _LightShaftPower: 2
+    - _LightShaftScale: 1.4
+    - _LightShaftSpeed: 0.7
+    - _LightShaftTilt: -0.2
+    - _StencilReference: 123
+    - _SurfaceDistortionMul: 5
+    - _SurfaceThicknessLower: 1
+    - _SurfaceThicknessUpper: 1
+    m_Colors:
+    - _AmbientWaveAmptitude: {r: 0.01, g: 0.007, b: 0.003, a: 0.01}
+    - _AmbientWaveFrequency: {r: 2, g: 4, b: 8, a: 6}
+    - _AmbientWaveSpeed: {r: 4, g: -7, b: 10, a: 0.5}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _LightShaftColor: {r: 0.23137255, g: 0.25852698, b: 0.32156864, a: 0.4}
+    - _SurfaceColorLower: {r: 0.30980393, g: 0.31039932, b: 0.3764706, a: 0.2}
+    - _SurfaceColorUpper: {r: 0.83137256, g: 0.83332235, b: 0.8862745, a: 0.2}
+    - _UnderwaterTintDeep: {r: 0.3932792, g: 0.23834105, b: 0.49056602, a: 1}
+    - _UnderwaterTintShallow: {r: 0.78221786, g: 0.8127188, b: 0.8867924, a: 1}
+    - _WaterColorDeep: {r: 0.40115395, g: 0.26148093, b: 0.49056602, a: 0.4}
+    - _WaterColorShallow: {r: 0.4963955, g: 0.71362895, b: 0.9150943, a: 0.101960786}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1 &884151436
 GameObject:
   m_ObjectHideFlags: 0
@@ -30876,72 +30942,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 993338211}
   m_CullTransparentMesh: 1
---- !u!21 &1002563966
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Cainos/Interactive Pixel Water/Pixel Water
-  m_Shader: {fileID: 4800000, guid: fb2bece584ef8de46908093f3ebc0a23, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - unity_Lightmaps:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_LightmapsInd:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_ShadowMasks:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _AmbientWaveMul: 1
-    - _BlurAmountDeep: 14
-    - _BlurAmountShallow: 8
-    - _DistortionScale: 0.6
-    - _DistortionSpeed: 1
-    - _DistortionStrength: 0.5
-    - _LightShaftDepth: 2
-    - _LightShaftPower: 2
-    - _LightShaftScale: 1.4
-    - _LightShaftSpeed: 0.7
-    - _LightShaftTilt: -0.2
-    - _StencilReference: 123
-    - _SurfaceDistortionMul: 5
-    - _SurfaceThicknessLower: 1
-    - _SurfaceThicknessUpper: 1
-    m_Colors:
-    - _AmbientWaveAmptitude: {r: 0.01, g: 0.007, b: 0.003, a: 0.01}
-    - _AmbientWaveFrequency: {r: 2, g: 4, b: 8, a: 6}
-    - _AmbientWaveSpeed: {r: 4, g: -7, b: 10, a: 0.5}
-    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _LightShaftColor: {r: 0.23137255, g: 0.25852698, b: 0.32156864, a: 0.4}
-    - _SurfaceColorLower: {r: 0.30980393, g: 0.31039932, b: 0.3764706, a: 0.2}
-    - _SurfaceColorUpper: {r: 0.83137256, g: 0.83332235, b: 0.8862745, a: 0.2}
-    - _UnderwaterTintDeep: {r: 0.3932792, g: 0.23834105, b: 0.49056602, a: 1}
-    - _UnderwaterTintShallow: {r: 0.78221786, g: 0.8127188, b: 0.8867924, a: 1}
-    - _WaterColorDeep: {r: 0.40115395, g: 0.26148093, b: 0.49056602, a: 0.4}
-    - _WaterColorShallow: {r: 0.4963955, g: 0.71362895, b: 0.9150943, a: 0.101960786}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1 &1002659022
 GameObject:
   m_ObjectHideFlags: 0
@@ -31823,6 +31823,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5373330553216305745, guid: 19c814d7a6d59b74686e74ddb900f806, type: 3}
   m_PrefabInstance: {fileID: 1029863885}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1031449541
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1031449542}
+  - component: {fileID: 1031449543}
+  m_Layer: 0
+  m_Name: MapManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1031449542
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1031449541}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1440772582}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1031449543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1031449541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74a82b938549e9d4b8364c3fbf17bcf4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapList:
+  - {fileID: 1290007874}
+  - {fileID: 1719726869}
+  - {fileID: 1388005760}
+  - {fileID: 333634824}
 --- !u!1 &1041857171
 GameObject:
   m_ObjectHideFlags: 0
@@ -32403,72 +32452,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!21 &1066090231
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Cainos/Interactive Pixel Water/Pixel Water
-  m_Shader: {fileID: 4800000, guid: fb2bece584ef8de46908093f3ebc0a23, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - unity_Lightmaps:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_LightmapsInd:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_ShadowMasks:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _AmbientWaveMul: 1
-    - _BlurAmountDeep: 14
-    - _BlurAmountShallow: 8
-    - _DistortionScale: 0.6
-    - _DistortionSpeed: 1
-    - _DistortionStrength: 0.5
-    - _LightShaftDepth: 2
-    - _LightShaftPower: 2
-    - _LightShaftScale: 1.4
-    - _LightShaftSpeed: 0.7
-    - _LightShaftTilt: -0.2
-    - _StencilReference: 123
-    - _SurfaceDistortionMul: 5
-    - _SurfaceThicknessLower: 1
-    - _SurfaceThicknessUpper: 1
-    m_Colors:
-    - _AmbientWaveAmptitude: {r: 0.01, g: 0.007, b: 0.003, a: 0.01}
-    - _AmbientWaveFrequency: {r: 2, g: 4, b: 8, a: 6}
-    - _AmbientWaveSpeed: {r: 4, g: -7, b: 10, a: 0.5}
-    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _LightShaftColor: {r: 0.23137255, g: 0.25852698, b: 0.32156864, a: 0.4}
-    - _SurfaceColorLower: {r: 0.30980393, g: 0.31039932, b: 0.3764706, a: 0.2}
-    - _SurfaceColorUpper: {r: 0.83137256, g: 0.83332235, b: 0.8862745, a: 0.2}
-    - _UnderwaterTintDeep: {r: 0.3932792, g: 0.23834105, b: 0.49056602, a: 1}
-    - _UnderwaterTintShallow: {r: 0.78221786, g: 0.8127188, b: 0.8867924, a: 1}
-    - _WaterColorDeep: {r: 0.40115395, g: 0.26148093, b: 0.49056602, a: 0.4}
-    - _WaterColorShallow: {r: 0.4963955, g: 0.71362895, b: 0.9150943, a: 0.101960786}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1 &1068574106
 GameObject:
   m_ObjectHideFlags: 0
@@ -36928,7 +36911,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1290007875
 Transform:
   m_ObjectHideFlags: 0
@@ -38593,7 +38576,7 @@ PrefabInstance:
     - target: {fileID: 1866009694136763871, guid: 9f2fcdebbc53f6c4bb81a38283db78b1, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 1066090231}
+      objectReference: {fileID: 873295859}
     - target: {fileID: 3063698515212308602, guid: 9f2fcdebbc53f6c4bb81a38283db78b1, type: 3}
       propertyPath: m_Size.x
       value: 6.140091
@@ -38753,6 +38736,7 @@ Transform:
   - {fileID: 641833528}
   - {fileID: 1589980448}
   - {fileID: 1377240029}
+  - {fileID: 1031449542}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1445554961
@@ -39826,6 +39810,7 @@ MonoBehaviour:
   - {fileID: 1636274385}
   - {fileID: 1690761676}
   - {fileID: 759874460}
+  mapManager: {fileID: 1031449543}
 --- !u!1 &1539023721
 GameObject:
   m_ObjectHideFlags: 0
@@ -40512,7 +40497,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1614158999}
   m_Layer: 0
-  m_Name: Stage3
+  m_Name: Stage4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -42612,6 +42597,72 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5373330553216305745, guid: 19c814d7a6d59b74686e74ddb900f806, type: 3}
   m_PrefabInstance: {fileID: 1722209509}
   m_PrefabAsset: {fileID: 0}
+--- !u!21 &1725662603
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Cainos/Interactive Pixel Water/Pixel Water
+  m_Shader: {fileID: 4800000, guid: fb2bece584ef8de46908093f3ebc0a23, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3000
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AmbientWaveMul: 1
+    - _BlurAmountDeep: 14
+    - _BlurAmountShallow: 8
+    - _DistortionScale: 0.6
+    - _DistortionSpeed: 1
+    - _DistortionStrength: 0.5
+    - _LightShaftDepth: 2
+    - _LightShaftPower: 2
+    - _LightShaftScale: 1.4
+    - _LightShaftSpeed: 0.7
+    - _LightShaftTilt: -0.2
+    - _StencilReference: 123
+    - _SurfaceDistortionMul: 5
+    - _SurfaceThicknessLower: 1
+    - _SurfaceThicknessUpper: 1
+    m_Colors:
+    - _AmbientWaveAmptitude: {r: 0.01, g: 0.007, b: 0.003, a: 0.01}
+    - _AmbientWaveFrequency: {r: 2, g: 4, b: 8, a: 6}
+    - _AmbientWaveSpeed: {r: 4, g: -7, b: 10, a: 0.5}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _LightShaftColor: {r: 0.23137255, g: 0.25852698, b: 0.32156864, a: 0.4}
+    - _SurfaceColorLower: {r: 0.30980393, g: 0.31039932, b: 0.3764706, a: 0.2}
+    - _SurfaceColorUpper: {r: 0.83137256, g: 0.83332235, b: 0.8862745, a: 0.2}
+    - _UnderwaterTintDeep: {r: 0.3932792, g: 0.23834105, b: 0.49056602, a: 1}
+    - _UnderwaterTintShallow: {r: 0.78221786, g: 0.8127188, b: 0.8867924, a: 1}
+    - _WaterColorDeep: {r: 0.40115395, g: 0.26148093, b: 0.49056602, a: 0.4}
+    - _WaterColorShallow: {r: 0.4963955, g: 0.71362895, b: 0.9150943, a: 0.101960786}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1 &1746413894
 GameObject:
   m_ObjectHideFlags: 0
