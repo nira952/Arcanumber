@@ -108,6 +108,8 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
 
         //UIのフレームも 0 番に合わせる
         BattleUIManager.Instance.SkillFrameChange(p);
+        //コルーチンをすべて止める
+        StopAllCoroutines();
     }
 
     //ゲッター
