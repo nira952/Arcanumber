@@ -272,12 +272,12 @@ public static class PlayerUtility
     /// </summary>
     public static void FinalDamage(NetworkPlayer target, NetworkPlayer player, float amount)
     {
-        //カウンター状態か
-        if (HaveEffect(target, EffectList.Counter, true))
-            ProcessCounterDamage(target, player, amount);
         //防御無視か
         if (!HaveEffect(player, EffectList.IgnoreDefense, true))
             amount /= GetFinalDef(target);
+        //カウンター状態か
+        if (HaveEffect(target, EffectList.Counter, true))
+            ProcessCounterDamage(target, player, amount);
         //ダメージ無効を持っているか
         if (HaveEffect(target, EffectList.Invincible, true))
             return;
@@ -340,7 +340,10 @@ public static class PlayerUtility
         {
             //半分回復を横取りする
             if(HaveEffect(p, EffectList.HealSteal, true))
+            {
                 amount *= 0.5f;
+                p.Heal(amount);
+            }
         }
         player.Heal(amount);
     }
