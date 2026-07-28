@@ -15,9 +15,9 @@ namespace nira.Demo
 
         [SerializeField] private DemoSkill skill;
 
-        private void Awake()
+        public void Initialize(IPlayerActionHandler actionHandler)
         {
-            actionHandler = GetComponent<IPlayerActionHandler>();
+            this.actionHandler = actionHandler;
         }
 
         private void Update()

@@ -44,7 +44,8 @@ public class CurtainManager : MonoBehaviour
             // もしシーンがTitle以外ならcurtainを開ける
             if (GameSceneManager.Instance.GetCurrentScene() != Scene.Title)
             {
-                _activeCurtain.OpenAsync(default).Forget();
+                Debug.Log($"[CurtainManager] シーンがTitle以外なので、カーテンを開けます。");
+                OpenAsync(GetType().Name).Forget();
             }
 
 
@@ -71,6 +72,17 @@ public class CurtainManager : MonoBehaviour
         if (_activeCurtain == null) return;
         Debug.Log($"[CurtainManager] OpenAsync called: {caller}");
         await _activeCurtain.OpenAsync(destroyCancellationToken);
+    }
+
+    public async UniTask FullOpenAsync(string caller, float duration = 0.2f)
+    {
+        // duration分待機してからカーテンを開ける
+        await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: destroyCancellationToken);
+
+        if (_activeCurtain == null) return;
+        Debug.Log($"[CurtainManager] FullOpenAsync called: {caller}");
+        await _activeCurtain.FullOpenAsync(destroyCancellationToken);
+
     }
 
     public async UniTask CloseAsync(string message,string caller,float duration = 0.1f)

@@ -7,7 +7,8 @@ public enum Scene
     Title,
     ArcanaSelect,
     SkillSelect,
-    Game
+    Game,
+    Non,
 }
 
 
@@ -77,7 +78,7 @@ public class GameSceneManager : MonoBehaviour
     {
         string sceneName = SceneManager.GetActiveScene().name;
 
-        return Scene.TryParse(sceneName, out Scene currentScene) ? currentScene : Scene.Title;
+        return Scene.TryParse(sceneName, out Scene currentScene) ? currentScene : Scene.Non;
     }
 
     /// <summary>

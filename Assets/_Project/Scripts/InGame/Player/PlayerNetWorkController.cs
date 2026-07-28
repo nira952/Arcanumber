@@ -32,7 +32,7 @@ namespace nira.Demo
                 player.CurrentHealth.Subscribe(v => netCurrentHealth.Value = v).AddTo(this);
                 player.IsDown.Subscribe(v => netIsDown.Value = v).AddTo(this);
 
-                if (GameManager.Instance != null) GameManager.Instance.RegisterPlayer(player);
+                //if (GameManager.Instance != null) GameManager.Instance.RegisterPlayer(player);
             }
             else
             {
