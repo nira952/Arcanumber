@@ -12,7 +12,7 @@ public class AimCursor : MonoBehaviour
 
     [SerializeField] private GameObject magicStart;
 
-    [SerializeField] private Camera _mainCam;   //カメラの位置
+    private Camera _mainCam;   //カメラの位置
     private Vector3 _mouseWorldPos; //現在のマウスの位置
 
     private AimSelect _currentMode; //どの標準方法か
@@ -28,6 +28,14 @@ public class AimCursor : MonoBehaviour
     /// </summary>
     public void Initialize()
     {
+        _mainCam = CameraManager.Instance.GetMainCamera();
+
+        if (_mainCam == null)
+        {
+            Debug.LogError("[AimCursor] メインカメラが見つかりません。");
+            return;
+        }
+
         // システムカーソルを非表示に
         Cursor.visible = false;
         // 初期状態としてカーソルを表示する

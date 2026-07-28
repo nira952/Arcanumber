@@ -20,6 +20,8 @@ namespace nira.Demo
             // オフライン用の初期化（ID 0 としてUIをセットアップ）
             player.Initialize(0);
 
+            //if (GameManager.Instance != null) GameManager.Instance.RegisterPlayer(player);
+
             if (GameUIManager.Instance != null)
             {
                 GameUIManager.Instance.SetPlayerName(0, "練習用プレイヤー");

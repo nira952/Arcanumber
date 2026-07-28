@@ -25,12 +25,19 @@ public static class AppBootstrapper
         Object.DontDestroyOnLoad(root);
 
         // 1. 順番にAddComponent
-        var dataManager = root.AddComponent<PlayerDataManager>();
-        var gameSceneManager = root.AddComponent<GameSceneManager>();
+        var dataManager         = root.AddComponent<PlayerDataManager>();
+        var gameSceneManager    = root.AddComponent<GameSceneManager>();
         var netWorkAudioManager = root.AddComponent<NetWorkAudioManager>();
-        var CurtainManager = root.AddComponent<CurtainManager>();
+        var curtainManager      = root.AddComponent<CurtainManager>();
+        var loadManager         = root.AddComponent<LoadManager>();
+        var assetLoader         = root.AddComponent<AssetLoader>();
 
         // 2. 意図した順番で初期化を実行
+
+        // デバッグ用にローカルモードにする
+        dataManager.SetLocalMode(true);
+
+        loadManager.Initialize();
 
 
         // 3. すべて終わったらR3で通知

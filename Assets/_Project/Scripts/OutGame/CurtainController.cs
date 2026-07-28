@@ -1,6 +1,7 @@
-using System.Threading;
 using Cysharp.Threading.Tasks;
+using System.Threading;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,12 +17,24 @@ public class CurtainController : MonoBehaviour
 
     // アニメーションの状態名（AnimatorControllerのState名と一致させてください）
     private static readonly int OpenStateHash = Animator.StringToHash("Open");
+
+    private static readonly int FullOpenStateHash = Animator.StringToHash("FullOpen");
     private static readonly int CloseStateHash = Animator.StringToHash("Close");
 
     private void Awake()
     {
         _animator = GetComponent<Animator>();
+
+#if UNITY_EDITOR
+        // 実行時にSceneビュー上でのみ非表示にする
+        if (Application.isPlaying)
+        {
+            SceneVisibilityManager.instance.Hide(gameObject, true);
+        }
+#endif
+    
     }
+
 
     /// <summary>
     /// カーテンを閉める（画面を隠す）
@@ -57,6 +70,21 @@ public class CurtainController : MonoBehaviour
 
         loadingMessageText.text = string.Empty;
     }
+
+    public async UniTask FullOpenAsync(CancellationToken token = default)
+    {
+        _animator.Play(FullOpenStateHash, 0, 0f);
+        await UniTask.Yield(PlayerLoopTiming.Update, token);
+
+        await WaitAnimationCompleteAsync("FullOpen", token);
+
+        // カーテンが開いたら、UIの操作ブロックを解除
+        curtainImage.raycastTarget = false;
+
+        loadingMessageText.text = string.Empty;
+
+    }
+
 
     // アニメーションが指定したStateかつ、NormalizedTimeが1（100%再生）になるまで待つ補助関数
     private async UniTask WaitAnimationCompleteAsync(string stateName, CancellationToken token)

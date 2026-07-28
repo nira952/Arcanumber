@@ -4,17 +4,11 @@ using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class ArcanaSelectManager : NetworkBehaviour
 
 {
-
-    [Header("Debug Settings")]
-
-    [SerializeField, Tooltip("オンにするとインターネット通信なし（オフライン）で動作します")]
-
-    private bool isDebugMode = false;
+    private bool isLocalMode = false;
 
 
 
@@ -95,9 +89,9 @@ public class ArcanaSelectManager : NetworkBehaviour
 
 
     private void Start()
-
     {
-
+        // ローカルモードかどうかを判定
+        isLocalMode = PlayerDataManager.Instance.IsLocalMode;
         arcanaDatabase = AssetLoader.Instance.LoadAllArcanas;
 
 
@@ -108,7 +102,7 @@ public class ArcanaSelectManager : NetworkBehaviour
 
         // -------------------------
 
-        if (!isDebugMode)
+        if (!isLocalMode)
 
         {
 
@@ -150,7 +144,7 @@ public class ArcanaSelectManager : NetworkBehaviour
 
         // UIManagerの初期化 (デバッグ時はデフォルトで0番とするなどの配慮)
 
-        int myLobbyIndex = isDebugMode ? 0 : PlayerDataManager.Instance.GetMyLobbyIndex();
+        int myLobbyIndex = isLocalMode ? 0 : PlayerDataManager.Instance.GetMyLobbyIndex();
 
         Sprite myBackSprite = cardSprites[Mathf.Clamp(myLobbyIndex, 0, cardSprites.Length - 1)];
 
@@ -196,7 +190,7 @@ public class ArcanaSelectManager : NetworkBehaviour
 
     {
 
-        if (!isDebugMode && PlayerDataManager.Instance != null)
+        if (!isLocalMode && PlayerDataManager.Instance != null)
 
         {
 
@@ -226,7 +220,7 @@ public class ArcanaSelectManager : NetworkBehaviour
 
 
 
-        if (isDebugMode)
+        if (isLocalMode)
 
         {
 
@@ -258,9 +252,11 @@ public class ArcanaSelectManager : NetworkBehaviour
 
         Debug.Log("[DebugMode] 確定されました。1秒後にローカルで SkillSelectScene に移行します。");
 
+        await CurtainManager.Instance.CloseAsync("Ready!", GetType().Name, duration: 0.5f);
+
         await UniTask.Delay(TimeSpan.FromSeconds(1.0f));
 
-        SceneManager.LoadSceneAsync("SkillSelect");
+        GameSceneManager.Instance.LoadLocalScene("SkillSelect"); // オフライン用のシーン遷移
 
     }
 
@@ -378,7 +374,7 @@ public class ArcanaSelectManager : NetworkBehaviour
 
     {
 
-        if (isDebugMode)
+        if (isLocalMode)
 
         {
 

@@ -6,9 +6,10 @@ public class PlayerDataManager : NetworkBehaviour
 {
     public static PlayerDataManager Instance { get; private set; }
 
+    public bool IsLocalMode { get; private set; } = false;
+
     // セーブデータ用のキー
     private const string NameSaveKey = "Save_PlayerName";
-
     // 初期名の定数
     public const string DefaultPlayerNamePrefix = "プレイヤー";
 
@@ -17,7 +18,6 @@ public class PlayerDataManager : NetworkBehaviour
 
 
     // ホストがデータを確定させ、全クライアントへ自動同期するリスト
-    // 💡 引数に NetworkVariableReadPermission.Everyone を指定する
     private readonly NetworkList<PlayerNetworkData> _allPlayerData =
         new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
@@ -305,15 +305,20 @@ public class PlayerDataManager : NetworkBehaviour
     // ==========================================
 
 
+    public void SetLocalMode(bool isLocal)
+    {
+        IsLocalMode = isLocal;
+    }
+
     /// <summary>
     /// ローカルスキルを設定する
     /// </summary>
     /// <param name="skills"></param>
     public void SetLocalSkills(Skill[] skills)
     {
-        if (skills == null || skills.Length != 5)
+        if (skills == null || skills.Length != 4)
         {
-            Debug.LogError("[PlayerDataManager] スキル配列の長さが不正です。5つのスキルを設定してください。");
+            Debug.LogError("[PlayerDataManager] スキル配列の長さが不正です。4つのスキルを設定してください。");
             return;
         }
 
