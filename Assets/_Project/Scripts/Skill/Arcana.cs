@@ -40,6 +40,7 @@ public class Arcana : ScriptableObject
         this.effectPrefab = !string.IsNullOrEmpty(Get(6)) ? Resources.Load<GameObject>(Get(6)) : null;
         this.se = !string.IsNullOrEmpty(Get(7)) ? Resources.Load<AudioClip>(Get(7)) : null;
         this.arcanaEx = Get(8);
+        this.arcanaImage = !string.IsNullOrEmpty(Get(10)) ? Resources.Load<Sprite>(Get(10)) : null;
 
         //ロジック更新
         this.arcanaLogic = CreateInstanceFromName(Get(9));
