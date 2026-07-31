@@ -52,7 +52,7 @@ public class NetworkPlayer : MonoBehaviour
     public Skill GetNoSkill() { return playerRoot.SkillList[playerRoot.SelectedSkillIndex.Value]; }
     public PlayerStatus GetPlayerStatus() {  return playerRoot.GetPlayerStatus(); }
     public List<EffectAbility> GetHaveEffect() { return playerRoot.ActiveEffects.Value; }
-    public GameObject GetMagicStart() { return gameObject; }
+    public GameObject GetMagicStart() { return playerRoot.GetMagic(); }
 
     public PlayerRoot GetPlayerController() { return playerRoot; }
 

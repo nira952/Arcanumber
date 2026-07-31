@@ -52,6 +52,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
         {
             var playerInput = GetComponent<PlayerInput>();
             if (playerInput != null) playerInput.enabled = false;
+            root.gameObject.tag = "Enemy";
         }
 
         Debug.Log($"[PlayerNetworkController] OnNetworkSpawn - IsOwner: {IsOwner}");
@@ -129,6 +130,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
             }
         }).AddTo(this);
 
+        
         root.Initialize(this);
     }
 
