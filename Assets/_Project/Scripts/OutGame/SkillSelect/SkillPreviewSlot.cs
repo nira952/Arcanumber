@@ -5,4 +5,6 @@ public class SkillPreviewSlot : MonoBehaviour
 {
     public Image skillImage;
     public Button removeButton;
+
+    public HoverActionTrigger hoverTrigger;
 }

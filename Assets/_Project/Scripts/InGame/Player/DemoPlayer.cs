@@ -54,10 +54,7 @@ namespace nira.Demo
                 CurrentHealth.Value = 0;
                 IsDown.Value = true;
 
-                if (GameManager.Instance != null)
-                {
-                    GameManager.Instance.CheckFinishCondition();
-                }
+
             }
         }
 

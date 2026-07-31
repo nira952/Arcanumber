@@ -41,7 +41,7 @@ public static class ActionHandler
                 .SelectAim(player.GetNoSkill().GetAimSelect());
 
         //UIを変更する
-        BattleUIManager.Instance.SkillFrameChange(player);
+        PlayerUIManager.Instance.SkillFrameChange(player);
     }
 
     /// <summary>

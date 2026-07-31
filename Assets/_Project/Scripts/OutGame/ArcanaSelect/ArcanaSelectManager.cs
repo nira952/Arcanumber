@@ -6,87 +6,45 @@ using Unity.Netcode;
 using UnityEngine;
 
 public class ArcanaSelectManager : NetworkBehaviour
-
 {
     private bool isLocalMode = false;
 
-
-
     // アルカナの構造体（NGO通信用）
-
     public struct ArcanaCard : INetworkSerializable, IEquatable<ArcanaCard>
-
     {
-
         public int CardId;   // 0 ～ 21 (計22種類)
-
         public bool IsFace;  // true: 表, false: 裏
 
-
-
         public ArcanaCard(int id, bool isFace)
-
         {
-
             CardId = id;
-
             IsFace = isFace;
-
         }
-
-
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-
         {
-
             serializer.SerializeValue(ref CardId);
-
             serializer.SerializeValue(ref IsFace);
-
         }
-
-
 
         public bool Equals(ArcanaCard other)
-
         {
-
             return CardId == other.CardId && IsFace == other.IsFace;
-
         }
-
     }
 
-
-
     private const int CardsPerPlayer = 5;
-
     private const int TotalUniqueCards = 22;
 
-
-
     private Dictionary<ulong, List<ArcanaCard>> _playerAllocations = new Dictionary<ulong, List<ArcanaCard>>();
-
     private List<ArcanaCard> _myCards = new List<ArcanaCard>();
-
     private List<Arcana> arcanaDatabase = new List<Arcana>();
-
-
-
     [SerializeField] private ArcanaUIManager arcanaUIManager;
-
     [SerializeField] private Sprite[] cardSprites = new Sprite[4];
-
     [SerializeField] private Color[] glowColors = new Color[4]; // 0:赤, 1:青, 2:緑, 3:黄
 
-
-
     private Arcana selectedArcana;
-
     private readonly CompositeDisposable _disposables = new();
-
-
 
     private void Start()
     {
@@ -95,25 +53,15 @@ public class ArcanaSelectManager : NetworkBehaviour
         arcanaDatabase = AssetLoader.Instance.LoadAllArcanas;
 
 
-
         // -------------------------
-
         // 通信初期化・サブスクライブ
-
         // -------------------------
-
         if (!isLocalMode)
-
         {
-
             if (IsServer) SetupGamePositions();
 
-
-
             if (IsServer)
-
             {
-
                 Observable.FromEvent<NetworkList<PlayerNetworkData>.OnListChangedDelegate, NetworkListEvent<PlayerNetworkData>>(
 
                     h => (ev) => h(ev),
@@ -156,6 +104,7 @@ public class ArcanaSelectManager : NetworkBehaviour
 
         // --- R3によるUIイベントの結合 ---
 
+        // 1. カード選択時の処理
         arcanaUIManager.OnCardSelected
 
             .Subscribe(HandleCardSelected)
@@ -163,23 +112,19 @@ public class ArcanaSelectManager : NetworkBehaviour
             .AddTo(_disposables);
 
 
-
+        // 2. 確定ボタン押下時の処理
         arcanaUIManager.OnSelectCardSubmit
 
             .Subscribe(_ => SubmitCardSetting())
 
             .AddTo(_disposables);
 
-
-
+        // 3. カードオープンアニメーション開始時の処理
         arcanaUIManager.OnAnimationStarted
 
             .Subscribe(_ => CardOpen())
 
             .AddTo(_disposables);
-
-
-
     }
 
 
@@ -187,21 +132,14 @@ public class ArcanaSelectManager : NetworkBehaviour
     // Viewから流れてきたArcanaデータを受け取る
 
     private void HandleCardSelected(Arcana arcana)
-
     {
-
         if (!isLocalMode && PlayerDataManager.Instance != null)
-
         {
-
             PlayerDataManager.Instance.SetLocalArcana(arcana);
-
         }
 
-
-
+        arcanaUIManager.ShowSelectText(true);
         selectedArcana = arcana;
-
     }
 
 
@@ -209,35 +147,20 @@ public class ArcanaSelectManager : NetworkBehaviour
     // 確定ボタンのロジック
 
     private void SubmitCardSetting()
-
     {
-
         if (selectedArcana == null) return; // 選択されていない場合のフェールセーフ
-
-
 
         CurtainManager.Instance.CloseAsync("待機中", GetType().Name, duration: 0.5f).Forget();
 
-
-
         if (isLocalMode)
-
         {
-
             // デバッグ時は直接ローカルで遷移処理を呼ぶ
-
             DebugTransitionAsync().Forget();
-
         }
-
         else
-
         {
-
             SubmitSelectedArcanaServerRpc(selectedArcana.GetArcanaListID());
-
             SetReadyStatusServerRpc(true);
-
         }
 
     }

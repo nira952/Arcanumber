@@ -1,11 +1,21 @@
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
 /// スキルの生成と管理を行うクラス
 /// </summary>
-public class SkillManager : SingletonMonoBehaviour<SkillManager>
+public class SkillManager : NetworkBehaviour
 { 
+    public static SkillManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
     /// <summary>
     /// GameManagerから一番最初に呼ばれる受付窓口
     /// </summary>
@@ -18,8 +28,15 @@ public class SkillManager : SingletonMonoBehaviour<SkillManager>
         //ポジションも確定
         Vector2 pos = player.GetPlayerController().GetAimCursor().GetTransform().position;
 
-        //ディレイのコルーチンを開始
-        StartCoroutine(SkillSpawnDelayCoroutine(player, skill, pos));
+        if (IsSpawned)
+        {
+            RequestSkillServerRpc(player.GetNetworkId(), pos);
+        }
+        else
+        {
+            // オフライン時などは直接実行する
+            StartCoroutine(SkillSpawnDelayCoroutine(player, skill, pos));
+        }
     }
     public void RequestSkill(NetworkPlayer player, int skillNo)
     {
@@ -30,7 +47,53 @@ public class SkillManager : SingletonMonoBehaviour<SkillManager>
         //ポジションも確定
         Vector2 pos = player.GetPlayerController().GetAimCursor().GetTransform().position;
 
-        //ディレイのコルーチンを開始
+        if (IsSpawned)
+        {
+            RequestSkillWithNoServerRpc(player.GetNetworkId(), skillNo, pos);
+        }
+        else
+        {
+            // オフライン時などは直接実行する
+            StartCoroutine(SkillSpawnDelayCoroutine(player, skill, pos));
+        }
+    }
+
+    // SkillManager.cs
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestSkillServerRpc(int playerId, Vector2 pos)
+    {
+        // 送信者の ClientId から正しいプレイヤーを取得
+        NetworkPlayer player = PlayerUtility.FindPlayerByNo(playerId);
+
+        // もし FindPlayerByClientId が無ければ FindPlayerByNo(playerId) でも可（修正1でplayerIdが正常になるため）
+        if (player == null) player = PlayerUtility.FindPlayerByNo(playerId);
+        if (player == null) return;
+
+        Skill skill = player.GetNoSkill();
+        if (skill == null) return;
+
+        RequestSkillClientRpc(player.GetNetworkId(), -1, pos);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestSkillWithNoServerRpc(int playerId, int skillNo, Vector2 pos)
+    {
+        NetworkPlayer player = PlayerUtility.FindPlayerByNo(playerId);
+        if (player == null) return;
+        Skill skill = player.GetSkill()[skillNo];
+        if (skill == null) return;
+        RequestSkillClientRpc(playerId, skillNo, pos);
+    }
+
+    [ClientRpc]
+    private void RequestSkillClientRpc(int playerId, int skillNo, Vector2 pos)
+    {
+        NetworkPlayer player = PlayerUtility.FindPlayerByNo(playerId);
+        if (player == null) return;
+
+        Skill skill = skillNo == -1 ? player.GetNoSkill() : player.GetSkill()[skillNo];
+        if (skill == null) return;
+
         StartCoroutine(SkillSpawnDelayCoroutine(player, skill, pos));
     }
 

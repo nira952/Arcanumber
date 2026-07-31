@@ -36,7 +36,9 @@ public class LobbyModel
 #if !UNITY_EDITOR
         options.SetProfile("Player_BuildClient");
 #else
-        options.SetProfile("Player_Editor");
+
+        string randomProfile = UnityEngine.Random.Range(1000, 9999).ToString();
+        options.SetProfile($"Player_Editor{randomProfile}");
 #endif
         await UnityServices.InitializeAsync(options);
 

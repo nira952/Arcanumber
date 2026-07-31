@@ -7,40 +7,108 @@ using UnityEngine;
 /// </summary>
 public static class PlayerUtility
 {
-    //プレイヤーをまとめる辞書
-    private static Dictionary<int, NetworkPlayer> playerCache = new Dictionary<int, NetworkPlayer>();
+    // IDからプレイヤーを直接引くための辞書
+    private static readonly Dictionary<int, NetworkPlayer> _playerMap = new Dictionary<int, NetworkPlayer>();
 
     /// <summary>
-    /// 全プレイヤーを返す
+    /// 全プレイヤーのリストを返す
     /// </summary>
-    public static List<NetworkPlayer> GetAllPlyer => playerCache.Values.ToList();
+    public static List<NetworkPlayer> GetAllPlyer
+    {
+        get
+        {
+            // 登録済みのプレイヤー群からnull（破棄されたオブジェクト）を除外して返す
+            CleanUpNullMapEntries();
+            return _playerMap.Values.ToList();
+        }
+    }
 
     /// <summary>
     /// プレイヤーを追加する処理
     /// </summary>
     public static void RegisterPlayer(NetworkPlayer player)
     {
-        if (!playerCache.ContainsKey(player.GetNetworkId()))
-            playerCache.Add(player.GetNetworkId(), player);
+        if (player == null) return;
+
+        int id = player.GetNetworkId();
+        if (_playerMap.ContainsKey(id))
+        {
+            _playerMap[id] = player;
+        }
+        else
+        {
+            _playerMap.Add(id, player);
+        }
     }
 
     /// <summary>
-    ///プレイヤーを消す処理
+    /// プレイヤーを消す処理
     /// </summary>
     public static void UnregisterPlayer(int charaNo)
     {
-        if (playerCache.ContainsKey(charaNo))
-            playerCache.Remove(charaNo);
+        if (_playerMap.ContainsKey(charaNo))
+        {
+            _playerMap.Remove(charaNo);
+        }
     }
 
     /// <summary>
-    /// プレイヤーを探す処理
+    /// プレイヤーを探す処理（Dictionaryから即座に取得）
     /// </summary>
     public static NetworkPlayer FindPlayerByNo(int charaNo)
     {
-        if (playerCache.TryGetValue(charaNo, out NetworkPlayer player))
+        CleanUpNullMapEntries();
+        if (_playerMap.TryGetValue(charaNo, out var player))
+        {
             return player;
-        return null;
+        }
+
+        // 辞書に存在しない場合はGameManager側からの直接取得（フォールバック）を試みる
+        return FindAndRegisterFromGameManager(charaNo);
+    }
+
+    /// <summary>
+    /// 破棄されたインスタンス（Unityのnull）を辞書から取り除く内部処理
+    /// </summary>
+    private static void CleanUpNullMapEntries()
+    {
+        // Unityオブジェクト特有の Destroy 済み参照（== null）を掃除
+        List<int> keysToRemove = null;
+        foreach (var pair in _playerMap)
+        {
+            if (pair.Value == null)
+            {
+                keysToRemove ??= new List<int>();
+                keysToRemove.Add(pair.Key);
+            }
+        }
+
+        if (keysToRemove != null)
+        {
+            foreach (var key in keysToRemove)
+            {
+                _playerMap.Remove(key);
+            }
+        }
+    }
+
+    /// <summary>
+    /// GameManagerから検索して自動登録する安全策（フォールバック）
+    /// </summary>
+    private static NetworkPlayer FindAndRegisterFromGameManager(int charaNo)
+    {
+        if (nira.Demo.GameManager.Instance == null) return null;
+
+        var target = nira.Demo.GameManager.Instance.Players
+            .Select(p => p != null ? p.GetComponentInChildren<NetworkPlayer>() : null)
+            .FirstOrDefault(np => np != null && np.GetNetworkId() == charaNo);
+
+        if (target != null)
+        {
+            RegisterPlayer(target);
+        }
+
+        return target;
     }
 
     /// <summary>
@@ -48,16 +116,12 @@ public static class PlayerUtility
     /// </summary>
     public static List<NetworkPlayer> GetOtherPlayers(NetworkPlayer self)
     {
-        List<NetworkPlayer> others = new List<NetworkPlayer>();
-        foreach (var entry in playerCache)
-        {
-            //IDが自分自身と一致しないものだけを追加
-            if (entry.Key != self.GetNetworkId())
-            {
-                others.Add(entry.Value);
-            }
-        }
-        return others;
+        if (self == null) return GetAllPlyer;
+        int selfId = self.GetNetworkId();
+
+        return _playerMap.Values
+            .Where(p => p != null && p.GetNetworkId() != selfId)
+            .ToList();
     }
 
     /// <summary>
@@ -65,64 +129,44 @@ public static class PlayerUtility
     /// </summary>
     public static void UpdatePlayerSystem(NetworkPlayer player)
     {
-        //プレイヤーとコントローラーの存在チェック
         if (player == null) return;
-        //エフェクト更新
+
         EffectDurationUpdate(player);
-        //持続ダメージ用
         ApplyPoisonDamage(player);
-        //太陽用
         CheckAndApplyRoofDamage(player);
 
-        PlayerController controller = player.GetPlayerController();
-        if (controller == null) return;
+        PlayerRoot root = player.GetPlayerController();
+        if (root == null) return;
 
-        //エフェクトによる行動制限の処理
-        EffectStopController(player, controller);
-
-        //移動速度の計算
-        controller.SetMoveSpeed(GetFinalSpeed(player));
-        //位置の更新
-        controller.LatePlayerPosUpdate();
+        EffectStopController(player, root);
+        root.SetMoveSpeed(GetFinalSpeed(player));
     }
 
-    /// <summary>
-    /// 行動制限の処理をするメソッド
-    /// </summary>
-    private static void EffectStopController(NetworkPlayer player, PlayerController controller)
+    private static void EffectStopController(NetworkPlayer player, PlayerRoot root)
     {
         bool canMove = true;
         bool canJump = true;
         bool reverseMove = false;
         bool canNAttack = true;
 
-        //スタン状態の場合、動けないようにする
         if (HaveEffect(player, EffectList.Stun, false))
         {
             canMove = false;
             canJump = false;
         }
-        //混乱状態の場合、移動方向を逆にする
         if (HaveEffect(player, EffectList.Reverse, false))
             reverseMove = true;
-        //ジャンプ禁止状態の場合、ジャンプできないようにする
         if (HaveEffect(player, EffectList.NoJump, false))
             canJump = false;
-        //皇帝の威厳がある場合
-        if(!HaveEffect(player, EffectList.EnperorAura, true))
+        if (!HaveEffect(player, EffectList.EnperorAura, true))
             canNAttack = false;
 
-        //結果をコントローラーに反映
-        controller.SetIsMove(canMove);
-        controller.SetIsJump(canJump);
-        controller.SetIsChangeMove(reverseMove);
-        controller.SetIsNormalAttack(canNAttack);
-
+        root.SetIsMove(canMove);
+        root.SetIsJump(canJump);
+        root.SetIsChangeMove(reverseMove);
+        root.SetIsNormalAttack(canNAttack);
     }
 
-    /// <summary>
-    /// 持続用のダメージメソッド
-    /// </summary>
     private static void ApplyPoisonDamage(NetworkPlayer player)
     {
         List<EffectAbility> haveEffect = player.GetHaveEffect();
@@ -131,69 +175,49 @@ public static class PlayerUtility
             if (e == null) continue;
             Effect effectData = e.GetEffect();
             if (effectData == null) continue;
-            // 毒効果があり、かつ1秒経過したタイミングなら
+
             if (effectData.GetEffectList() == EffectList.Poison && e.CheckDamageInterval())
                 FinalDamage(player, e.GetValue());
         }
     }
 
-    /// <summary>
-    /// 太陽のダメージメソッド
-    /// </summary>
     public static void CheckAndApplyRoofDamage(NetworkPlayer player)
     {
-        //太陽のデバフを取得
-        EffectAbility sunEffect = player.GetHaveEffect().Find(e => e.GetEffect().GetEffectList() == EffectList.SunBurn);
-        //エフェクトがない
+        EffectAbility sunEffect = player.GetHaveEffect().Find(e => e.GetEffect() != null && e.GetEffect().GetEffectList() == EffectList.SunBurn);
         if (sunEffect == null || sunEffect.GetEffect().GetIsUp() != false) return;
 
-        //屋根判定
         Vector2 pos = player.transform.position;
         bool isUnderRoof = Physics2D.Raycast(pos + Vector2.up * 0.1f, Vector2.up, 50f, LayerMask.GetMask("Ground")).collider != null;
 
-        //屋根がなく、かつ1秒経過しているならダメージ
         if (!isUnderRoof && sunEffect.CheckDamageInterval())
             FinalDamage(player, sunEffect.GetValue());
     }
 
-    /// <summary>
-    /// 効果の残り時間を更新するメソッド
-    /// </summary>
     private static void EffectDurationUpdate(NetworkPlayer player)
     {
         List<EffectAbility> haveEffect = player.GetHaveEffect();
         foreach (EffectAbility e in haveEffect)
         {
-            e.DecreaseTime(Time.deltaTime);
+            if (e != null) e.DecreaseTime(Time.deltaTime);
         }
 
-        //player自身に期限切れを送る
         player.CleanExpiredEffects();
     }
 
-    /// <summary>
-    /// 現在のエイムの場所を返す
-    /// </summary>
     public static Transform GetAimPos(NetworkPlayer player)
     {
-        return player.GetPlayerController().GetAimCursor().GetTransform();
+        return player.GetPlayerController()?.GetAimCursor()?.GetTransform();
     }
 
-    /// <summary>
-    /// プレイヤーの現在のスキル選択番号から、クールタイム配列のインデックス(1~5)を計算する
-    /// </summary>
     public static int GetCoolTimeIndex(int skillNo)
     {
         return (skillNo == GameConfig.SKILL_HOPPER_MAX) ? 5 : skillNo + 1;
     }
 
-    /// <summary>
-    /// 特定の効果を持っているかどうかを返す
-    /// </summary>
     public static bool HaveEffect(NetworkPlayer player, EffectList effect, bool isUp)
     {
         List<EffectAbility> haveEffect = player.GetHaveEffect();
-        foreach(EffectAbility e in haveEffect)
+        foreach (EffectAbility e in haveEffect)
         {
             if (e == null || e.GetEffect() == null) continue;
             if (e.GetEffect().GetEffectList() == effect && e.GetEffect().GetIsUp() == isUp)
@@ -202,28 +226,22 @@ public static class PlayerUtility
         return false;
     }
 
-    /// <summary>
-    /// 自分以外の全プレイヤーにエフェクトを付与する
-    /// </summary>
     public static void ApplyEffectToOthers(NetworkPlayer self, EffectAbility effect)
     {
         List<NetworkPlayer> others = GetOtherPlayers(self);
         foreach (NetworkPlayer p in others)
         {
-            // NetworkPlayer側にエフェクト追加用のメソッドがある想定です
             p.SetHaveEffect(effect.Clone());
         }
     }
 
-    /// <summary>
-    /// バフデバフ倍率の計算をするメソッド
-    /// </summary>
     public static float GetEffectValue(NetworkPlayer player, EffectList effect)
     {
         List<EffectAbility> haveEffect = player.GetHaveEffect();
         float Value = 1;
         foreach (EffectAbility e in haveEffect)
         {
+            if (e == null || e.GetEffect() == null) continue;
             if (e.GetEffect().GetEffectList() == effect)
             {
                 Value += (e.GetEffect().GetIsUp()) ? e.GetValue() : -e.GetValue();
@@ -232,82 +250,86 @@ public static class PlayerUtility
         return Mathf.Max(0f, Value);
     }
 
-    /// <summary>
-    /// 最終的な攻撃力メソッド（最低値: 0.1f）
-    /// </summary>
     public static float GetFinalAtk(NetworkPlayer player)
     {
         float calculatedAtk = player.GetPlayerStatus().GetAtk() * GetEffectValue(player, EffectList.ATK);
         return Mathf.Max(0.1f, calculatedAtk);
     }
+
     public static float GetFinalAtk(NetworkPlayer player, Skill skill)
     {
-        //スキルを含めたダメージ計算
+        if (skill == null)
+        {
+            Debug.LogWarning("Skill is null in GetFinalAtk.");
+            return Mathf.Max(0.1f, player != null ? player.GetPlayerStatus().GetAtk() * GetEffectValue(player, EffectList.ATK) : 0.1f);
+        }
+
+        if (player == null)
+        {
+            Debug.LogWarning("Player is null in GetFinalAtk.");
+            return Mathf.Max(0.1f, skill.GetAtk());
+        }
+
         float calculatedAtk = player.GetPlayerStatus().GetAtk()
             * skill.GetAtk()
             * GetEffectValue(player, EffectList.ATK);
         return Mathf.Max(0.1f, calculatedAtk);
     }
 
-    /// <summary>
-    /// 最終的な防御力メソッド（最低値: 0.1f）
-    /// </summary>
     public static float GetFinalDef(NetworkPlayer player)
     {
         float calculatedDef = player.GetPlayerStatus().GetDef() * GetEffectValue(player, EffectList.DEF);
         return Mathf.Max(0.1f, calculatedDef);
     }
 
-    /// <summary>
-    /// 最終的な移動速度メソッド（最低値: 2.0f）
-    /// </summary>
     public static float GetFinalSpeed(NetworkPlayer player)
     {
         float calculatedSpeed = player.GetPlayerStatus().GetSpeed() * GetEffectValue(player, EffectList.DEX);
         return Mathf.Max(2f, calculatedSpeed);
     }
-    
-    /// <summary>
-    /// 最終的なダメージ計算
-    /// </summary>
+
     public static void FinalDamage(NetworkPlayer target, NetworkPlayer player, float amount)
     {
-        //防御無視か
-        if (!HaveEffect(player, EffectList.IgnoreDefense, true))
+        if (target == null) return;
+
+        if (player != null && !HaveEffect(player, EffectList.IgnoreDefense, true))
             amount /= GetFinalDef(target);
-        //カウンター状態か
-        if (HaveEffect(target, EffectList.Counter, true))
+
+        if (HaveEffect(target, EffectList.Counter, true) && player != null)
             ProcessCounterDamage(target, player, amount);
-        //ダメージ無効を持っているか
+
         if (HaveEffect(target, EffectList.Invincible, true))
             return;
-        //魅了を持っているか
+
         if (HaveEffect(target, EffectList.Charm, true))
         {
             ProcessCharmDamage(target, amount);
             return;
         }
+
         if (amount < 0) amount = 0;
-        target.TakeDamage(amount);
-    }
-    public static void FinalDamage(NetworkPlayer target, float amount)
-    {
-        if (HaveEffect(target, EffectList.Invincible, true))
-            return;
-        amount /= GetFinalDef(target);
-        if (amount < 0) amount = 0;
-        //魅了を持っているか
-        if (HaveEffect(target, EffectList.Charm, true))
-        {
-            ProcessCharmDamage(target, amount);
-            return;
-        }
         target.TakeDamage(amount);
     }
 
-    /// <summary>
-    /// 魅了による肩代わり処理
-    /// </summary>
+    public static void FinalDamage(NetworkPlayer target, float amount)
+    {
+        if (target == null) return;
+
+        if (HaveEffect(target, EffectList.Invincible, true))
+            return;
+
+        amount /= GetFinalDef(target);
+        if (amount < 0) amount = 0;
+
+        if (HaveEffect(target, EffectList.Charm, true))
+        {
+            ProcessCharmDamage(target, amount);
+            return;
+        }
+
+        target.TakeDamage(amount);
+    }
+
     private static void ProcessCharmDamage(NetworkPlayer target, float amount)
     {
         List<NetworkPlayer> players = GetOtherPlayers(target);
@@ -315,31 +337,25 @@ public static class PlayerUtility
 
         float shareDamage = (amount * 0.5f) / players.Count;
         foreach (NetworkPlayer p in players)
-            p.TakeDamage(shareDamage);
+        {
+            p?.TakeDamage(shareDamage);
+        }
     }
 
-    /// <summary>
-    /// カウンター処理
-    /// </summary>
     private static void ProcessCounterDamage(NetworkPlayer target, NetworkPlayer attacker, float amount)
     {
-        //0.3倍のダメージを算出
         float counterDamage = amount * 0.3f;
-        //攻撃者にダメージを与える
-        attacker.TakeDamage(counterDamage);
+        attacker?.TakeDamage(counterDamage);
     }
 
-    /// <summary>
-    /// ヒールの最終計算
-    /// </summary>
     public static void FinalHeal(NetworkPlayer player, float amount)
     {
-        //回復スティール持っているプレイヤーがいたら
+        if (player == null) return;
+
         List<NetworkPlayer> players = GetOtherPlayers(player);
         foreach (NetworkPlayer p in players)
         {
-            //半分回復を横取りする
-            if(HaveEffect(p, EffectList.HealSteal, true))
+            if (p != null && HaveEffect(p, EffectList.HealSteal, true))
             {
                 amount *= 0.5f;
                 p.Heal(amount);
@@ -348,17 +364,14 @@ public static class PlayerUtility
         player.Heal(amount);
     }
 
-    /// <summary>
-    /// クールタイムの数値計算メソッド
-    /// </summary>
     public static float CoolTimeValue(NetworkPlayer player, float duration)
     {
-        //倍率計算
+        if (player == null) return duration;
+
         float effectMultiplier = GetEffectValue(player, EffectList.CoolTimeReduction);
-        //短縮率（倍率）を計算
         float reductionRate = 1.0f - (effectMultiplier - 1.0f);
 
-        //マイナスにならないよう
         return Mathf.Max(0.1f, duration * reductionRate);
     }
+
 }

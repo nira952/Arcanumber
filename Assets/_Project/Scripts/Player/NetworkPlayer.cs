@@ -6,83 +6,56 @@ using UnityEngine;
 /// </summary>
 public class NetworkPlayer : MonoBehaviour
 {
-    [SerializeField] int networkId;  //ネットワークのID
-    [SerializeField] string playerName;  //プレイヤーの名前
-    [SerializeField] PlayerStatus status = new PlayerStatus();    //プレイヤーステータス
-    [SerializeField] float nowHp;  //現在のHP
-    [SerializeField] int nowJump = 0;   //現在のジャンプの回数
-    Arcana arcana;  //持っているアルカナスキル
-    [SerializeField] Skill[] skillList = new Skill[4];  //持っているスキルリスト
-    [SerializeField] private float[] currentCoolTimes = new float[6];   //クールタイムの管理用変数
+    private PlayerRoot playerRoot;
+
+    private float[] currentCoolTimes = new float[6];
     private float attackCoolTimeDuration = 0.5f; //通常攻撃のクールタイムの時間
-    [SerializeField] int skillNo = 0;    //現在合わせているスキルNo
 
-    [SerializeField] List<EffectAbility> haveEffect = new List<EffectAbility>();  //持っているエフェクト
-
-    [SerializeField] PlayerController pController;    //持っているプレイヤーコントローラー
-    [SerializeField] private GameObject magicStart; //予備動作用のオブジェクト
-
-    //ダメージを受けたときのイベント（NetworkPlayer, ダメージ量）
     public static event System.Action<NetworkPlayer, float> OnTakeDamageEvent;
+
+
+    private bool isSpawn = false;
 
     /// <summary>
     /// 初期化
     /// </summary>
-    public void Initialize(bool isLocalPlayer)
+    public void Initialize(PlayerRoot playerRoot, bool isLocalPlayer)
     {
+        this.playerRoot = playerRoot;
+
         //リセット処理
         ResetToInitialState();
 
-        //(アルカナ発動を分離)
-        if (isLocalPlayer)
-            InitializeLocalSettings();
+        isSpawn = true;
     }
 
-    /// <summary>
-    /// ローカル用の初期化
-    /// </summary>
-    private void InitializeLocalSettings()
-    {
-        ChangeColor();
-        //入力やコントローラー、アルカナ発動は「自分だけ」のものにする
-        pController.SetIsMove(true);
-        pController.SetIsJump(true);
-        pController.Initialize();
-        pController.OnAttackEvent += UseAttack;
-        pController.OnSkillSelectEvent += ChangeSelectedSkill;
-        pController.OnSkillUseEvent += UseCurrentSkill;
-        pController.OnJumpEvent += RequestJump;
-        //エイム設定
-        GetPlayerController().GetAimCursor()
-            .SelectAim(GetNoSkill().GetAimSelect());
-    }
-
-    private void OnDestroy()
-    {
-        if (pController != null)
-        {
-            pController.OnAttackEvent -= UseAttack;
-            pController.OnSkillSelectEvent -= ChangeSelectedSkill;
-            pController.OnSkillUseEvent -= UseCurrentSkill;
-            pController.OnJumpEvent -= RequestJump;
-        }
-    }
 
     /**
      * --------- ゲッター ---------
      */
-    public int GetNetworkId() { return networkId; }
-    public string GetPlayerName() { return playerName; }
-    public float GetNowHP() {  return nowHp; }
-    public int GetNowJump() {  return nowJump; }
-    public Arcana GetArcana() { return arcana; }
-    public Skill[] GetSkill() { return skillList; }
-    public int GetSkillNo() {  return skillNo; }
-    public Skill GetNoSkill() { return skillList[skillNo]; }
-    public PlayerStatus GetPlayerStatus() {  return status; }
-    public List<EffectAbility> GetHaveEffect() { return haveEffect; }
-    public PlayerController GetPlayerController() {  return pController; }
-    public GameObject GetMagicStart() { return magicStart; }
+    public int GetNetworkId()
+    {
+        // playerRoot や NetworkObject が null の場合は safe に -1 を返す
+        if (playerRoot == null)
+        {
+            return -1;
+        }
+
+        return playerRoot.PlayerIndex.Value; // または NetworkObject.OwnerClientId など
+    }
+    public string GetPlayerName() { return playerRoot.name; }
+    public float GetNowHP() {  return playerRoot.CurrentHealth.Value; }
+    public int GetNowJump() {  return playerRoot.Nowjump.Value; }
+    public Arcana GetArcana() { return playerRoot.CurrentArcana; }
+    public Skill[] GetSkill() { return playerRoot.SkillList; }
+    public int GetSkillNo() {  return playerRoot.SelectedSkillIndex.Value; }
+    public Skill GetNoSkill() { return playerRoot.SkillList[playerRoot.SelectedSkillIndex.Value]; }
+    public PlayerStatus GetPlayerStatus() {  return playerRoot.GetPlayerStatus(); }
+    public List<EffectAbility> GetHaveEffect() { return playerRoot.ActiveEffects.Value; }
+    public GameObject GetMagicStart() { return gameObject; }
+
+    public PlayerRoot GetPlayerController() { return playerRoot; }
+
     public float GetSkillCoolTime(int index) 
     {
         if (index >= 0 && index < currentCoolTimes.Length)
@@ -94,53 +67,44 @@ public class NetworkPlayer : MonoBehaviour
     /**
      * --------- セッター ---------
      */
-    public void SetNowHp(float nowHp) { this.nowHp = nowHp; }
+    public void SetNowHp(float nowHp) { playerRoot.CurrentHealth.Value = (int)nowHp; }
     public void SetHaveEffect(EffectAbility effect) 
     { 
-        haveEffect.Add(effect); 
-        BattleUIManager.Instance.StatusAddUpdate(this, effect);
+        playerRoot.ActiveEffects.Value.Add(effect);
     }
-    public void SetHaveEffects(List<EffectAbility> effect) { this.haveEffect =  effect; }
-    public void SetSkillNo(int skillNo) { this.skillNo = skillNo; }
-    public void SetArcana(Arcana arcana) { this.arcana = arcana; }
-    public void SetSkill(Skill skill, int sNum) { this.skillList[sNum] = skill; }
+    public void SetSkillNo(int skillNo) { playerRoot.SelectedSkillIndex.Value = skillNo; }
+    public void SetArcana(Arcana arcana) { playerRoot.CurrentArcana = arcana; }
+    public void SetSkill(Skill skill, int sNum) { playerRoot.SkillList[sNum] = skill; }
 
-    /// <summary>
-    /// リセット用のメソッド
-    /// </summary>
+
     public void ResetToInitialState()
     {
-        // ステータスを新品に入れ替える
-        status = new PlayerStatus();
-        //NULLだったら愚者（逆）を入れる
-        if (arcana == null)
-            arcana = LoadManager.Instance.GetData(0, false);
-            //クールタイムリセット
+        playerRoot.ResetToInitialState();
+
+        //クールタイムリセット
         for (int i = 0; i < currentCoolTimes.Length; i++)
-        currentCoolTimes[i] = 0f;
-        //エフェクトリセット
-        haveEffect.Clear();
+            currentCoolTimes[i] = 0f;
+
         //一番最初に発動するアルカナスキル
-        arcana.ExecuteArcanaEffect(ASkillCategory.StartEffect, this);
-        SetNowHp(status.GetMaxHp());
+        playerRoot.CurrentArcana.ExecuteArcanaEffect(ASkillCategory.StartEffect, this);
     }
 
     /// <summary>
     /// ジャンプのリセット
     /// </summary>
-    public void JumpReset() { nowJump = 0; }
+    public void JumpReset() { playerRoot.Nowjump.Value = 0; }
 
     /// <summary>
     /// ジャンプのアクション
     /// </summary>
     private void RequestJump()
     {
-        int maxJump = status != null ? status.GetMaxJump() : 1;
+        int maxJump = playerRoot.GetPlayerStatus() != null ? playerRoot.GetPlayerStatus().GetMaxJump() : 1;
 
-        if (nowJump < maxJump)
+        if (playerRoot.Nowjump.Value < maxJump)
         {
-            nowJump++;
-            pController.ExecuteJump();
+            playerRoot.Nowjump.Value++;
+            playerRoot.GetActionController().ExecuteJumpLocal();
         }
     }
 
@@ -175,6 +139,13 @@ public class NetworkPlayer : MonoBehaviour
         }
     }
 
+    public void SkillUpdate()
+    {
+        if (!isSpawn) { return; }
+
+        UpdateAllCoolTimes(Time.deltaTime);
+        PlayerUIManager.Instance.UpdateSkillCoolTimeUI(this);
+    }
     /// <summary>
     /// クールタイムの更新
     /// </summary>
@@ -194,26 +165,24 @@ public class NetworkPlayer : MonoBehaviour
     /// <summary>
     /// 予備動作の色変更
     /// </summary>
-    public void ChangeColor()
-    {
-        SpriteRenderer renderer = magicStart.GetComponent<SpriteRenderer>();
-        renderer.color = status.GetCharaColor(networkId);
-    }
+    //public void ChangeColor()
+    //{
+    //    SpriteRenderer renderer = magicStart.GetComponent<SpriteRenderer>();
+    //    renderer.color = playerRoot.GetPlayerStatus().GetCharaColor(networkId);
+    //}
 
     /// <summary>
     /// ダメージ処理
     /// </summary>
     public void TakeDamage(float damage)
     {
-        nowHp -= damage;
-        if (nowHp < 0) nowHp = 0;
-        SetNowHp(nowHp);
-        if (nowHp <= 0)
-            arcana.ExecuteArcanaEffect(ASkillCategory.DeathEffect, this);
+        playerRoot.ApplyDamage((int)damage);
+
+        if (playerRoot.CurrentHealth.Value <= 0)
+            playerRoot.CurrentArcana.ExecuteArcanaEffect(ASkillCategory.DeathEffect, this);
         //ダメージアルカナスキルの発動
-        if (arcana.GetASkillCategory() == ASkillCategory.DamageEffect)
+        if (playerRoot.CurrentArcana.GetASkillCategory() == ASkillCategory.DamageEffect)
             OnTakeDamageEvent?.Invoke(this, damage);
-        BattleUIManager.Instance.hpSliderChange(this, this.GetNetworkId());
     }
 
     /// <summary>
@@ -221,10 +190,7 @@ public class NetworkPlayer : MonoBehaviour
     /// </summary>
     public void Heal(float healAmount)
     {
-        nowHp += healAmount;
-        if (nowHp > status.GetMaxHp()) nowHp = status.GetMaxHp();
-        SetNowHp(nowHp);
-        BattleUIManager.Instance.hpSliderChange(this, this.GetNetworkId());
+        playerRoot.ApplyHeal((int)healAmount);
     }
 
     /// <summary>
@@ -233,13 +199,9 @@ public class NetworkPlayer : MonoBehaviour
     public void CleanExpiredEffects()
     {
         //期限切れのエフェクトを取得
-        var expiredEffects = haveEffect.FindAll(e => e.IsExpired);
-        foreach (var e in expiredEffects)
-        {
-            //終了したエフェクトをUIから消す
-            BattleUIManager.Instance.RemoveStatusUI(this, e);
-        }
+        var expiredEffects = playerRoot.ActiveEffects.Value.FindAll(e => e.IsExpired);
+
         //最後にリストから削除
-        haveEffect.RemoveAll(e => e.IsExpired);
+        playerRoot.ActiveEffects.Value.RemoveAll(e => e.IsExpired);
     }
 }

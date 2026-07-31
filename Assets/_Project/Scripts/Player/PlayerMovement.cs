@@ -1,8 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// プレイヤーの物理的な移動とジャンプ処理を担うクラス
-/// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
@@ -23,20 +20,21 @@ public class PlayerMovement : MonoBehaviour
 
     public void UpdateMovement()
     {
-        Debug.Log($"[PlayerMovement] UpdateMovement called with input: {currentMoveInput}");
+        if (rb == null || root == null) return;
 
-        if (rb != null && root != null)
-        {
-            rb.linearVelocity = new Vector2(currentMoveInput * root.GetMoveSpeed(), rb.linearVelocity.y);
-        }
+        // ★ 1. Rigidbody2D が Kinematic の場合は速度直接代入が効かないためガード
+        if (rb.isKinematic) return;
+
+        // ★ 2. Transform 座標を直接移動させるのではなく、物理速度を設定
+        rb.linearVelocity = new Vector2(currentMoveInput * root.GetMoveSpeed(), rb.linearVelocity.y);
     }
 
     public void ExecuteJump()
     {
-        if (rb != null && root != null)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, root.GetJumpForce());
-        }
+        if (rb == null || root == null) return;
+        if (rb.isKinematic) return;
+
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, root.GetJumpForce());
     }
 
     public Rigidbody2D GetRigidbody() => rb;

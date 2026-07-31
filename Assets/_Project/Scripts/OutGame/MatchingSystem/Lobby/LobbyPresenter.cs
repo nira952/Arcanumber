@@ -337,9 +337,14 @@ public class LobbyPresenter : IDisposable
             }
         }
 
+        Debug.Log($"[Presenter] ロビー更新: {lobby.Name}, プレイヤー数: {lobby.Players.Count}, ホスト: {lobby.HostId}");
+
         // 全員が揃ってNGO接続も完了したら「次へ」ボタンを有効化
         int ngoCount = NetworkManager.Singleton != null ? NetworkManager.Singleton.ConnectedClientsIds.Count : 0;
-        _view.SetNextSceneButtonActive(_isHost && lobby.Players.Count >= MinPlayersToStart && ngoCount >= MinPlayersToStart);
+
+        Debug.Log(_isHost && lobby.Players.Count >= MinPlayersToStart);
+
+        _view.SetNextSceneButtonActive(_isHost && lobby.Players.Count >= MinPlayersToStart);
     }
 
 

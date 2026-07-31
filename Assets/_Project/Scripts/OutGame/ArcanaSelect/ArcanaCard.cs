@@ -12,8 +12,8 @@ public class ArcanaCard : MonoBehaviour
 
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private GameObject flontFaces;
-    [SerializeField] private GlowImage frontImage;
-    [SerializeField] private GlowImage backImage;
+    [SerializeField] private Image frontImage;
+    [SerializeField] private Image backImage;
     [SerializeField] private float flipDuration = 0.4f;
     [SerializeField] private HoverActionTrigger flipHoverTrigger;
     [SerializeField] private DragActionTrigger dragTrigger;
@@ -21,7 +21,7 @@ public class ArcanaCard : MonoBehaviour
     private bool isSelected = false;
 
     // ▼ アニメーションの衝突を防ぐためのキャッシュ
-    private Tween scaleTween = null;
+
     private Tween moveTween = null;
 
     // ▼ カードの初期位置（ローカル座標 / アンカー座標）を記憶
@@ -38,7 +38,7 @@ public class ArcanaCard : MonoBehaviour
         backImage.gameObject.SetActive(true);
         transform.localEulerAngles = Vector3.zero;
         selectHoverTrigger.IsInteractable = false;
-        frontImage.glowSize = 0f;
+        //frontImage.glowSize = 0f;
         isSelected = false;
 
         flipHoverTrigger.onHoverEnter.AddListener(FlipToFront);
@@ -56,8 +56,8 @@ public class ArcanaCard : MonoBehaviour
     {
         frontImage.sprite = frontSprite;
         backImage.sprite = backSprite;
-        frontImage.glowColor = glowColor;
-        backImage.glowColor = glowColor;
+        //frontImage.glowColor = glowColor;
+        //backImage.glowColor = glowColor;
 
         if (!isFront)
         {
@@ -107,14 +107,12 @@ public class ArcanaCard : MonoBehaviour
 
             if (dragTrigger != null) dragTrigger.IsInteractable = true;
 
-            frontImage.glowSize = 10f;
+            //frontImage.glowSize = 10f;
 
-            // スケールと位置のTweenをリセット
-            scaleTween?.Kill();
+            // スケールと位置のTweenをリセッ
             moveTween?.Kill();
 
             // 拡大表示 ＆ 基準位置から +20 浮き上がらせる
-            scaleTween = frontRectTransform.DOScale(1.1f, 0.2f).SetEase(Ease.OutBack);
             moveTween = frontRectTransform.DOAnchorPosY(defaultAnchoredPos.y + 20f, 0.2f).SetEase(Ease.OutBack);
         }
     }
@@ -124,13 +122,11 @@ public class ArcanaCard : MonoBehaviour
         // 選択中の場合は何もしない（選択中の見栄えを維持）
         if (isSelected) return;
 
-        frontImage.glowSize = 10f;
+        //frontImage.glowSize = 10f;
 
-        scaleTween?.Kill();
         moveTween?.Kill();
 
         // ホバー時の拡大表示 ＆ 少し浮かせる演出
-        scaleTween = frontRectTransform.DOScale(1.1f, 0.15f).SetEase(Ease.OutQuad);
         moveTween = frontRectTransform.DOAnchorPosY(defaultAnchoredPos.y + 10f, 0.15f).SetEase(Ease.OutQuad);
     }
 
@@ -139,13 +135,11 @@ public class ArcanaCard : MonoBehaviour
         // 選択中の場合はホバーが外れても元の位置・スケールに戻さない
         if (isSelected) return;
 
-        frontImage.glowSize = 0f;
+        //frontImage.glowSize = 0f;
 
-        scaleTween?.Kill();
         moveTween?.Kill();
 
         // 未選択状態へリセット
-        scaleTween = frontRectTransform.DOScale(1.0f, 0.15f).SetEase(Ease.InQuad);
         moveTween = frontRectTransform.DOAnchorPosY(defaultAnchoredPos.y, 0.15f).SetEase(Ease.InQuad);
     }
 
@@ -153,15 +147,13 @@ public class ArcanaCard : MonoBehaviour
     public void ResetCard()
     {
         isSelected = false;
-        frontImage.glowSize = 0f;
+        //frontImage.glowSize = 0f;
 
         if (dragTrigger != null) dragTrigger.IsInteractable = false;
 
-        scaleTween?.Kill();
         moveTween?.Kill();
 
         // 初期スケール ＆ 初期Y座標に確実に戻す
-        scaleTween = frontRectTransform.DOScale(1.0f, 0.2f).SetEase(Ease.OutQuad);
         moveTween = frontRectTransform.DOAnchorPosY(defaultAnchoredPos.y, 0.2f).SetEase(Ease.OutQuad);
     }
 
