@@ -34,6 +34,22 @@ public class PlayerDataManager : NetworkBehaviour
     [SerializeField] private Arcana myArcana;   // アルカナ
 
 
+    public void DebugSettings()
+    {
+        // 全てのスキルをデバッグ用に設定する
+        for (int i = 0; i < mySkills.Length; i++)
+        {
+            Skill skill = ScriptableObject.CreateInstance<Skill>();
+
+
+            mySkills[i] = skill;
+        }
+
+        // デバッグ用のアルカナを設定する
+        Arcana arcana = ScriptableObject.CreateInstance<Arcana>();
+        myArcana = arcana;
+    }
+
     private void Awake()
     {
         // もし既にインスタンスが存在していれば、重複防止のために警告を出すか破棄する
@@ -82,7 +98,14 @@ public class PlayerDataManager : NetworkBehaviour
         }
         return -1; // 見つからない場合
     }
-
+    public int GetLobbyIndexByClientId(ulong clientId)
+    {
+        foreach (var data in _allPlayerData)
+        {
+            if (data.ClientId == clientId) return data.LobbyIndex;
+        }
+        return -1; // 見つからない場合
+    }
     /// <summary>
     /// 引数として渡されたインデックス（0〜3など）から、該当プレイヤーの全データを取得する
     /// </summary>
@@ -127,6 +150,18 @@ public class PlayerDataManager : NetworkBehaviour
         Debug.Log($"[PlayerDataManager] 現在のロビー人数: {_allPlayerData.Count}");
 
         return _allPlayerData.Count;
+    }
+
+    public string GetPlayerNameByIndex(int index)
+    {
+        foreach (var data in _allPlayerData)
+        {
+            if (data.LobbyIndex == index)
+            {
+                return data.PlayerName.ToString();
+            }
+        }
+        return null; // 見つからない場合
     }
 
     // ==========================================

@@ -43,15 +43,25 @@ namespace nira.Demo
         }
         #endregion
 
+        [SerializeField] private GameUIManager gameUIManager;
+        [SerializeField] private TimeManager timeManager;
+
+
         // --- ネットワーク変数 ---
         public NetworkVariable<GameState> CurrentState = new NetworkVariable<GameState>(GameState.Initialize);
-        public NetworkVariable<int> RemainingTime = new NetworkVariable<int>(0);
-
         private readonly ReactiveProperty<GameState> stateRx = new ReactiveProperty<GameState>(GameState.Initialize);
         public ReadOnlyReactiveProperty<GameState> StateRx => stateRx;
 
-        [SerializeField] private List<PlayerRoot> players = new List<PlayerRoot>();
 
+        // 全端末で自動同期されるNetworkListを定義
+        private readonly NetworkList<NetworkObjectReference> playerNetworkList = new();
+
+        // クライアント側でも扱いやすいように PlayerRoot のリストを返すプロパティ
+        [SerializeField] private List<PlayerRoot> localPlayerCache = new();
+        public IReadOnlyList<PlayerRoot> Players => isLocalMode ? localPlayerCache : GetPlayersFromNetworkList();
+
+        // キャンセル管理用（GameObject 破棄時に自動で Dispose される）
+        private readonly CompositeDisposable disposables = new CompositeDisposable();
         private void Awake()
         {
             SetUpSingleton(); // シングルトンの初期化
@@ -74,10 +84,14 @@ namespace nira.Demo
                     HandleStateChangeUI(state);
                 }).AddTo(this);
             }
+            CurtainManager.Instance.FullOpenAsync(GetType().Name).Forget();
+
         }
 
         public override void OnNetworkSpawn()
         {
+            playerNetworkList.OnListChanged += OnPlayerListChanged;
+
             CurrentState.OnValueChanged += (previousValue, newValue) =>
             {
                 stateRx.Value = newValue;
@@ -85,13 +99,18 @@ namespace nira.Demo
                 HandleStateChangeUI(newValue);
             };
 
-            RemainingTime.OnValueChanged += (oldVal, newVal) =>
-            {
-                if (CurrentState.Value == GameState.Ready && newVal > 0)
-                {
-                    GameUIManager.Instance.UpdateTimer(newVal.ToString());
-                }
-            };
+
+            // NetworkVariable の OnValueChanged イベントを Observable（ストリーム）に変換
+            Observable.FromEvent<NetworkVariable<int>.OnValueChangedDelegate, int>(
+                h => (prev, curr) => h(curr), // イベントハンドラを R3 の Action<int> に変換
+                h => timeManager.RemainingTime.OnValueChanged += h,
+                h => timeManager.RemainingTime.OnValueChanged -= h
+            )
+            // 初期値（スポーン時点の RemainingTime.Value）も最初に一発流す
+            .Prepend(timeManager.RemainingTime.Value)
+            // UI 更新処理を実行
+            .Subscribe(seconds => gameUIManager.UpdateTimerDisplay(seconds))
+            .AddTo(disposables); // 自動破棄の登録
 
             // ステートが切り替わった時、ログを流す
             stateRx.Subscribe(state =>
@@ -100,6 +119,19 @@ namespace nira.Demo
             }).AddTo(this);
         }
 
+        public override void OnNetworkDespawn()
+        {
+            playerNetworkList.OnListChanged -= OnPlayerListChanged;
+        }
+
+        /// <summary>
+        /// ネットワークリストの変更を全端末で検知し、キャッシュを最新化する
+        /// </summary>
+        private void OnPlayerListChanged(NetworkListEvent<NetworkObjectReference> changeEvent)
+        {
+            localPlayerCache = GetPlayersFromNetworkList();
+            Debug.Log($"[GameManager] プレイヤーリスト更新。現在の参加者数: {localPlayerCache.Count}");
+        }
         /// <summary>
         /// オンライン/オフライン両方でUIを更新するための共通メソッド
         /// </summary>
@@ -108,11 +140,12 @@ namespace nira.Demo
             switch (state)
             {
                 case GameState.Start:
+                    break;
                 case GameState.Playing:
-                    GameUIManager.Instance.UpdateTimer("START!");
+                    GameUIManager.Instance.UpdateGameStateText("Playing");
                     break;
                 case GameState.Finish:
-                    GameUIManager.Instance.UpdateTimer("FINISH!");
+                    GameUIManager.Instance.UpdateGameStateText("Finish");
                     break;
             }
         }
@@ -132,82 +165,183 @@ namespace nira.Demo
             }
         }
 
+
+
         /// <summary>
-        /// 残り時間変更用のラッパーメソッド
+        /// NetworkList の参照から PlayerRoot のリストを復元するヘルパー
         /// </summary>
-        private void ChangeRemainingTime(int newTime)
+        private List<PlayerRoot> GetPlayersFromNetworkList()
         {
-            if (isLocalMode)
+            List<PlayerRoot> list = new List<PlayerRoot>();
+            foreach (var netRef in playerNetworkList)
             {
-                // オフライン時は直接UIを更新する
-                if (stateRx.Value == GameState.Ready && newTime > 0)
+                if (netRef.TryGet(out NetworkObject netObj))
                 {
-                    GameUIManager.Instance.UpdateTimer(newTime.ToString());
+                    if (netObj.TryGetComponent<PlayerRoot>(out var player))
+                    {
+                        list.Add(player);
+                    }
                 }
             }
-            else
-            {
-                RemainingTime.Value = newTime; // NGOの同期経由
-            }
+            return list;
         }
 
         /// <summary>
-        /// プレイヤーを登録する
+        /// プレイヤーを登録する（サーバー専用）
         /// </summary>
-        /// <param name="player"></param>
         public void RegisterPlayer(PlayerRoot player)
         {
-            // デバッグモードなら IsServer 判定を無視する
-            if (!isLocalMode && !IsServer) return;
-
-            players.Add(player);
-
-            // オフライン時はプレイヤー1人として扱う
-            int totalPlayers = isLocalMode ? 1 : PlayerDataManager.Instance.GetLobbyPlayerCount();
-
-            // 全員が揃ったらゲーム開始シーケンスを開始
-            if (players.Count >= totalPlayers)
+            // オフライン（ローカル）モード時の処理
+            if (isLocalMode)
             {
-                StartGameSequenceAsync().Forget();
+                if (!localPlayerCache.Contains(player))
+                {
+                    localPlayerCache.Add(player);
+                }
+
+                if (localPlayerCache.Count >= 1)
+                {
+                    StartGameSequenceAsync().Forget();
+                }
+                return;
+            }
+
+            // オンライン時：サーバー側ガード
+            if (!IsServer) return;
+
+            if (player.TryGetComponent<NetworkObject>(out var netObj))
+            {
+                // 重複チェック：NetworkObjectId（ulong）で直接判定する
+                bool alreadyRegistered = false;
+                foreach (var existingRef in playerNetworkList)
+                {
+                    // NetworkObjectReference から NetworkObjectId を安全に取得して比較
+                    if (existingRef.TryGet(out NetworkObject existingObj) && existingObj.NetworkObjectId == netObj.NetworkObjectId)
+                    {
+                        alreadyRegistered = true;
+                        break;
+                    }
+                }
+
+                if (!alreadyRegistered)
+                {
+                    // 明示的に NetworkObjectReference を作成して追加
+                    playerNetworkList.Add(new NetworkObjectReference(netObj));
+                }
+
+                int totalPlayers = PlayerDataManager.Instance.GetLobbyPlayerCount();
+
+                Debug.Log($"[GameManager] サーバー登録完了: {player.name} (ID: {netObj.NetworkObjectId}). 現在の参加者数: {playerNetworkList.Count}/{totalPlayers}");
+
+                // 全員揃ったらゲーム開始シーケンスを開始（サーバー側で判定・実行）
+                if (playerNetworkList.Count >= totalPlayers)
+                {
+                    // PlayerUtilityに全プレイヤーの参照を渡す
+                    foreach (var root in Players)
+                    {
+                        PlayerUtility.RegisterPlayer(root.gameObject.GetComponent<NetworkPlayer>());
+                    }
+                    StartGameSequenceAsync().Forget();
+                }
             }
         }
+        /// <summary>
+        /// 自分以外の全プレイヤーを取得（クライアント側からも正常に呼べます）
+        /// </summary>
+        public List<PlayerRoot> GetOtherPlayers(PlayerRoot self)
+        {
+            return Players.Where(p => p != self).ToList();
+        }
+        // ====================================================================
+        // ゲーム開始シーケンス & 同期処理
+        // ====================================================================
 
         private async UniTaskVoid StartGameSequenceAsync()
         {
-            // カーテンを開く
-            await CurtainManager.Instance.FullOpenAsync(GetType().Name);
+            ChangeGameState(GameState.Ready);
 
-            ChangeGameState(GameState.Ready); // ラッパー経由に変更
-
+            // 3, 2, 1 カウントダウン
             for (int i = 3; i > 0; i--)
             {
-                ChangeRemainingTime(i); // ラッパー経由に変更
+                UpdateGameStateTextInternal(i.ToString()); // 変更後
                 await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: this.GetCancellationTokenOnDestroy());
             }
 
             ChangeGameState(GameState.Start);
             await UniTask.Yield(PlayerLoopTiming.Update);
             ChangeGameState(GameState.Playing);
+
+            if (isLocalMode || IsServer)
+            {
+                timeManager.StartTimer();
+            }
+
+            await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: this.GetCancellationTokenOnDestroy());
+
+            HideGameStateTextInternal(); // 変更後
         }
 
         /// <summary>
-        /// 【修正版】ダウン数が終了条件を満たしたか判定する
+        /// 全端末（オフライン時は自端末のみ）でUIテキストを更新する
         /// </summary>
+        private void UpdateGameStateTextInternal(string text)
+        {
+            if (isLocalMode)
+            {
+                gameUIManager.UpdateGameStateText(text);
+            }
+            else if (IsServer)
+            {
+                UpdateGameStateTextClientRpc(text);
+            }
+        }
+
+        /// <summary>
+        /// 全端末でUIテキストを非表示にする
+        /// </summary>
+        private void HideGameStateTextInternal()
+        {
+            if (isLocalMode)
+            {
+                gameUIManager.HideGameStateText();
+            }
+            else if (IsServer)
+            {
+                HideGameStateTextClientRpc();
+            }
+        }
+
+
+        [ClientRpc]
+        private void UpdateGameStateTextClientRpc(string text)
+        {
+            gameUIManager.UpdateGameStateText(text);
+        }
+
+        [ClientRpc]
+        private void HideGameStateTextClientRpc()
+        {
+            gameUIManager.HideGameStateText();
+        }
+
+        // ====================================================================
+
         public void CheckFinishCondition()
         {
-            // デバッグモードなら IsServer 判定を無視する
+            if (StateRx.CurrentValue != GameState.Playing) return;
             if (!isLocalMode && !IsServer) return;
 
-            // ※注：DemoPlayerの IsDown が NetworkVariable の場合、オフライン時に .Value にアクセスすると
-            // エラーになる可能性があります。その場合は DemoPlayer 側にも同様の isDebugMode 対策が必要です。
-            int downCount = players.Count(p => p.IsDown.Value);
+            IReadOnlyList<PlayerRoot> currentPlayers = Players;
 
-            // オフライン時は強制的に1人デバッグモードの挙動にする
-            int totalPlayers = isLocalMode ? 1 : PlayerDataManager.Instance.GetLobbyPlayerCount();
+            if (currentPlayers == null || currentPlayers.Count == 0) return;
 
-            if (totalPlayers <= 1) // 安全のため <= 1 に修正
+            int downCount = currentPlayers.Count(p => p != null && p.IsDown.Value);
+            int totalPlayers = isLocalMode ? 1 : Players.Count;
+
+            Debug.Log($"[CheckFinishCondition] DownCount: {downCount} / Total: {totalPlayers}");
+
+            if (totalPlayers <= 1)
             {
-                // 1人デバッグ時：自分がダウン（downCountが1）したら終了
                 if (downCount >= 1)
                 {
                     ChangeGameState(GameState.Finish);
@@ -215,7 +349,6 @@ namespace nira.Demo
             }
             else
             {
-                // 複数人プレイ時：自分以外の全員（総人数 - 1）がダウンしたら終了
                 if (downCount >= totalPlayers - 1)
                 {
                     ChangeGameState(GameState.Finish);

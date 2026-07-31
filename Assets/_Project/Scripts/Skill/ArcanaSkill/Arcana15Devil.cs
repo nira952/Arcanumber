@@ -29,7 +29,6 @@ public class Arcana15DevilBack : ArcanaLogic
         //デバフ、バフの数を数える
         int efeNum = player.GetHaveEffect().Count;
         //すべて消す
-        BattleUIManager.Instance.RemoveStatusUI(player, player.GetHaveEffect());
         player.GetHaveEffect().Clear();
         //数だけ攻撃力を上げる
         player.GetPlayerStatus().SetAtk(

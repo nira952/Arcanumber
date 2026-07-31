@@ -12,6 +12,8 @@ public class SkillSelectManager : NetworkBehaviour
     private bool isLocalMode = false; // オフラインデバッグモード
 
     [Header("UI Lineup")]
+
+    [SerializeField] private SkillSelectUIManager uIManager; // UIを管理するスクリプト
     [SerializeField] private Transform skillButtonParent;   // 全スキルボタンを生成する親のTransform
     [SerializeField] private SkillButton skillButtonPrefab; // スキルボタンのプレハブ
 
@@ -38,6 +40,7 @@ public class SkillSelectManager : NetworkBehaviour
         // デバッグモードの判定
         isLocalMode = PlayerDataManager.Instance.IsLocalMode;
 
+        SettingAddListner();
         InitializeSkillList();
         UpdatePreviewUI();
 
@@ -107,6 +110,7 @@ public class SkillSelectManager : NetworkBehaviour
             if (mySkills[i] == null)
             {
                 Debug.LogWarning($"枠 {i} が空欄のため、まだ決定できません。");
+                uIManager.ShowWarningText("スキルを4つ選択してください。");
                 return;
             }
         }
@@ -137,6 +141,8 @@ public class SkillSelectManager : NetworkBehaviour
 
         // 3. サーバーへ「スキル構成」と「準備完了(Ready=true)」を送信 (オンライン時のみ)
         SubmitSelectedSkillsAndReadyServerRpc(skillNumbers);
+
+        CurtainManager.Instance.CloseAsync("Ready!", GetType().Name).Forget(); // カーテンを閉じる演出
     }
 
     /// <summary>
@@ -191,6 +197,16 @@ public class SkillSelectManager : NetworkBehaviour
         GameSceneManager.Instance.LoadNetworkScene("Game");
     }
 
+    private void SettingAddListner()
+    {
+        foreach (var slot in previewSlots)
+        {
+            int slotIndex = Array.IndexOf(previewSlots, slot); // クロージャ対策
+            slot.hoverTrigger.onHoverEnter.AddListener(() =>uIManager.ShowDeleteText(true));
+            slot.hoverTrigger.onHoverExit.AddListener(() =>uIManager.ShowDeleteText(false));
+        }
+    }
+
     /// <summary>
     /// AssetLoaderからスキル一覧を取得し、選択用のボタンを生成する
     /// </summary>
@@ -213,6 +229,12 @@ public class SkillSelectManager : NetworkBehaviour
                 btnInstance.skillImage.sprite = skillData.GetSprite();
             }
 
+            // スキル名とスキル説明文をUIManagerに渡すためのリスナーを設定
+            string skillName = skillData.GetSkillName();
+            string skillEx = skillData.GetSkillEx();
+
+            btnInstance.selectHoverTrigger.onHoverEnter.AddListener(() => uIManager.SetSkillExText(skillEx, skillName));
+
             btnInstance.skillButton.onClick.AddListener(() => OnSkillButtonClicked(skillData));
         }
     }
@@ -225,6 +247,7 @@ public class SkillSelectManager : NetworkBehaviour
         if (IsSkillAlreadySelected(selectedSkill))
         {
             Debug.LogWarning($"{selectedSkill.GetSkillName()} は既に選択されています。");
+            uIManager.ShowWarningText($"{selectedSkill.GetSkillName()} は既に選択されています。");
             return;
         }
 
@@ -241,6 +264,7 @@ public class SkillSelectManager : NetworkBehaviour
         }
 
         Debug.LogWarning("選択スキル枠（4つ）が満杯です。どれかを外してください。");
+        uIManager.ShowWarningText("スキル枠が満杯です。どれかを外してください。");
     }
 
     /// <summary>

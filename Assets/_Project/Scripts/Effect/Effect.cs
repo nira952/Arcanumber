@@ -1,4 +1,6 @@
 using NaughtyAttributes;
+using System;
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
@@ -132,4 +134,31 @@ public enum EffectList
     [InspectorName("魂吸")] AtkHeal,
     [InspectorName("次元移動")] WallSwap,
     [InspectorName("太陽")] SunBurn
+}
+
+public struct NetworkEffectData : INetworkSerializable, IEquatable<NetworkEffectData>
+{
+    public EffectList EffectType;
+    public bool IsUp; 
+    public bool IsDisplay;
+    public float Time;
+    public float Value;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref EffectType);
+        serializer.SerializeValue(ref IsUp);
+        serializer.SerializeValue(ref IsDisplay);
+        serializer.SerializeValue(ref Time);
+        serializer.SerializeValue(ref Value);
+    }
+
+    public bool Equals(NetworkEffectData other)
+    {
+        return EffectType == other.EffectType &&
+               IsUp == other.IsUp &&
+               IsDisplay == other.IsDisplay &&
+               Time == other.Time &&
+               Value == other.Value;
+    }
 }

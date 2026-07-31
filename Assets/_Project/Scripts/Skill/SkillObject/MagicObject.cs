@@ -6,7 +6,7 @@ using UnityEngine;
 /// </summary>
 public abstract class MagicObject : MonoBehaviour
 {
-    protected int haveCharaNo;    //出したキャラクターNo
+    protected int haveCharaNo = -1; // -1で未初期化を表す
     protected float dmg;          //ダメージ
     protected float keepTime;     //持続時間
     protected Animator animator;  //アニメーター
@@ -51,11 +51,14 @@ public abstract class MagicObject : MonoBehaviour
 
     private void HandleHit(Collider2D collision)
     {
-        NetworkPlayer targetPlayer = collision.GetComponent<NetworkPlayer>();
+        // 1. プレイヤー判定（子オブジェクトのコライダーも考慮）
+        NetworkPlayer targetPlayer = collision.GetComponentInParent<NetworkPlayer>();
         if (targetPlayer != null)
         {
             int targetId = targetPlayer.GetNetworkId();
-            if (hitList.Contains(targetId) || targetId == haveCharaNo) return;
+
+            // 自分自身への当たりの除外 & 重複ヒット防止
+            if (targetId == -1 || hitList.Contains(targetId) || targetId == haveCharaNo) return;
 
             hitList.Add(targetId);
             OnHit(targetPlayer);
@@ -73,19 +76,26 @@ public abstract class MagicObject : MonoBehaviour
             return;
         }
 
-        FragileMinion targetMinion = collision.GetComponent<FragileMinion>();
+        // 2. ミニオン判定
+        FragileMinion targetMinion = collision.GetComponentInParent<FragileMinion>();
         if (targetMinion != null && targetMinion.GetwnerPlayerNo() != haveCharaNo)
         {
             targetMinion.TakeDamage();
             if (!isPenetrate) Destroy(gameObject);
+            return;
         }
 
-        if(collision.tag == "Wall" ||  collision.tag == "Ground")
+        // 3. 地形・壁判定（CompareTagで軽量化 & 反射切れてからの破棄）
+        if (collision.CompareTag("Wall") || collision.CompareTag("Ground"))
         {
             if (reflectCount > 0)
             {
                 HandleReflect(collision);
-                return;
+            }
+            else if (!isPenetrate)
+            {
+                if (useAnimationEndEvent) isHitAndWaitingDestroy = true;
+                else Destroy(gameObject);
             }
         }
     }
@@ -119,7 +129,7 @@ public abstract class MagicObject : MonoBehaviour
     protected void AtkHeal()
     {
         NetworkPlayer player = PlayerUtility.FindPlayerByNo(haveCharaNo);
-        if (PlayerUtility.HaveEffect(player, EffectList.AtkHeal, true))
+        if (player != null && PlayerUtility.HaveEffect(player, EffectList.AtkHeal, true))
             PlayerUtility.FinalHeal(player, dmg * GameConfig.DEATH_BACK_VALUE);
     }
 }

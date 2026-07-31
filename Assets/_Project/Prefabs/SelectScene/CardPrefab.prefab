@@ -186,7 +186,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3334982158702188558}
   - component: {fileID: 557910830329541964}
-  - component: {fileID: 2887848649831144927}
+  - component: {fileID: 3152794013649159655}
   m_Layer: 5
   m_Name: FlontImage
   m_TagString: Untagged
@@ -221,7 +221,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3370834104185760854}
   m_CullTransparentMesh: 1
---- !u!114 &2887848649831144927
+--- !u!114 &3152794013649159655
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -230,7 +230,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3370834104185760854}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b02f8498bfa1fed458ff21619713bb33, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -251,10 +251,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
-  mGlowSize: 10
-  mGlowColor: {r: 1, g: 1, b: 1, a: 1}
-  mGlowIntensitive: 1
-  mGlowQuality: 5
 --- !u!1 &3515727087652423484
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,7 +261,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5486948660882858835}
   - component: {fileID: 786795623175938101}
-  - component: {fileID: 895589739840235287}
+  - component: {fileID: 2252507850748417099}
   m_Layer: 5
   m_Name: BackImage
   m_TagString: Untagged
@@ -300,7 +296,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3515727087652423484}
   m_CullTransparentMesh: 1
---- !u!114 &895589739840235287
+--- !u!114 &2252507850748417099
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -309,7 +305,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3515727087652423484}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b02f8498bfa1fed458ff21619713bb33, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -320,7 +316,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d457a0ce468f5f44786dbc16104c97a7, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -330,10 +326,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
-  mGlowSize: 10
-  mGlowColor: {r: 1, g: 1, b: 1, a: 1}
-  mGlowIntensitive: 1
-  mGlowQuality: 5
 --- !u!1 &4240827374160004977
 GameObject:
   m_ObjectHideFlags: 0
@@ -432,8 +424,8 @@ MonoBehaviour:
   selectHoverTrigger: {fileID: 9099089282517686124}
   canvasGroup: {fileID: -854254761639838333}
   flontFaces: {fileID: 2688059872972443486}
-  frontImage: {fileID: 2887848649831144927}
-  backImage: {fileID: 895589739840235287}
+  frontImage: {fileID: 3152794013649159655}
+  backImage: {fileID: 2252507850748417099}
   flipDuration: 0.4
   flipHoverTrigger: {fileID: 5656420566041330744}
   dragTrigger: {fileID: 4416483821478425446}

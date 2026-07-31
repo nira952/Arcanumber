@@ -1,10 +1,11 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
 /// スキルの標準設定
 /// </summary>
-public class AimCursor : MonoBehaviour
+public class AimCursor : NetworkBehaviour
 {
     [SerializeField] private GameObject aimCursor;  //標準の位置
     [SerializeField] private Transform normalPos;   //プレイヤーの位置（中心）
@@ -12,7 +13,7 @@ public class AimCursor : MonoBehaviour
 
     [SerializeField] private GameObject magicStart;
 
-    private Camera _mainCam;   //カメラの位置
+    //private Camera _mainCam;   //カメラの位置
     private Vector3 _mouseWorldPos; //現在のマウスの位置
 
     private AimSelect _currentMode; //どの標準方法か
@@ -23,19 +24,23 @@ public class AimCursor : MonoBehaviour
     private bool _useRadiusLimit = false;   //円周にするか
     private Transform _lockOnTarget = null; //ロックオンにするか
 
+    //private void Start()
+    //{
+    //    _mainCam = CameraManager.Instance.GetMainCamera();
+
+    //    if (_mainCam == null)
+    //    {
+    //        Debug.LogError("[AimCursor] メインカメラが見つかりません。");
+    //        return;
+    //    }
+
+    //}
+
     /// <summary>
     /// 初期設定
     /// </summary>
     public void Initialize()
     {
-        _mainCam = CameraManager.Instance.GetMainCamera();
-
-        if (_mainCam == null)
-        {
-            Debug.LogError("[AimCursor] メインカメラが見つかりません。");
-            return;
-        }
-
         // システムカーソルを非表示に
         Cursor.visible = false;
         // 初期状態としてカーソルを表示する
@@ -148,7 +153,7 @@ public class AimCursor : MonoBehaviour
         foreach (var enemy in enemies)
         {
             // 画面内判定
-            Vector3 viewPos = _mainCam.WorldToViewportPoint(enemy.transform.position);
+            Vector3 viewPos = Camera.main.WorldToViewportPoint(enemy.transform.position);
             if (viewPos.x >= 0 && viewPos.x <= 1 && viewPos.y >= 0 && viewPos.y <= 1)
             {
                 float dist = Vector2.Distance(_mouseWorldPos, enemy.transform.position);
@@ -180,8 +185,9 @@ public class AimCursor : MonoBehaviour
     /// </summary>
     private void UpdateMousePosition()
     {
+
         Vector3 screenPos = Mouse.current.position.ReadValue();
-        _mouseWorldPos = _mainCam.ScreenToWorldPoint(screenPos);
+        _mouseWorldPos = Camera.main.ScreenToWorldPoint(screenPos);
         _mouseWorldPos.z = 0;
     }
 
@@ -190,11 +196,11 @@ public class AimCursor : MonoBehaviour
     /// </summary>
     private Vector3 ClampPositionToScreen(Vector3 targetPos)
     {
-        Vector3 viewPos = _mainCam.WorldToViewportPoint(targetPos);
+        Vector3 viewPos = Camera.main.WorldToViewportPoint(targetPos);
         viewPos.x = Mathf.Clamp(viewPos.x, 0.05f, 0.95f);
         viewPos.y = Mathf.Clamp(viewPos.y, 0.05f, 0.95f);
 
-        Vector3 clampedWorldPos = _mainCam.ViewportToWorldPoint(viewPos);
+        Vector3 clampedWorldPos = Camera.main.ViewportToWorldPoint(viewPos);
         clampedWorldPos.z = 0;
         return clampedWorldPos;
     }

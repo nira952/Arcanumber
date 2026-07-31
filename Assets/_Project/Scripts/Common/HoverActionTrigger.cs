@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -7,6 +8,12 @@ public class HoverActionTrigger : MonoBehaviour, IPointerEnterHandler, IPointerE
 {
     [Header("判定の有効/無効")]
     [SerializeField] private bool _isInteractable = true;
+
+    [Header("ホバー時拡大有効/無効")]
+    [SerializeField] private bool _scaleOnHover = true;
+
+    [Header("ホバー時の拡大率")]
+    [SerializeField]private float _hoverScale = 1.1f; // ホバー時の拡大率
 
     // 外部から値を変更するためのプロパティ
     public bool IsInteractable
@@ -24,7 +31,7 @@ public class HoverActionTrigger : MonoBehaviour, IPointerEnterHandler, IPointerE
     public UnityEvent onHoverExit;
 
     private Graphic targetGraphic;
-
+    private Tween scaleTween = null;
     private void Awake()
     {
         // ImageやTextなどのUIコンポーネントを取得
@@ -45,11 +52,23 @@ public class HoverActionTrigger : MonoBehaviour, IPointerEnterHandler, IPointerE
     {
         if (!IsInteractable) return;
         onHoverEnter?.Invoke();
+
+        if (_scaleOnHover)
+        {
+            scaleTween?.Kill();
+            scaleTween = targetGraphic.rectTransform.DOScale(_hoverScale, 0.15f).SetEase(Ease.OutQuad);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (!IsInteractable) return;
         onHoverExit?.Invoke();
+
+        if (_scaleOnHover)
+        {
+            scaleTween?.Kill();
+            scaleTween = targetGraphic.rectTransform.DOScale(1.0f, 0.15f).SetEase(Ease.InQuad);
+        }
     }
 }

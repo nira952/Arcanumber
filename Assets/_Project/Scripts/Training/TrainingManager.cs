@@ -18,8 +18,6 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
     void Start()
     {
         LoadManager.Instance.Initialize();
-        //マップ決定
-        mapManager.RamdomMapSelect();
 
         Initialise();
         TrainingUIManager.Instance.Initialize();
@@ -45,10 +43,10 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
                     p.SetSkill(AssetLoader.Instance.GetSkill(i + 1), i);
                 }
             }
-            p.Initialize(p.GetNetworkId() == pNum);
+            //p.Initialize(p.GetNetworkId() == pNum);
         }
 
-        BattleUIManager.Instance.Initialize(all, pNum);
+        PlayerUIManager.Instance.Initialize(all, pNum);
         //ダメージエフェクト（アクション）の登録
         all[pNum].GetArcana().ExecuteArcanaEffect(ASkillCategory.DamageEffect, all[pNum]);
 
@@ -58,11 +56,11 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
 
     private void FixedUpdate()
     {
-        //地面判定と移動
-        bool isGrounded = all[pNum].GetPlayerController().PlayerPosUpdate();
-        //ジャンプリセット
-        if (isGrounded)
-            all[pNum].JumpReset();
+        ////地面判定と移動
+        //bool isGrounded = all[pNum].GetPlayerController().PlayerPosUpdate();
+        ////ジャンプリセット
+        //if (isGrounded)
+        //    all[pNum].JumpReset();
     }
 
     void Update()
@@ -74,7 +72,7 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
         //クールタイムの更新
         if (all[pNum] != null)
             all[pNum].UpdateAllCoolTimes(Time.deltaTime);
-        BattleUIManager.Instance.UpdateSkillCoolTimeUI(all[pNum]);
+        PlayerUIManager.Instance.UpdateSkillCoolTimeUI(all[pNum]);
     }
 
     /// <summary>
@@ -100,14 +98,14 @@ public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
         p.SetSkillNo(0);    //最初のスキルに戻す
 
         //UIとエイムをその状態に合わせて再構築
-        BattleUIManager.Instance.Initialize(all, 0);
+        PlayerUIManager.Instance.Initialize(all, 0);
 
         //エイムリセット
         p.GetPlayerController().GetAimCursor()
             .SelectAim(p.GetNoSkill().GetAimSelect());
 
         //UIのフレームも 0 番に合わせる
-        BattleUIManager.Instance.SkillFrameChange(p);
+        PlayerUIManager.Instance.SkillFrameChange(p);
         //コルーチンをすべて止める
         StopAllCoroutines();
     }

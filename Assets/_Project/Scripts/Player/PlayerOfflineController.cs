@@ -1,4 +1,5 @@
 using nira.Demo;
+using R3;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerRoot))]
@@ -6,18 +7,13 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerActionHandler
 {
     private PlayerRoot root;
 
-    // ゲーム状態が Playing の時のみ入力を許可する
     public bool CanProcessInput
     {
         get
         {
             if (GameManager.Instance == null) return false;
-
-            // StateRx の値が Playing かどうかをチェック
-            bool isPlaying = GameManager.Instance.StateRx.CurrentValue == GameState.Playing;
-
-            // HPなどのダウン判定を追加する場合はここで && !player.IsDown.Value を付与
-            return isPlaying;
+            // ゲーム状態がPlaying かつ ダウンしていない時のみ入力を許可
+            return GameManager.Instance.StateRx.CurrentValue == GameState.Playing && !root.IsDown.Value;
         }
     }
 
@@ -28,16 +24,33 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerActionHandler
 
     private void Start()
     {
-        root.Initialize(this);
+        // オフライン用 UI更新処理（PlayerIndexは便宜上0など固定で割り当てる）
+        root.PlayerIndex.Value = 0;
 
-        if (GameManager.Instance != null) GameManager.Instance.RegisterPlayer(root);
-
-        if (GameUIManager.Instance != null)
+        root.PlayerIndex.Where(idx => idx != -1).Take(1).Subscribe(idx =>
         {
-            GameUIManager.Instance.SetPlayerName(0, "練習用プレイヤー");
-            GameUIManager.Instance.SetHealthSliderMaxValue(0, 100);
-        }
+            if (GameUIManager.Instance != null)
+            {
+                string playerName = PlayerDataManager.Instance.GetPlayerNameByIndex(idx);
 
+
+                GameUIManager.Instance.SetPlayerName(idx, playerName);
+                GameUIManager.Instance.SetHealthSliderMaxValue(idx, 100);
+            }
+        }).AddTo(this);
+
+        root.CurrentHealth.Subscribe(hp => {
+            if (root.PlayerIndex.Value != -1 && GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.UpdateHealth(root.PlayerIndex.Value, hp);
+            }
+        }).AddTo(this);
+    }
+
+    // オフライン時は自分自身に直接ダメージ処理を行う
+    public void RequestTakeDamage(int damage)
+    {
+        root.ApplyDamage(damage);
     }
 
     public void RequestJump() => root.GetActionController().ExecuteJumpLocal();

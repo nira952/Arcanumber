@@ -81,6 +81,7 @@ public class EffectRegistry : ScriptableObject
         return null;
     }
 
+
     /// <summary>
     /// ボタンを押したらプロジェクト内から全自動で集める
     /// </summary>

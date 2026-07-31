@@ -12,12 +12,15 @@ public class ArcanaUIManager : MonoBehaviour
 {
     [SerializeField] private DragActionTrigger dragActionTrigger;
     [SerializeField] private TextMeshProUGUI arcanaEXText;
+    [SerializeField] private TextMeshProUGUI arcanaNameText;
+    [SerializeField] private TextMeshProUGUI dragText;
+    [SerializeField] private TextMeshProUGUI selectText;
     [SerializeField] private Transform cardDisplayParent;
     [SerializeField] private ArcanaCard cardPrefab;
     [SerializeField] private List<ArcanaCard> arcanaCards = new List<ArcanaCard>();
 
     [Header("--- アニメーション用設定 ---")]
-    [SerializeField] private GlowImage[] animationCards = new GlowImage[22];
+    [SerializeField] private Image[] animationCards = new Image[22];
     [SerializeField] private RectTransform animationParent;
     [SerializeField] private RectTransform animationDefaultParent;
     [SerializeField] private RectTransform arcanaCardParent;
@@ -56,10 +59,16 @@ public class ArcanaUIManager : MonoBehaviour
         arcanaCardParantOriginPos = arcanaCardParent.anchoredPosition;
         arcanaCardParent.anchoredPosition = new Vector3(2000, arcanaCardParantOriginPos.y, 0);
 
+        SetArcanaEXText("", ""); // テキストも初期化
+        dragText.enabled = true;
+        selectText.enabled = false;
+
+        // ドラッグされたらアニメーション開始
         dragActionTrigger.onDragTriggered.AddListener(() =>
         {
             dragActionTrigger.IsInteractable = false;
             StartAnimation();
+            dragText.enabled = false;
             _onAnimationStartSubject.OnNext(Unit.Default);
         });
 
@@ -83,11 +92,12 @@ public class ArcanaUIManager : MonoBehaviour
         this.glowColor = glowColor;
     }
 
-    private void SetArcanaEXText(string text)
+    private void SetArcanaEXText(string text, string name)
     {
         if (arcanaEXText != null)
         {
             arcanaEXText.text = text;
+            arcanaNameText.text = name;
         }
     }
 
@@ -100,7 +110,7 @@ public class ArcanaUIManager : MonoBehaviour
 
         arcanaCards.Clear();
         currentSelectedCard = null; // リセット時に選択状態も初期化
-        SetArcanaEXText(""); // テキストも初期化
+        SetArcanaEXText("", ""); // テキストも初期化
 
         foreach (var card in myCards)
         {
@@ -127,7 +137,8 @@ public class ArcanaUIManager : MonoBehaviour
                     cardPrefabInstance.ResetCard();
                     cardPrefabInstance.transform.DOKill();
                     cardPrefabInstance.transform.DOScale(defaultScale, 0.2f);
-                    SetArcanaEXText("");
+                    SetArcanaEXText("", "");
+                    ShowSelectText(false);
 
                     _onCardSelectedSubject.OnNext(null);
                 }
@@ -145,7 +156,8 @@ public class ArcanaUIManager : MonoBehaviour
                     currentSelectedCard = cardPrefabInstance;
                     cardPrefabInstance.transform.DOKill();
                     cardPrefabInstance.transform.DOScale(hoverScale, 0.2f);
-                    SetArcanaEXText(arcanaData.GetArcanaEX());
+
+                    SetArcanaEXText(arcanaData.GetArcanaEX(),arcanaData.GetArcanaName);
 
                     _onCardSelectedSubject.OnNext(arcanaData);
                 }
@@ -159,7 +171,7 @@ public class ArcanaUIManager : MonoBehaviour
 
                 cardPrefabInstance.transform.DOKill();
                 cardPrefabInstance.transform.DOScale(hoverScale, 0.2f);
-                SetArcanaEXText(arcanaData.GetArcanaEX());
+                SetArcanaEXText(arcanaData.GetArcanaEX(),arcanaData.GetArcanaName);
             });
 
             // ③ ホバー解除時の処理 (selectHoverTrigger に onHoverExit が定義されている想定)
@@ -174,12 +186,13 @@ public class ArcanaUIManager : MonoBehaviour
                 // 未選択状態なら元のスケールに戻し、テキストを消す
                 cardPrefabInstance.transform.DOKill();
                 cardPrefabInstance.transform.DOScale(defaultScale, 0.2f);
-                SetArcanaEXText("");
+                SetArcanaEXText("", "");
             });
 
             // ④ 確定ボタンなどがあった場合
             cardPrefabInstance.OnCardSubmit += () =>
             {
+                ShowSelectText(false);
                 _onSelectCardSubmit.OnNext(Unit.Default);
             };
         }
@@ -245,7 +258,7 @@ public class ArcanaUIManager : MonoBehaviour
             chosenIndices.Add(randomIndex);
 
             animationCards[randomIndex].sprite = cardSprite;
-            animationCards[randomIndex].glowColor = glowColor;
+            //animationCards[randomIndex].glowColor = glowColor;
 
             await UniTask.Delay(System.TimeSpan.FromSeconds(0.3f), cancellationToken: token);
 
@@ -333,5 +346,10 @@ public class ArcanaUIManager : MonoBehaviour
         // アルカナカードの親オブジェクトを元の位置に戻すアニメーション（ここだけは必ず再生される）
         float duration = wasSkipped ? 0.8f : 1f; // スキップ時は少し早めにしても気持ちいいです
         arcanaCardParent.DOAnchorPosX(arcanaCardParantOriginPos.x, duration).SetEase(Ease.InOutQuad);
+    }
+
+    public void ShowSelectText(bool show)
+    {
+        selectText.enabled = show;
     }
 }
