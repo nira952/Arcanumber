@@ -24,17 +24,10 @@ public class AimCursor : NetworkBehaviour
     private bool _useRadiusLimit = false;   //円周にするか
     private Transform _lockOnTarget = null; //ロックオンにするか
 
-    //private void Start()
-    //{
-    //    _mainCam = CameraManager.Instance.GetMainCamera();
-
-    //    if (_mainCam == null)
-    //    {
-    //        Debug.LogError("[AimCursor] メインカメラが見つかりません。");
-    //        return;
-    //    }
-
-    //}
+    private void Start()
+    {
+        if (!IsOwner) gameObject.SetActive(false);
+    }
 
     /// <summary>
     /// 初期設定

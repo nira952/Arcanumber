@@ -111,7 +111,7 @@ GameObject:
   - component: {fileID: 1115423024171626306}
   m_Layer: 0
   m_Name: PlayerRoot
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -196,7 +196,7 @@ MonoBehaviour:
   moveSpeed: 5
   jumpForce: 5
   maxHealth: 100
-  magicStart: {fileID: 877682507621878113}
+  magicStart: {fileID: 7060418422167205889, guid: a300bf94befe5da44b4933f0ed53a274, type: 3}
   CurrentArcana: {fileID: 0}
   SkillList:
   - {fileID: 0}
@@ -834,7 +834,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

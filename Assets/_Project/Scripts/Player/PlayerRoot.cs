@@ -177,6 +177,7 @@ public class PlayerRoot : MonoBehaviour
     public PlayerActionController GetActionController() => actionController;
     public AimCursor GetAimCursor() { return aim; }
 
+    public GameObject GetMagic() { return magicStart; }
     public PlayerStatus GetPlayerStatus() => status;
 
     /// <summary>
