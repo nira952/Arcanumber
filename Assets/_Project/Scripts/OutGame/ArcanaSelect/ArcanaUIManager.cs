@@ -19,6 +19,8 @@ public class ArcanaUIManager : MonoBehaviour
     [SerializeField] private ArcanaCard cardPrefab;
     [SerializeField] private List<ArcanaCard> arcanaCards = new List<ArcanaCard>();
 
+    [SerializeField] private Sprite defaultSprite; // デフォルトのカード画像（裏面など）
+
     [Header("--- アニメーション用設定 ---")]
     [SerializeField] private Image[] animationCards = new Image[22];
     [SerializeField] private RectTransform animationParent;
@@ -121,7 +123,16 @@ public class ArcanaUIManager : MonoBehaviour
 
             ArcanaCard cardPrefabInstance = Instantiate(cardPrefab, cardDisplayParent);
             arcanaCards.Add(cardPrefabInstance);
-            cardPrefabInstance.SetCardInfo(arcanaData.GetIsFront(), arcanaData.GetArcanaImage(), backSprite, glowColor);
+
+            bool isFront = arcanaData.GetIsFront();
+            Sprite arcanaImage = arcanaData.GetArcanaImage();
+
+            if(arcanaImage == null)
+            {
+                arcanaImage = defaultSprite;
+            }
+
+            cardPrefabInstance.SetCardInfo(isFront, arcanaImage, backSprite, glowColor);
 
             // スケール値の定義
             Vector3 defaultScale = Vector3.one;

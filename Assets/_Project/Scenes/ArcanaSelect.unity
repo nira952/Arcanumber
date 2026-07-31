@@ -396,6 +396,7 @@ MonoBehaviour:
   cardDisplayParent: {fileID: 1873959001}
   cardPrefab: {fileID: 5357887284016860093, guid: 382d6f80fc4255c4aa1e2555e32c60b1, type: 3}
   arcanaCards: []
+  defaultSprite: {fileID: 21300000, guid: d457a0ce468f5f44786dbc16104c97a7, type: 3}
   animationCards:
   - {fileID: 1117168945}
   - {fileID: 847936147}

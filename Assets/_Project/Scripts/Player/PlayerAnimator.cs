@@ -1,6 +1,5 @@
 using R3;
 using Unity.Netcode;
-using UnityEditor.Animations;
 using UnityEngine;
 
 /// <summary>
@@ -15,7 +14,7 @@ public class PlayerAnimator : NetworkBehaviour
 
     [SerializeField] private GameObject youObject; // 自分のプレイヤーを示すオブジェクト（UIやエフェクト用）
 
-    [SerializeField] private AnimatorController[] animatorControllers = new AnimatorController[4];
+    [SerializeField] private RuntimeAnimatorController[] animatorControllers = new RuntimeAnimatorController[4];
 
     private readonly NetworkVariable<int> syncedPlayerIndex = new NetworkVariable<int>(
         0,
