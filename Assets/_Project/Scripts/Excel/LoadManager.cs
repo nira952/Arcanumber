@@ -7,16 +7,15 @@ using UnityEngine;
 
 public class LoadManager : SingletonMonoBehaviour<LoadManager>
 {
-
     //アルカナデータ
-    private string arcanaFilePath => GetExcelPath("ArcanaData.xlsx");
+    private string arcanaFilePath = Path.Combine(Application.streamingAssetsPath, "Excel/ArcanaData.xlsx");
     private int arcanaSheetNumber = 1;    //シートの番号
     private IWorkbook arcanaWorkbook; //Excelファイル
     private ISheet arcanaSheet;   //シート
     private IFormulaEvaluator arcanaEvaluator;    //計算機
 
     //スキルデータ
-    private string skillFilePath => GetExcelPath("SkillData.xltm");
+    private string skillFilePath = Path.Combine(Application.streamingAssetsPath, "Excel/SkillData.xltm");
     private int skillSheetNumber = 0;    //シートの番号
     private IWorkbook skillWorkbook; //Excelファイル
     private ISheet skillSheet;   //シート
@@ -25,16 +24,6 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
     //データ保管
     private List<Arcana> arcanaList = new List<Arcana>();
     private List<Skill> skillList = new List<Skill>();
-
-    private string GetExcelPath(string fileName)
-    {
-        if (Application.isEditor)
-            //Unityエディタで再生中は、現在の開発用フォルダを見る
-            return Path.Combine(Application.dataPath, "_Project/Excel", fileName);
-        else
-            //ビルド後では、StreamingAssetsフォルダを見る
-            return Path.Combine(Application.streamingAssetsPath, fileName);
-    }
 
     public void Initialize() 
     {
