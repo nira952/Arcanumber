@@ -32,12 +32,22 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
     [Header("ステータス関係 (プレイヤーごと)")]
     [SerializeField] private PlayerEffectBlock[] playerEffectBlocks = new PlayerEffectBlock[4];
 
+    [SerializeField] private GameObject[] statusObjects = new GameObject[4]; // プレイヤーごとのステータスUIオブジェクトs
+
     [SerializeField] private Slider[] healthSliders = new Slider[4];
     [SerializeField] private TextMeshProUGUI[] hpText;
     [SerializeField] private TextMeshProUGUI[] playerNameTexts = new TextMeshProUGUI[4];
     [SerializeField] private TextMeshProUGUI timerText;
 
     [SerializeField] private TextMeshProUGUI gameStateText;
+
+    [Header("リザルト関連")]
+    [SerializeField] private CanvasGroup resultPanel;
+    [SerializeField] private TextMeshProUGUI resultText;
+    public Button endButton;
+    public Button reMatchButton;
+
+
 
     protected override void Awake()
     {
@@ -52,6 +62,11 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
         foreach (var slider in healthSliders)
         {
             slider.gameObject.SetActive(false);
+        }
+
+        foreach (var obj in statusObjects)
+        {
+            obj.SetActive(false);
         }
 
         // 初期化時に全てのプレイヤー名テキストを非表示にする
@@ -83,6 +98,8 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
     public void SetHealthSliderMaxValue(int playerIndex, int maxHealth)
     {
         if (playerIndex < 0 || playerIndex >= healthSliders.Length) return;
+
+        statusObjects[playerIndex].SetActive(true);
 
         healthSliders[playerIndex].gameObject.SetActive(true);
         healthSliders[playerIndex].maxValue = maxHealth;
@@ -210,5 +227,25 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
             }
         }
     }
+
+    public void ShowResult(string resultMessage)
+    {
+        if (resultPanel != null && resultText != null)
+        {
+            resultText.text = resultMessage;
+            resultPanel.alpha = 1f;
+            resultPanel.interactable = true;
+            resultPanel.blocksRaycasts = true;
+        }
+    }
+
+    public void ShowEndButton()
+    {
+        endButton.gameObject.SetActive(true);
+        reMatchButton.gameObject.SetActive(true);
+
+
+    }
+
 }
 

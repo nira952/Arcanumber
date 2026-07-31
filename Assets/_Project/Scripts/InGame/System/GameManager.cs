@@ -1,8 +1,9 @@
+using Cysharp.Threading.Tasks;
+using NPOI.SS.Formula.Functions;
+using R3;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
-using R3;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -68,6 +69,15 @@ namespace nira.Demo
 
             // デバッグモード（オフライン）かどうかを判定
             isLocalMode = PlayerDataManager.Instance.IsLocalMode;
+
+            timeManager.Initialize(this);
+
+            timeManager.onTimeUp.Subscribe(_ =>
+            {
+                // タイムアップ時の処理をメソッドに切り出し
+                HandleTimeUp();
+            }).AddTo(this);
+
         }
 
         private void Start()
@@ -142,7 +152,7 @@ namespace nira.Demo
                 case GameState.Start:
                     break;
                 case GameState.Playing:
-                    GameUIManager.Instance.UpdateGameStateText("Playing");
+                    GameUIManager.Instance.UpdateGameStateText("Start!");
                     break;
                 case GameState.Finish:
                     GameUIManager.Instance.UpdateGameStateText("Finish");
@@ -157,11 +167,11 @@ namespace nira.Demo
         {
             if (isLocalMode)
             {
-                stateRx.Value = newState; // Rxを直接更新してイベントを発火させる
+                stateRx.Value = newState;
             }
-            else
+            else if (IsServer) // クライアントが誤って呼び出しても無視するようにガード
             {
-                CurrentState.Value = newState; // NGOの同期機能を使ってイベントを発火させる
+                CurrentState.Value = newState;
             }
         }
 
@@ -271,11 +281,6 @@ namespace nira.Demo
             await UniTask.Yield(PlayerLoopTiming.Update);
             ChangeGameState(GameState.Playing);
 
-            if (isLocalMode || IsServer)
-            {
-                timeManager.StartTimer();
-            }
-
             await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: this.GetCancellationTokenOnDestroy());
 
             HideGameStateTextInternal(); // 変更後
@@ -325,6 +330,58 @@ namespace nira.Demo
         }
 
         // ====================================================================
+        // タイムアップ時の勝敗判定処理
+        // ====================================================================
+        private void HandleTimeUp()
+        {
+            // 勝敗判定と演出のトリガーはサーバー（またはオフラインホスト）のみで行う
+            if (!isLocalMode && !IsServer) return;
+
+            // ゲームステートをFinishに変更し、操作等を止める
+            ChangeGameState(GameState.Finish);
+
+            IReadOnlyList<PlayerRoot> currentPlayers = Players;
+            if (currentPlayers == null || currentPlayers.Count == 0) return;
+
+            // 生きている（ダウンしていない）プレイヤーを抽出
+            var alivePlayers = currentPlayers.Where(p => p != null && !p.IsDown.Value).ToList();
+            string winnerName = "Draw";
+
+            if (alivePlayers.Count == 0)
+            {
+                // 全滅している場合
+                winnerName = isLocalMode ? "Game Over" : "Draw";
+            }
+            else if (alivePlayers.Count == 1)
+            {
+                // 1人のみ生存している場合
+                winnerName = PlayerDataManager.Instance.GetPlayerNameByIndex(alivePlayers[0].PlayerIndex.Value);
+            }
+            else
+            {
+                // 複数人が生存している場合、最も体力の多いプレイヤーを探す
+                // 【注意】 PlayerRoot の体力プロパティ名（例: CurrentHealth.Value）に合わせて以下のプロパティを書き換えてください
+                int maxHp = alivePlayers.Max(p => p.CurrentHealth.Value);
+
+                // 最大HPを持つプレイヤーのリストを取得（同値による引き分けを考慮）
+                var topPlayers = alivePlayers.Where(p => p.CurrentHealth.Value == maxHp).ToList();
+
+                if (topPlayers.Count == 1)
+                {
+                    // 単独トップの場合
+                    winnerName = PlayerDataManager.Instance.GetPlayerNameByIndex(topPlayers[0].PlayerIndex.Value);
+                }
+                else
+                {
+                    // 最大HPが同じプレイヤーが複数いる場合は引き分け
+                    winnerName = "Draw";
+                }
+            }
+
+            // リザルト演出を開始
+            TriggerFinishSequenceInternal(winnerName);
+        }
+        // ====================================================================
 
         public void CheckFinishCondition()
         {
@@ -340,21 +397,124 @@ namespace nira.Demo
 
             Debug.Log($"[CheckFinishCondition] DownCount: {downCount} / Total: {totalPlayers}");
 
+            string winnerName = "";
+
             if (totalPlayers <= 1)
             {
+                // 各クライアントのステートを Finish にしてプレイヤーの操作等を止める
+                ChangeGameState(GameState.Finish);
+
                 if (downCount >= 1)
                 {
-                    ChangeGameState(GameState.Finish);
+                    // オフライン（1人）でダウンした場合
+                    winnerName = "Game Over";
+                    TriggerFinishSequenceInternal(winnerName);
                 }
             }
             else
             {
+                // 各クライアントのステートを Finish にしてプレイヤーの操作等を止める
+                ChangeGameState(GameState.Finish);
+
                 if (downCount >= totalPlayers - 1)
                 {
-                    ChangeGameState(GameState.Finish);
+                    // 生き残っているプレイヤーを探す
+                    var winner = currentPlayers.FirstOrDefault(p => p != null && !p.IsDown.Value);
+                    if (winner != null)
+                    {
+                        string playerName = PlayerDataManager.Instance.GetPlayerNameByIndex(winner.PlayerIndex.Value);
+
+                        winnerName = playerName;
+                    }
+                    else
+                    {
+                        // 全員同時にダウンした（相打ち）場合
+                        winnerName = "Draw";
+                    }
+
+                    TriggerFinishSequenceInternal(winnerName);
                 }
             }
         }
+
+        // ====================================================================
+        // リザルトアニメーションの同期処理
+        // ====================================================================
+
+        /// <summary>
+        /// オフライン/オンラインに応じてリザルト演出のトリガーを振り分ける
+        /// </summary>
+        private void TriggerFinishSequenceInternal(string winnerName)
+        {
+            if (isLocalMode)
+            {
+                FinishAnimationAsync(winnerName).Forget();
+            }
+            else if (IsServer)
+            {
+                TriggerFinishSequenceClientRpc(winnerName);
+            }
+        }
+
+        /// <summary>
+        /// 全クライアントに対してリザルト演出の開始を指示する
+        /// </summary>
+        [ClientRpc]
+        private void TriggerFinishSequenceClientRpc(string winnerName)
+        {
+            FinishAnimationAsync(winnerName).Forget();
+        }
+
+        /// <summary>
+        /// 実際のアニメーションとUI表示（各端末のローカルで実行される）
+        /// </summary>
+        private async UniTaskVoid FinishAnimationAsync(string winnerName)
+        {
+
+            // 1秒待ってからゲーム終了処理を行う
+            await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: this.GetCancellationTokenOnDestroy());
+
+            await CurtainManager.Instance.CloseAsync("Finish!", GetType().Name, 0.1f);
+
+            // 表示するメッセージの組み立て
+            string resultMessage;
+            if (winnerName == "Game Over" || winnerName == "Draw")
+            {
+                resultMessage = winnerName;
+            }
+            else
+            {
+                resultMessage = $"{winnerName}  Win!";
+            }
+
+            gameUIManager.ShowResult(resultMessage);
+
+            await CurtainManager.Instance.OpenAsync(GetType().Name, 0.1f);
+
+            if (IsServer)
+            {
+                gameUIManager.ShowEndButton();
+                SettingEndButton();
+            }
+
+        }
+
+        private void SettingEndButton()
+        {
+            gameUIManager.endButton.onClick.AddListener(() =>
+            {
+                // 終了処理
+                GameSceneManager.Instance.LoadNetworkScene(Scene.Title.ToString());
+            });
+
+            gameUIManager.reMatchButton.onClick.AddListener(() =>
+            {
+                // リマッチ処理
+                GameSceneManager.Instance.LoadNetworkScene(Scene.ArcanaSelect.ToString());
+            });
+        }
+
+
 
         public override void OnDestroy()
         {

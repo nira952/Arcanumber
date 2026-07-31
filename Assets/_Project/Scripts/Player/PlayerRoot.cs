@@ -50,9 +50,6 @@ public class PlayerRoot : MonoBehaviour
 
     [SerializeField] bool previewInput = false;
 
-
-
-
     /// <summary>
     /// コントローラー（オフライン/オンライン）から呼ばれる初期化処理
     /// </summary>

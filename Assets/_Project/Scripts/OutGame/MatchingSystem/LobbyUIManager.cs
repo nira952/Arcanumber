@@ -128,11 +128,14 @@ public class LobbyUIManager : MonoBehaviour
 
         playerNameInput.onValueChanged.AddListener(newName =>
         {
-            // プレイヤー名が空文字の場合はデフォルト名を設定する
-            if (string.IsNullOrWhiteSpace(newName))
-            {
-                playerNameInput.text = PlayerDataManager.DefaultPlayerNamePrefix;
-            }
+            //// プレイヤー名が空文字の場合はデフォルト名を設定する
+            //if (string.IsNullOrWhiteSpace(newName))
+            //{
+            //    playerNameInput.text = PlayerDataManager.DefaultPlayerNamePrefix;
+            //}
+
+            PlayerDataManager.Instance.SaveLocalPlayerName(newName);
+
         });
     }
 

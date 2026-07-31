@@ -17,9 +17,7 @@ public class TimeManager : NetworkBehaviour
         NetworkVariableWritePermission.Server
     );
 
-    public ReactiveProperty<bool> isTimeUp = new ReactiveProperty<bool>(false);
-
-    private GameManager gameManager;
+    public Subject<Unit> onTimeUp = new Subject<Unit>();
 
     private float timerAccumulator;
     private bool isTimerRunning = false;
@@ -27,13 +25,25 @@ public class TimeManager : NetworkBehaviour
 
     public void Initialize(GameManager gameManager)
     {
-        this.gameManager = gameManager;
+        RemainingTime.Value = Mathf.CeilToInt(maxTimeInSeconds);
+
+        gameManager.StateRx.Subscribe(state =>
+        {
+            if (state == GameState.Playing)
+            {
+                isTimerRunning = true;
+            }
+            else
+            {
+                isTimerRunning = false;
+            }
+
+        }).AddTo(this);
     }
 
     private void Update()
     {
-        // ゲームがプレイ中でない場合はタイマーを更新しない
-        if (gameManager.CurrentState.Value != GameState.Playing) { return; }
+
 
         // 時間経過の処理はサーバー（ホスト）でのみ行う
         if (!IsServer || !isTimerRunning) return;
@@ -51,21 +61,7 @@ public class TimeManager : NetworkBehaviour
         }
         else
         {
-            // タイムアップ処理
-            isTimerRunning = false;
             OnTimeUp();
-        }
-    }
-
-
-
-    // 外部からタイマーを開始したい場合（ゲーム開始時など）
-    public void StartTimer()
-    {
-        if (IsServer)
-        {
-            RemainingTime.Value = Mathf.CeilToInt(maxTimeInSeconds);
-            isTimerRunning = true;
         }
     }
 
@@ -73,6 +69,6 @@ public class TimeManager : NetworkBehaviour
     private void OnTimeUp()
     {
         Debug.Log("タイムアップ！");
-        // ここにゲーム終了ロジックなどを記述（サーバー主導）
+        onTimeUp.OnNext(Unit.Default);
     }
 }
