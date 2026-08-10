@@ -97,7 +97,6 @@ public class EffectAbility
         //基準時刻から1秒経過したかを確認
         if (Time.time - lastDamageTime >= 1.0f)
         {
-            //ここが重要！
             lastDamageTime += 1.0f;
             return true;
         }
@@ -136,14 +135,20 @@ public enum EffectList
     [InspectorName("太陽")] SunBurn
 }
 
+/// <summary>
+/// ネットワーク経由でプレイヤー間同期するためのエフェクトデータ構造体
+/// </summary>
 public struct NetworkEffectData : INetworkSerializable, IEquatable<NetworkEffectData>
 {
-    public EffectList EffectType;
-    public bool IsUp; 
-    public bool IsDisplay;
-    public float Time;
-    public float Value;
+    public EffectList EffectType;   //エフェクトの種類
+    public bool IsUp; //バフかデバフか
+    public bool IsDisplay;  //UIに表示するか
+    public float Time;  //継続時間
+    public float Value; //効果値
 
+    /// <summary>
+    /// ネットワーク上でこのデータを送受信するためのメソッド
+    /// </summary>
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref EffectType);
@@ -153,6 +158,9 @@ public struct NetworkEffectData : INetworkSerializable, IEquatable<NetworkEffect
         serializer.SerializeValue(ref Value);
     }
 
+    /// <summary>
+    /// 2つのエフェクトデータの内容が一致しているかを判定するメソッド
+    /// </summary>
     public bool Equals(NetworkEffectData other)
     {
         return EffectType == other.EffectType &&

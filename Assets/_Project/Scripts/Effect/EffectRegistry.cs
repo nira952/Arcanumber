@@ -16,7 +16,7 @@ public class EffectRegistry : ScriptableObject
     [ReadOnly]
     [SerializeField] private List<Effect> allEffects = new List<Effect>();
 
-    // 外部取り出し用の静的辞書
+    //外部取り出し用の静的辞書
     private static Dictionary<(EffectList type, bool isUp), Effect> effectDict = new Dictionary<(EffectList, bool), Effect>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -31,13 +31,9 @@ public class EffectRegistry : ScriptableObject
         }
 
         if (registry != null)
-        {
             registry.BuildDictionary();
-        }
         else
-        {
             Debug.LogError("【EffectRegistry】アセットが見つかりませんでした。アセット名を 'EffectRegistry' にして Resources フォルダに配置することをおすすめします。");
-        }
     }
 
     /// <summary>
@@ -55,9 +51,9 @@ public class EffectRegistry : ScriptableObject
             if (!effectDict.ContainsKey(key))
                 effectDict.Add(key, fx);
             else
-                Debug.LogWarning($"【重複注意】{key.Item1} (isUp: {key.Item2}) のEffectアセットが複数登録されようとしました。'{fx.name}' は無視されます。");
+                Debug.LogWarning($"【重複】{key.Item1} (isUp: {key.Item2}) のEffectが複数登録されようとしました。'{fx.name}' は無視されます。");
         }
-        Debug.Log($"【EffectRegistry】自動初期化完了： {effectDict.Count} 個の効果を辞書に登録しました。");
+        Debug.Log($"【EffectRegistry】初期化完了： {effectDict.Count} 個の効果を辞書に登録しました。");
     }
 
     private void OnValidate()
@@ -65,6 +61,9 @@ public class EffectRegistry : ScriptableObject
         BuildDictionary();
     }
 
+    /// <summary>
+    /// 特定のEffectListとバフ/デバフの状態に対応するEffectを取得する
+    /// </summary>
     public static Effect Get(EffectList type, bool isUp)
     {
         //辞書が空なら初期化
@@ -109,7 +108,6 @@ public class EffectRegistry : ScriptableObject
 
         //変更を保存してUnityに覚えさせる
         EditorUtility.SetDirty(this);
-        //AssetDatabase.SaveAssets();
 
         Debug.Log($"【完了】 {allEffects.Count} 個のEffectアセットを登録");
 #else

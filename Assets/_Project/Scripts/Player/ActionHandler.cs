@@ -69,7 +69,7 @@ public static class ActionHandler
             //アルカナスキルの発動
             player.GetArcana().ExecuteArcanaEffect(ASkillCategory.Command, player);
             //Arcanaデータが持っているクールタイムを設定
-            player.StartActionCoolTime(5, player.GetArcana().GetCoolTime());
+            player.StartActionCoolTime(GameConfig.SKILL_ARCANA, player.GetArcana().GetCoolTime());
         }
         else
         {

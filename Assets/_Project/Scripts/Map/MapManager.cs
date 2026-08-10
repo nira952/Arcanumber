@@ -17,35 +17,27 @@ public class MapManager : NetworkBehaviour
     private void Awake()
     {
         if (mapList.Count == 0)
-        {
             Debug.LogError("マップリストが空です。");
-        }
     }
 
     public override void OnNetworkSpawn()
     {
-        // 値変更イベントの登録（全端末）
+        //値変更イベントの登録
         selectedMapIndex.OnValueChanged += OnMapIndexChanged;
 
         if (IsServer)
         {
-            // ★ サーバー側：すでにマップが決定済みの場合は適用、未設定(-1)なら抽選する
+            //すでにマップが決定済みの場合は適用、未設定なら抽選する
             if (selectedMapIndex.Value == -1)
-            {
                 SelectRandomMapServer();
-            }
             else
-            {
                 ApplyMapSelection(selectedMapIndex.Value);
-            }
         }
         else
         {
-            // ★ クライアント側：すでに同期された値があれば即時反映
+            //すでに同期された値があれば即時反映
             if (selectedMapIndex.Value >= 0 && selectedMapIndex.Value < mapList.Count)
-            {
                 ApplyMapSelection(selectedMapIndex.Value);
-            }
         }
     }
 
@@ -63,10 +55,10 @@ public class MapManager : NetworkBehaviour
 
         int randomIndex = Random.Range(0, mapList.Count);
 
-        // ★ NetworkVariable への代入（OnNetworkSpawn内で呼ぶことで安全に同期されます）
+        //NetworkVariable への代入
         selectedMapIndex.Value = randomIndex;
 
-        // サーバー自身の画面も更新
+        //サーバー自身の画面も更新
         ApplyMapSelection(randomIndex);
     }
 
@@ -86,9 +78,7 @@ public class MapManager : NetworkBehaviour
         if (index < 0 || index >= mapList.Count) return;
 
         for (int i = 0; i < mapList.Count; i++)
-        {
             mapList[i].SetActive(i == index);
-        }
 
         Debug.Log($"[MapManager] マップ '{mapList[index].name}' (Index: {index}) が読み込まれました。");
     }

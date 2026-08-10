@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CameraManager : SingletonMonoBehaviour<CameraManager>
 {
-    [SerializeField] private Camera mainCamera; // メインカメラの参照
+    [SerializeField] private Camera mainCamera; //メインカメラの参照
 
 
     /// <summary>

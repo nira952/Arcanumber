@@ -28,6 +28,17 @@ public class AIPlayer : MonoBehaviour
     private float targetSpeed = 0f;
     private float currentVelocityX = 0f;
 
+    //定数
+    private const float groundCheckRadius = 0.2f;   //接地判定の半径
+    private const float timerMin = 0.5f;    //時間の最小値
+    private const float timerMax = 1.5f;    //時間の最大値
+    private const float jumpState = 0.01f;  //ジャンプする確率
+    private const float randomDirectionProbability = 0.3f;    //方向転換する確率
+    private const float landingDelay = -0.2f; //ディレイする時間
+
+    //ランダムな時間を返すプロパティ
+    private float RandomTime => Random.Range(timerMin, timerMax);
+
     void Start()
     {
         if (TryGetComponent(out NetworkPlayer netPlayer))
@@ -90,7 +101,7 @@ public class AIPlayer : MonoBehaviour
 
         if (IsGrounded() && IsJump())
         {
-            if (Random.value < 0.01f)
+            if (Random.value < jumpState)
                 ChangeState(AIState.JUMP);
         }
         else if (stateTimer <= 0)
@@ -109,7 +120,7 @@ public class AIPlayer : MonoBehaviour
             targetSpeed = moveDirection * moveSpeed;
 
         //時間を置いてから再び着地したらMOVEに
-        if (IsGrounded() && stateTimer <= -0.2f)
+        if (IsGrounded() && stateTimer <= landingDelay)
             ChangeState(AIState.MOVE);
     }
 
@@ -133,7 +144,7 @@ public class AIPlayer : MonoBehaviour
     private bool IsGrounded()
     {
         if (groundCheck == null) return true;
-        return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+        return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
     }
 
     /// <summary>
@@ -156,7 +167,7 @@ public class AIPlayer : MonoBehaviour
     /// </summary>
     private void EnterIdle()
     {
-        stateTimer = Random.Range(0.5f, 1.5f);
+        stateTimer = RandomTime;
     }
 
     /// <summary>
@@ -164,13 +175,15 @@ public class AIPlayer : MonoBehaviour
     /// </summary>
     private void EnterMove()
     {
-        stateTimer = Random.Range(0.5f, 1.5f);
+        //時間をランダムに決める
+        stateTimer = RandomTime;
 
         //方向転換するロジック
-        if (Random.value < 0.3f)
+        if (Random.value < randomDirectionProbability)
             moveDirection *= -1;
         else
-            moveDirection = Random.Range(0, 2) == 0 ? 1 : -1;
+            //ランダムに方向を決める
+            moveDirection = Random.value < 0.5f ? 1 : -1;
     }
 
     /// <summary>
@@ -202,8 +215,10 @@ public class AIPlayer : MonoBehaviour
             || PlayerUtility.HaveEffect(enemy, EffectList.NoJump, false));
     }
 
-
+    // == Getter == 
     public bool GetIsAIPlayer() => isAIPlayer;
+
+    // == Setter == 
     public void SetIsAIPlayer(bool aIPlayer) { isAIPlayer = aIPlayer; }
     public void SetIsHumanLike(bool isHumanLike) { this.isHumanLike = isHumanLike; }
 }
