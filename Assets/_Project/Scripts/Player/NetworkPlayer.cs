@@ -25,7 +25,7 @@ public class NetworkPlayer : MonoBehaviour
 
         //リセット処理
         ResetToInitialState();
-
+        ChangeColor();
         isSpawn = true;
     }
 
@@ -35,13 +35,11 @@ public class NetworkPlayer : MonoBehaviour
      */
     public int GetNetworkId()
     {
-        // playerRoot や NetworkObject が null の場合は safe に -1 を返す
+        //playerRoot や NetworkObject が null の場合は safe に -1 を返す
         if (playerRoot == null)
-        {
             return -1;
-        }
 
-        return playerRoot.PlayerIndex.Value; // または NetworkObject.OwnerClientId など
+        return playerRoot.PlayerIndex.Value; //または NetworkObject.OwnerClientId など
     }
     public string GetPlayerName() { return playerRoot.name; }
     public float GetNowHP() {  return playerRoot.CurrentHealth.Value; }
@@ -95,20 +93,6 @@ public class NetworkPlayer : MonoBehaviour
     public void JumpReset() { playerRoot.Nowjump.Value = 0; }
 
     /// <summary>
-    /// ジャンプのアクション
-    /// </summary>
-    private void RequestJump()
-    {
-        int maxJump = playerRoot.GetPlayerStatus() != null ? playerRoot.GetPlayerStatus().GetMaxJump() : 1;
-
-        if (playerRoot.Nowjump.Value < maxJump)
-        {
-            playerRoot.Nowjump.Value++;
-            playerRoot.GetActionController().ExecuteJumpLocal();
-        }
-    }
-
-    /// <summary>
     /// 攻撃のアクション
     /// </summary>
     public void UseAttack() { ActionHandler.ExecuteAttack(this); }
@@ -139,6 +123,9 @@ public class NetworkPlayer : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// クールタイムの更新
+    /// </summary>
     public void SkillUpdate()
     {
         if (!isSpawn) { return; }
@@ -146,6 +133,7 @@ public class NetworkPlayer : MonoBehaviour
         UpdateAllCoolTimes(Time.deltaTime);
         PlayerUIManager.Instance.UpdateSkillCoolTimeUI(this);
     }
+
     /// <summary>
     /// クールタイムの更新
     /// </summary>
@@ -165,11 +153,11 @@ public class NetworkPlayer : MonoBehaviour
     /// <summary>
     /// 予備動作の色変更
     /// </summary>
-    //public void ChangeColor()
-    //{
-    //    SpriteRenderer renderer = magicStart.GetComponent<SpriteRenderer>();
-    //    renderer.color = playerRoot.GetPlayerStatus().GetCharaColor(networkId);
-    //}
+    public void ChangeColor()
+    {
+        SpriteRenderer renderer = playerRoot.GetMagic().GetComponent<SpriteRenderer>();
+        renderer.color = playerRoot.GetPlayerStatus().GetCharaColor(GetNetworkId());
+    }
 
     /// <summary>
     /// ダメージ処理

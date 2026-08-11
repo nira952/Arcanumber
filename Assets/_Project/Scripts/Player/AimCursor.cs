@@ -13,7 +13,6 @@ public class AimCursor : NetworkBehaviour
 
     [SerializeField] private GameObject magicStart;
 
-    //private Camera _mainCam;   //カメラの位置
     private Vector3 _mouseWorldPos; //現在のマウスの位置
 
     private AimSelect _currentMode; //どの標準方法か
@@ -23,6 +22,10 @@ public class AimCursor : NetworkBehaviour
     private bool _useLerp = true;   //移動を滑らかにするか
     private bool _useRadiusLimit = false;   //円周にするか
     private Transform _lockOnTarget = null; //ロックオンにするか
+
+    private const float SCREEN_MARGIN_MIN = 0.05f;  //画面の端から5%の位置
+    private const float SCREEN_MARGIN_MAX = 0.95f;  //画面の端から95%の位置
+    private const float ZERO_DIVISION_EPSILON = 0.001f; //ゼロ除算の対策用の値
 
     private void Start()
     {
@@ -34,9 +37,9 @@ public class AimCursor : NetworkBehaviour
     /// </summary>
     public void Initialize()
     {
-        // システムカーソルを非表示に
+        //システムカーソルを非表示に
         Cursor.visible = false;
-        // 初期状態としてカーソルを表示する
+        //初期状態としてカーソルを表示する
         if (aimCursor != null)
             aimCursor.SetActive(true);
     }
@@ -55,9 +58,7 @@ public class AimCursor : NetworkBehaviour
         {
             _lockOnTarget = GetNearestEnemyOnScreen();
             if (_lockOnTarget != null)
-            {
                 targetPos = _lockOnTarget.position;
-            }
         }
         //決定されたパラメータを元に、カーソルを実際に移動させる（毎フレーム実行）
         ApplyAimMovement(_currentRadius, _useLerp, _useRadiusLimit, targetPos);
@@ -70,7 +71,7 @@ public class AimCursor : NetworkBehaviour
     {
         aimCursor.SetActive(true);
         _currentMode = aim;
-        // パラメータの初期化
+        //パラメータの初期化
         _currentRadius = 0f;
         _useLerp = true;
         _useRadiusLimit = false;
@@ -83,7 +84,7 @@ public class AimCursor : NetworkBehaviour
                 _useRadiusLimit = true;
                 break;
             case AimSelect.AutoFollow:
-                // デフォルト値のまま
+                //デフォルト値のまま
                 break;
             case AimSelect.LookOn:
                 _lockOnTarget = GetNearestEnemyOnScreen();
@@ -114,7 +115,7 @@ public class AimCursor : NetworkBehaviour
             Vector3 toTarget = baseTarget - centerPosition;
             toTarget.z = 0;
             //ゼロ除算の対策
-            if (toTarget.sqrMagnitude < 0.001f)
+            if (toTarget.sqrMagnitude < ZERO_DIVISION_EPSILON)
                 toTarget = Vector3.right;
             //向きだけを抽出
             Vector3 dir = toTarget.normalized;
@@ -145,7 +146,7 @@ public class AimCursor : NetworkBehaviour
 
         foreach (var enemy in enemies)
         {
-            // 画面内判定
+            //画面内判定
             Vector3 viewPos = Camera.main.WorldToViewportPoint(enemy.transform.position);
             if (viewPos.x >= 0 && viewPos.x <= 1 && viewPos.y >= 0 && viewPos.y <= 1)
             {
@@ -190,8 +191,8 @@ public class AimCursor : NetworkBehaviour
     private Vector3 ClampPositionToScreen(Vector3 targetPos)
     {
         Vector3 viewPos = Camera.main.WorldToViewportPoint(targetPos);
-        viewPos.x = Mathf.Clamp(viewPos.x, 0.05f, 0.95f);
-        viewPos.y = Mathf.Clamp(viewPos.y, 0.05f, 0.95f);
+        viewPos.x = Mathf.Clamp(viewPos.x, SCREEN_MARGIN_MIN, SCREEN_MARGIN_MAX);
+        viewPos.y = Mathf.Clamp(viewPos.y, SCREEN_MARGIN_MIN, SCREEN_MARGIN_MAX);
 
         Vector3 clampedWorldPos = Camera.main.ViewportToWorldPoint(viewPos);
         clampedWorldPos.z = 0;

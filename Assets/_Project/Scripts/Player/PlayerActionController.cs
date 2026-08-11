@@ -1,10 +1,14 @@
 using UnityEngine;
 using R3;
 
+/// <summary>
+/// プレイヤーのアクションを管理するコントローラー
+/// </summary>
 public class PlayerActionController : MonoBehaviour
 {
     [SerializeField] private AimCursor aim;
 
+    // --- イベントの公開 ---
     private readonly Subject<Unit> jumpSubject = new();
     public Observable<Unit> OnJumpAsObservable => jumpSubject;
 
