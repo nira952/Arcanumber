@@ -53,25 +53,27 @@ public class NetworkSessionModel
     // ==========================================
     // 🏫 ローカル (LAN) モード
     // ==========================================
-    public bool StartHostLAN(string hostPlayerId, string playerName, string ipAddress, ushort port = 7777)
+    public bool StartHostLAN(string hostPlayerId, string playerName, ushort port = 7777)
     {
         PlayerIdToClientIdMap.Clear();
         ClientIdToPlayerNameMap.Clear();
         NetworkManager.Singleton.ConnectionApprovalCallback += OnConnectionApproval;
 
         var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        transport.SetConnectionData(ipAddress, port);
+        // ホストは全インターフェース（0.0.0.0）で待ち受ける
+        transport.SetConnectionData("0.0.0.0", port);
 
         bool isSuccess = NetworkManager.Singleton.StartHost();
         if (isSuccess)
         {
-            Debug.Log($"[NGO] LANホストを開始しました。IP: {ipAddress}, Port: {port}");
+            string localIp = GetLocalIPAddress();
+            Debug.Log($"[NGO] LANホストを開始しました。待受IP: 0.0.0.0 (公開IP: {localIp}), Port: {port}");
+
             PlayerIdToClientIdMap[hostPlayerId] = NetworkManager.Singleton.LocalClientId;
-            ClientIdToPlayerNameMap[NetworkManager.Singleton.LocalClientId] = playerName; // ホスト自身の名前を登録
+            ClientIdToPlayerNameMap[NetworkManager.Singleton.LocalClientId] = playerName;
         }
         return isSuccess;
     }
-
     public bool StartClientLAN(string localPlayerId, string playerName, string targetIpAddress, ushort port = 7777)
     {
         string cleanIp = targetIpAddress.Replace("\u200b", "").Trim();

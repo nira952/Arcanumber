@@ -61,8 +61,7 @@ public class LanLobbyPresenter : IDisposable
         {
             if (_isHost)
             {
-                string myIp = _networkModel.GetLocalIPAddress();
-                _networkModel.StartHostLAN(_myLocalPlayerId, PlayerDataManager.Instance.LocalPlayerName, myIp);
+                _networkModel.StartHostLAN(_myLocalPlayerId, PlayerDataManager.Instance.LocalPlayerName);
                 SpawnPlayerDataManager();
 
                 //  参加・切断時フック（UI更新はOnListChanged側で行われるため、ここではデータの更新のみを行う）
@@ -75,6 +74,7 @@ public class LanLobbyPresenter : IDisposable
 
                 PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
 
+                string myIp = _networkModel.GetLocalIPAddress();
                 _view.UpdateRoomName($"IP : {myIp}");
                 CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
                 _view.ShowRoomPanel();
