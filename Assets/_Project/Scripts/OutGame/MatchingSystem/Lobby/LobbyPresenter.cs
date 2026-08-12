@@ -8,24 +8,28 @@ using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
+/// <summary>
+/// マッチングシステムのクラス
+/// </summary>
 public class LobbyPresenter : IDisposable
 {
-    // スタートボタンを出す最低人数
-    private const int MinPlayersToStart = 2;
+    private const int MinPlayersToStart = 2;    //最低限必要なプレイヤー数
 
     private readonly LobbyUIManager _view;
     private readonly LobbyModel _lobbyModel;
     private readonly NetworkSessionModel _networkModel;
-    private readonly string _nextSceneName;
-    private readonly CancellationToken _destroyToken;
+    private readonly string _nextSceneName; //次のシーン名
+    private readonly CancellationToken _destroyToken;   //破棄されるときのキャンセルトークン
 
-    private readonly CompositeDisposable _disposables = new();
-    private CancellationTokenSource _matchCts;
+    private readonly LobbyMatchCoordinator _matchCoordinator;
+    private readonly LobbyPollingManager _pollingManager;
 
-    // 現在のモード状態
-    private bool _isLanMode = false;
-    private bool _isHost = false;
-    private string _myLocalPlayerId; // ネットワーク認証に依存しない固有ID
+    private readonly CompositeDisposable _disposables = new();  //IDisposableをまとめて管理するためのCompositeDisposable
+    private CancellationTokenSource _matchCts;  //マッチング処理用のキャンセルトークンソース
+
+    private bool _isLanMode = false;    //LANモードかどうかのフラグ
+    private bool _isHost = false;   //ホストかどうかのフラグ
+    private string _myLocalPlayerId;    //自分のローカルID
 
     public LobbyPresenter(
         LobbyUIManager view, LobbyModel lobbyModel, NetworkSessionModel networkModel,
@@ -37,35 +41,39 @@ public class LobbyPresenter : IDisposable
         _nextSceneName = nextSceneName;
         _destroyToken = destroyToken;
 
-        // オフラインでも一意に識別できるようにランダムGUIDを生成しておく
+        _matchCoordinator = new LobbyMatchCoordinator(lobbyModel, networkModel);
+        _pollingManager = new LobbyPollingManager();
+
         _myLocalPlayerId = Guid.NewGuid().ToString();
 
         _view.ResetMatchUI();
-
-        // 自身のローカルIPを取得してUIに表示（LANホスト用）
-        string myIp = _networkModel.GetLocalIPAddress();
-        _view.UpdateLocalIPText(myIp);
+        _view.UpdateLocalIPText(_networkModel.GetLocalIPAddress());
 
         BindEvents();
         InitializeServicesAsync().Forget();
     }
 
+    /// <summary>
+    /// UIイベントのバインドを行う
+    /// </summary>
     private void BindEvents()
     {
-        // ViewのトグルなどでLANモードが切り替わったときのイベント
         _view.OnLanModeToggled.Subscribe(isOn => _isLanMode = isOn).AddTo(_disposables);
 
         _view.OnJoinPrivateMatchRequested.Subscribe(_ =>
-            (HandleMatchAsync(LobbyModel.MatchTypePrivate)).Forget()
+            HandleMatchAsync(LobbyModel.MatchTypePrivate).Forget()
         ).AddTo(_disposables);
 
         _view.OnJoinCasualMatchRequested.Subscribe(_ =>
-            (HandleMatchAsync(LobbyModel.MatchTypeCasual)).Forget()
+            HandleMatchAsync(LobbyModel.MatchTypeCasual).Forget()
         ).AddTo(_disposables);
 
         _lobbyModel.OnLobbyUpdated.Subscribe(lobby => UpdateLobbyUI(lobby)).AddTo(_disposables);
     }
 
+    /// <summary>
+    /// UGSサービスの初期化を非同期で行う
+    /// </summary>
     private async UniTask InitializeServicesAsync()
     {
         try
@@ -74,168 +82,105 @@ public class LobbyPresenter : IDisposable
             await _lobbyModel.InitializeServicesAsync(_destroyToken);
 
             CurtainManager.Instance.UpdateLoadingMessage("接続完了！");
-
-            // ログイン成功したらUGSのIDを優先使用
             _myLocalPlayerId = AuthenticationService.Instance.PlayerId;
             _view.EnableJoinButton();
         }
         catch (Exception e)
         {
-            // 学校などでブロックされた場合ここに来る（フェイルセーフ）
             Debug.LogWarning($"[Presenter] UGS接続エラー(LANのみ可): {e.Message}");
             CurtainManager.Instance.UpdateLoadingMessage("オフラインモードです\n(LAN接続のみ使用可能)");
             await UniTask.Delay(2000, cancellationToken: _destroyToken);
 
-            _view.EnableJoinButton(); // エラーでもLAN用にボタンは解放する
+            _view.EnableJoinButton();
         }
     }
 
-    // ==========================================
-    // 🌐 オンラインマッチ処理 (UGS Relay)
-    // ==========================================
+    /// <summary>
+    /// マッチング処理を非同期で行う
+    /// </summary>
     private async UniTask HandleMatchAsync(string matchType)
     {
         string targetLobbyName = "カジュアルマッチ";
 
-        // プライベートマッチの場合は、ユーザーが入力した合言葉を使用する
         if (matchType == LobbyModel.MatchTypePrivate)
         {
-            // プライベート合言葉ロジック
             string rawInput = _view.RoomCodeText.Trim();
-
-            Debug.Log($"[Presenter] プライベートマッチの合言葉: {rawInput}");
-
-            // 入力が空の場合
-            if (string.IsNullOrEmpty(rawInput) || rawInput == " ")
+            if (string.IsNullOrEmpty(rawInput))
             {
                 Debug.Log("合言葉を入力してください");
                 return;
             }
-
             targetLobbyName = rawInput;
         }
 
         _isHost = false;
-        // カーテンを閉じる
         await CurtainManager.Instance.CloseAsync("マッチング中...", GetType().Name);
-
         _view.SetUIStateOnMatchingStart();
 
-        _matchCts?.Cancel();
-        _matchCts = new CancellationTokenSource();
-        var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_matchCts.Token, _destroyToken).Token;
+        RenewMatchCancellationToken();
 
         try
         {
-            if (matchType == LobbyModel.MatchTypePrivate)
-            {
-                var existingLobby = await _lobbyModel.FindAvailableLobbyByNameAsync(targetLobbyName, matchType);
-                if (existingLobby != null)
-                {
-                    await _lobbyModel.JoinLobbyAndRelayAsync(existingLobby, linkedToken);
-                }
-                else
-                {
-                    await _lobbyModel.CreateLobbyAndRelayAsync(targetLobbyName, matchType, linkedToken);
-                    _isHost = true;
-                }
-            }
-            else
-            {
-                // カジュアルクイックジョインロジック
-                var casualLobby = await _lobbyModel.FindAvailableCasualLobbyAsync();
+            // マッチメイク処理をCoordinatorに委譲
+            _isHost = await _matchCoordinator.ProcessMatchMakingAsync(matchType, targetLobbyName, _myLocalPlayerId, _matchCts.Token);
 
-                if (casualLobby != null)
-                {
-                    // 見つかった場合は、そのロビーとRelayサーバーに参加する
-                    await _lobbyModel.JoinLobbyAndRelayAsync(casualLobby, linkedToken);
-                }
-                else
-                {
-                    // 見つからなかった場合は、新しく自分でカジュアルロビーを作る（自分がホストになる）
-                    await _lobbyModel.CreateLobbyAndRelayAsync(targetLobbyName, matchType, linkedToken);
-                    _isHost = true;
-                }
-            }
-
-            // 💡 ロビーへの参加・作成が完了したため、全ユーザー共通でロビー情報のポーリングを開始する
-            _lobbyModel.StartLobbyPollingLoopAsync(linkedToken).Forget();
-
-            // NGO（Netcode）の起動
             if (_isHost)
             {
-                // ホスト起動時に自分の名前を渡す
-                _networkModel.StartHostRelay(_myLocalPlayerId, PlayerDataManager.Instance.LocalPlayerName);
-                _lobbyModel.HeartbeatLobbyAsync(linkedToken).Forget();
-                SpawnPlayerDataManager();
-
-                // 同期イベント
-                NetworkManager.Singleton.OnClientConnectedCallback += _ => {
-                    PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
-                };
-                NetworkManager.Singleton.OnClientDisconnectCallback += _ => {
-                    PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
-                };
-                PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
-
-                // ホスト用のオンライン監視ループを起動
-                OnlinePollingLoopAsync(linkedToken).Forget();
+                SetupHostNetworkSession();
+                _pollingManager.RunPollingLoopAsync(
+                    () => !_matchCts.Token.IsCancellationRequested && _isHost && !_isLanMode,
+                    () => { if (_lobbyModel.CurrentLobby != null) UpdateLobbyUI(_lobbyModel.CurrentLobby); },
+                    _matchCts.Token
+                ).Forget();
             }
             else
             {
-                // クライアントはポーリングを回しつつサーバーとの接続を待つ
-                await StartClientWaitAsync(_myLocalPlayerId, linkedToken);
-
-                // クライアント用のオンライン監視ループを起動
-                OnlineClientPollingLoopAsync(linkedToken).Forget();
+                await _matchCoordinator.StartClientWaitAsync(_myLocalPlayerId, _matchCts.Token);
+                _pollingManager.RunPollingLoopAsync(
+                    () => !_matchCts.Token.IsCancellationRequested && !_isHost && !_isLanMode && (NetworkManager.Singleton != null && NetworkManager.Singleton.IsClient),
+                    () => { if (_lobbyModel.CurrentLobby != null) UpdateLobbyUI(_lobbyModel.CurrentLobby); },
+                    _matchCts.Token
+                ).Forget();
             }
 
             _view.ShowRoomPanel();
             CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
         }
-        catch (Exception e) { HandleMatchError(e); }
-    }
-
-    // ==========================================
-    // 🌐 待機画面の更新ループ (オンライン専用)
-    // ==========================================
-
-    // 【ホスト用】オンライン時の状態監視ループ
-    private async UniTask OnlinePollingLoopAsync(CancellationToken token)
-    {
-        while (!token.IsCancellationRequested && _isHost && !_isLanMode)
+        catch (Exception e)
         {
-            if (NetworkManager.Singleton != null && _lobbyModel.CurrentLobby != null)
-            {
-                // UIを最新のロビー情報とNGO接続情報で強制更新する
-                UpdateLobbyUI(_lobbyModel.CurrentLobby);
-            }
-
-            await UniTask.Delay(1000, cancellationToken: token); // 1秒ごとに更新
+            HandleMatchError(e);
         }
     }
 
-    // 【ゲスト用】オンライン時の状態監視ループ
-    private async UniTask OnlineClientPollingLoopAsync(CancellationToken token)
+    /// <summary>
+    /// マッチングを安全に中断するためのメソッド
+    /// </summary>
+    private void RenewMatchCancellationToken()
     {
-        while (!token.IsCancellationRequested && !_isHost && !_isLanMode)
-        {
-            if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsClient) break;
-
-            if (_lobbyModel.CurrentLobby != null)
-            {
-                // ゲスト側も1秒ごとに画面情報を強制更新
-                UpdateLobbyUI(_lobbyModel.CurrentLobby);
-            }
-
-            await UniTask.Delay(1000, cancellationToken: token); // 1秒ごとに更新
-        }
+        _matchCts?.Cancel();
+        _matchCts = CancellationTokenSource.CreateLinkedTokenSource(_destroyToken);
     }
 
+    /// <summary>
+    /// ホストとしてのネットワークセッションをセットアップする
+    /// </summary>
+    private void SetupHostNetworkSession()
+    {
+        _networkModel.StartHostRelay(_myLocalPlayerId, PlayerDataManager.Instance.LocalPlayerName);
+        _lobbyModel.HeartbeatLobbyAsync(_matchCts.Token).Forget();
+        SpawnPlayerDataManager();
 
-    // ==========================================
-    // 共通処理群
-    // ==========================================
+        void UpdateData(ulong _) => PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
+
+        NetworkManager.Singleton.OnClientConnectedCallback += UpdateData;
+        NetworkManager.Singleton.OnClientDisconnectCallback += UpdateData;
+
+        PlayerDataManager.Instance.Server_UpdateLobbyData(_networkModel.ClientIdToPlayerNameMap);
+    }
+
+    /// <summary>
+    /// シーン上に存在するPlayerDataManagerをスポーンさせる
+    /// </summary>
     private void SpawnPlayerDataManager()
     {
         if (PlayerDataManager.Instance != null)
@@ -245,32 +190,9 @@ public class LobbyPresenter : IDisposable
         }
     }
 
-    private async UniTask StartClientWaitAsync(string playerId, CancellationToken token, bool isLan = false, string ip = "")
-    {
-        var tcs = new UniTaskCompletionSource<bool>();
-        void OnConnected(ulong clientId) { if (clientId == NetworkManager.Singleton.LocalClientId) tcs.TrySetResult(true); }
-        NetworkManager.Singleton.OnClientConnectedCallback += OnConnected;
-
-        string myName = PlayerDataManager.Instance.LocalPlayerName;
-        bool startResult = isLan ? _networkModel.StartClientLAN(playerId, myName, ip) : _networkModel.StartClientRelay(playerId, myName);
-
-        if (!startResult)
-        {
-            NetworkManager.Singleton.OnClientConnectedCallback -= OnConnected;
-            throw new Exception("StartClientに失敗。");
-        }
-
-        // 💡 修正: 1番目の要素は「左側(tcs.Task)が先に完了したか」を示すbool
-        var (hasConnected, _) = await UniTask.WhenAny(
-            tcs.Task.AttachExternalCancellation(token),
-            UniTask.Delay(TimeSpan.FromSeconds(10), cancellationToken: token)
-        );
-
-        NetworkManager.Singleton.OnClientConnectedCallback -= OnConnected;
-
-        if (!hasConnected) throw new Exception("サーバーへの接続がタイムアウトしました。");
-    }
-
+    /// <summary>
+    /// マッチングエラーを処理する
+    /// </summary>
     private void HandleMatchError(Exception e)
     {
         Debug.LogError($"[Presenter] マッチングエラー: {e.Message}");
@@ -279,7 +201,9 @@ public class LobbyPresenter : IDisposable
         CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
     }
 
-    // オンライン(UGS)モード時のUI更新ロジック
+    /// <summary>
+    /// ロビーのUIを更新する
+    /// </summary>
     private void UpdateLobbyUI(Lobby lobby)
     {
         if (_isLanMode) return;
@@ -291,8 +215,6 @@ public class LobbyPresenter : IDisposable
         }
 
         _view.UpdateRoomName(lobby.Name);
-
-        // 💡 自分のUGS IDを取得（「あなた」という表記をつけるかの判定用）
         string myPlayerId = AuthenticationService.Instance.PlayerId;
 
         for (int i = 0; i < MinPlayersToStart; i++)
@@ -300,52 +222,34 @@ public class LobbyPresenter : IDisposable
             if (i < lobby.Players.Count)
             {
                 var player = lobby.Players[i];
-
-                // 💡 UGSに登録されているプレイヤーデータを引き出す
                 string pName = "Unknown";
                 if (player.Data != null && player.Data.TryGetValue("PlayerName", out var nameData))
-                {
-                    pName = nameData.Value; // ここで相手の本当の名前を取得！
-                }
+                    pName = nameData.Value;
 
-                // LANモードと同じように、直感的なサフィックス（接尾辞）を付ける
                 string suffix = "";
                 if (player.Id == myPlayerId)
-                {
-                    // 自分自身の場合
                     suffix = (player.Id == lobby.HostId) ? " (あなた/ホスト)" : " (あなた)";
-                }
                 else if (player.Id == lobby.HostId)
-                {
-                    // 自分ではないが、ホストの場合
                     suffix = " (ホスト)";
-                }
 
-                // UIのテキストを更新する
                 _view.UpdatePlayerList(pName + suffix, i + 1);
             }
             else
-            {
                 _view.UpdatePlayerList("待機中...", i + 1);
-            }
         }
 
-        Debug.Log($"[Presenter] ロビー更新: {lobby.Name}, プレイヤー数: {lobby.Players.Count}, ホスト: {lobby.HostId}");
-
         int ngoCount = NetworkManager.Singleton != null ? NetworkManager.Singleton.ConnectedClientsIds.Count : 0;
-
         bool canStartGame = _isHost && lobby.Players.Count >= MinPlayersToStart && ngoCount >= MinPlayersToStart;
-        Debug.Log($"[Presenter] 次へボタン活性化判定: UGS人数={lobby.Players.Count}, NGO接続数={ngoCount}, CanStart={canStartGame}");
 
         _view.SetNextSceneButtonActive(canStartGame);
     }
 
+    //キャンセル処理
+    public void HandleCancelOrLeave() => HandleCancelOrLeaveAsync().Forget();
 
-    public void HandleCancelOrLeave()
-    {
-        HandleCancelOrLeaveAsync().Forget();
-    }
-
+    /// <summary>
+    /// 退出またはキャンセル処理を非同期で行う
+    /// </summary>
     private async UniTask HandleCancelOrLeaveAsync()
     {
         CurtainManager.Instance.UpdateLoadingMessage("キャンセル中...");
@@ -359,12 +263,12 @@ public class LobbyPresenter : IDisposable
         _view.ResetMatchUI();
     }
 
-    public void StartGame()
-    {
-        HandleStartGameAsync().Forget();
-    }
+    /// ゲーム開始処理
+    public void StartGame() => HandleStartGameAsync().Forget();
 
-    // 💡 ゲームシーンへの遷移処理（オンライン・LAN共通）
+    /// <summary>
+    /// 次のシーンに移動するためのゲーム開始処理を行う
+    /// </summary>
     private async UniTask HandleStartGameAsync()
     {
         if (!NetworkManager.Singleton.IsServer) return;
@@ -393,21 +297,19 @@ public class LobbyPresenter : IDisposable
             index++;
         }
 
-        // 1. データをサーバーから同期
         PlayerDataManager.Instance.Server_BuildAndSyncPlayerData(finalizedList);
 
-        // 💡 データの同期パケットがクライアントに行き渡るまで0.3秒ほど待つ
         await UniTask.Delay(TimeSpan.FromSeconds(0.3f), cancellationToken: _destroyToken);
-
         await CurtainManager.Instance.CloseAsync("シーンを移動します", GetType().Name);
         await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: _destroyToken);
 
-        // 2. ネットワークシーン遷移を実行
         GameSceneManager.Instance.LoadNetworkScene(_nextSceneName);
-
         CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
     }
 
+    /// <summary>
+    /// 破棄されるときに呼び出されるメソッド
+    /// </summary>
     public void Dispose()
     {
         _matchCts?.Cancel();
