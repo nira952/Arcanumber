@@ -69,6 +69,25 @@ public class PlayerRoot : MonoBehaviour
 
         GameUIManager.Instance. BindPlayerStatus(PlayerIndex.Value, ActiveEffects);
 
+        if (TryGetComponent<Unity.Netcode.NetworkObject>(out var netObj))
+        {
+            // オンライン時はオーナー（自分）のときだけ、オフライン時は常に実行
+            if (netObj.IsOwner || PlayerDataManager.Instance.IsLocalMode)
+            {
+                if (PlayerUIManager.Instance != null && PlayerDataManager.Instance != null)
+                {
+                    PlayerUIManager.Instance.Initialize(PlayerDataManager.Instance);
+                }
+            }
+        }
+        else
+        {
+            // そもそも NetworkObject がない純粋なローカル環境の場合
+            if (PlayerUIManager.Instance != null && PlayerDataManager.Instance != null)
+            {
+                PlayerUIManager.Instance.Initialize(PlayerDataManager.Instance);
+            }
+        }
 
         if (playerAnimator != null)
         {

@@ -208,16 +208,16 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
         Color color;
         switch (pIndex)
         {
-            case 1:
+            case 0:
                 color = Color.blue;
                 break;
-            case 2:
+            case 1:
                 color = Color.red;
                 break;
-            case 3:
+            case 2:
                 color = Color.green;
                 break;
-            case 4:
+            case 3:
                 color = Color.yellow;
                 break;
             default:
