@@ -108,12 +108,12 @@ public class NetworkSessionModel
         {
             CurtainManager.Instance.UpdateLoadingMessage("マッチング成功！");
 
-            // 💡 送られてきたPayloadを分解して、IDと名前に分ける
+            // 送られてきたPayloadを分解して、IDと名前に分ける
             string payloadStr = Encoding.UTF8.GetString(request.Payload);
             string[] parts = payloadStr.Split('|');
 
             string playerId = parts[0];
-            string playerName = parts.Length > 1 ? parts[1] : "Guest"; // もし名前が無ければGuestにする
+            string playerName = parts.Length > 1 ? parts[1] : "Guest";
 
             // 辞書に記憶する
             PlayerIdToClientIdMap[playerId] = request.ClientNetworkId;
@@ -124,8 +124,9 @@ public class NetworkSessionModel
             response.Approved = true;
             response.CreatePlayerObject = false;
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Debug.LogError($"[NGO] 接続承認エラー: {e.Message}");
             response.Approved = false;
             response.Reason = "Invalid Payload";
         }

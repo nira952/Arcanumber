@@ -110,7 +110,6 @@ public class LobbyPresenter : IDisposable
             {
                 Debug.Log("合言葉を入力してください");
                 return;
-
             }
 
             targetLobbyName = rawInput;
@@ -122,17 +121,14 @@ public class LobbyPresenter : IDisposable
 
         _view.SetUIStateOnMatchingStart();
 
-
         _matchCts?.Cancel();
         _matchCts = new CancellationTokenSource();
         var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_matchCts.Token, _destroyToken).Token;
 
         try
         {
-
             if (matchType == LobbyModel.MatchTypePrivate)
             {
-
                 var existingLobby = await _lobbyModel.FindAvailableLobbyByNameAsync(targetLobbyName, matchType);
                 if (existingLobby != null)
                 {
@@ -147,24 +143,23 @@ public class LobbyPresenter : IDisposable
             else
             {
                 // カジュアルクイックジョインロジック
-                // 1. 空いているカジュアルロビーがあるか検索する
                 var casualLobby = await _lobbyModel.FindAvailableCasualLobbyAsync();
 
                 if (casualLobby != null)
                 {
-                    // 2. 見つかった場合は、そのロビーとRelayサーバーに参加する
+                    // 見つかった場合は、そのロビーとRelayサーバーに参加する
                     await _lobbyModel.JoinLobbyAndRelayAsync(casualLobby, linkedToken);
                 }
                 else
                 {
-                    // 3. 見つからなかった場合は、新しく自分でカジュアルロビーを作る（自分がホストになる）
+                    // 見つからなかった場合は、新しく自分でカジュアルロビーを作る（自分がホストになる）
                     await _lobbyModel.CreateLobbyAndRelayAsync(targetLobbyName, matchType, linkedToken);
                     _isHost = true;
                 }
             }
 
-
-
+            // 💡 ロビーへの参加・作成が完了したため、全ユーザー共通でロビー情報のポーリングを開始する
+            _lobbyModel.StartLobbyPollingLoopAsync(linkedToken).Forget();
 
             // NGO（Netcode）の起動
             if (_isHost)
@@ -188,16 +183,14 @@ public class LobbyPresenter : IDisposable
             }
             else
             {
+                // クライアントはポーリングを回しつつサーバーとの接続を待つ
                 await StartClientWaitAsync(_myLocalPlayerId, linkedToken);
 
                 // クライアント用のオンライン監視ループを起動
                 OnlineClientPollingLoopAsync(linkedToken).Forget();
             }
 
-            _lobbyModel.StartLobbyPollingLoopAsync(linkedToken).Forget();
-
             _view.ShowRoomPanel();
-
             CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
         }
         catch (Exception e) { HandleMatchError(e); }
@@ -267,15 +260,15 @@ public class LobbyPresenter : IDisposable
             throw new Exception("StartClientに失敗。");
         }
 
-        Debug.Log($"[Presenter] クライアントとして接続開始: LAN={isLan}, IP={ip}, PlayerId={playerId}, Name={myName}");
-
-        var winner = await UniTask.WhenAny(
+        // 💡 修正: 1番目の要素は「左側(tcs.Task)が先に完了したか」を示すbool
+        var (hasConnected, _) = await UniTask.WhenAny(
             tcs.Task.AttachExternalCancellation(token),
             UniTask.Delay(TimeSpan.FromSeconds(10), cancellationToken: token)
         );
+
         NetworkManager.Singleton.OnClientConnectedCallback -= OnConnected;
 
-        if (winner.Equals(1)) throw new Exception("サーバーへの接続がタイムアウトしました。");
+        if (!hasConnected) throw new Exception("サーバーへの接続がタイムアウトしました。");
     }
 
     private void HandleMatchError(Exception e)
@@ -339,12 +332,12 @@ public class LobbyPresenter : IDisposable
 
         Debug.Log($"[Presenter] ロビー更新: {lobby.Name}, プレイヤー数: {lobby.Players.Count}, ホスト: {lobby.HostId}");
 
-        // 全員が揃ってNGO接続も完了したら「次へ」ボタンを有効化
         int ngoCount = NetworkManager.Singleton != null ? NetworkManager.Singleton.ConnectedClientsIds.Count : 0;
 
-        Debug.Log(_isHost && lobby.Players.Count >= MinPlayersToStart);
+        bool canStartGame = _isHost && lobby.Players.Count >= MinPlayersToStart && ngoCount >= MinPlayersToStart;
+        Debug.Log($"[Presenter] 次へボタン活性化判定: UGS人数={lobby.Players.Count}, NGO接続数={ngoCount}, CanStart={canStartGame}");
 
-        _view.SetNextSceneButtonActive(_isHost && lobby.Players.Count >= MinPlayersToStart);
+        _view.SetNextSceneButtonActive(canStartGame);
     }
 
 
@@ -356,7 +349,7 @@ public class LobbyPresenter : IDisposable
     private async UniTask HandleCancelOrLeaveAsync()
     {
         CurtainManager.Instance.UpdateLoadingMessage("キャンセル中...");
-        
+
         _view.DisableCancelButton();
         _matchCts?.Cancel();
 
@@ -378,22 +371,13 @@ public class LobbyPresenter : IDisposable
 
         var finalizedList = new List<PlayerNetworkData>();
         int index = 0;
-
-        // 🛠️ 重複チェック用のハッシュセットを用意
         var processedClientIds = new HashSet<ulong>();
 
         foreach (var kvp in _networkModel.PlayerIdToClientIdMap)
         {
             ulong clientId = kvp.Value;
+            if (processedClientIds.Contains(clientId)) continue;
 
-            // すでに同じClientIdを処理済みの場合はスキップ
-            if (processedClientIds.Contains(clientId))
-            {
-                Debug.LogWarning($"[HandleStartGame] 重複したClientId（{clientId}）を検出したため、リスト作成からスキップします。");
-                continue;
-            }
-
-            // マップから正しいプレイヤー名を取得する（万が一無い場合はフォールバック）
             string pName = _networkModel.ClientIdToPlayerNameMap.TryGetValue(clientId, out var name)
                 ? name
                 : $"Player{index + 1}";
@@ -405,21 +389,23 @@ public class LobbyPresenter : IDisposable
                 PlayerName = pName,
             });
 
-            // 処理済みとして記録
             processedClientIds.Add(clientId);
             index++;
         }
 
+        // 1. データをサーバーから同期
         PlayerDataManager.Instance.Server_BuildAndSyncPlayerData(finalizedList);
 
-        await CurtainManager.Instance.CloseAsync("シーンを移動します", GetType().Name);
-        await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: _destroyToken);
+        // 💡 データの同期パケットがクライアントに行き渡るまで0.3秒ほど待つ
+        await UniTask.Delay(TimeSpan.FromSeconds(0.3f), cancellationToken: _destroyToken);
 
+        await CurtainManager.Instance.CloseAsync("シーンを移動します", GetType().Name);
+        await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: _destroyToken);
+
+        // 2. ネットワークシーン遷移を実行
         GameSceneManager.Instance.LoadNetworkScene(_nextSceneName);
 
-
         CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
-
     }
 
     public void Dispose()

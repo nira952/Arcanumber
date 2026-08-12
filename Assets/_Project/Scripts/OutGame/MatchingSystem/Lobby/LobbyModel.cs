@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using R3;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -108,9 +109,10 @@ public class LobbyModel
         string relayJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
         var utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        var dtlsEndpoint = allocation.ServerEndpoints.First(e => e.ConnectionType == "dtls");
         utp.SetHostRelayData(
-            allocation.RelayServer.IpV4,
-            (ushort)allocation.RelayServer.Port,
+            dtlsEndpoint.Host,
+            (ushort)dtlsEndpoint.Port,
             allocation.AllocationIdBytes,
             allocation.Key,
             allocation.ConnectionData,
@@ -166,12 +168,18 @@ public class LobbyModel
         if (!CurrentLobby.Data.TryGetValue(RelayKey, out var relayData))
             throw new Exception("ロビーデータ内にRelayコードが見つかりません。");
 
+        Debug.Log($"[LobbyModel] 取得したRelayJoinCode: {relayData.Value}");
+
+        // 1. 取得したJoinCodeを使ってRelayに参加
         JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayData.Value);
 
         var utp = NetworkManager.Singleton.GetComponent<UnityTransport>();
+
+        // クライアント側
+        var dtlsEndpoint = joinAllocation.ServerEndpoints.First(e => e.ConnectionType == "dtls");
         utp.SetClientRelayData(
-            joinAllocation.RelayServer.IpV4,
-            (ushort)joinAllocation.RelayServer.Port,
+            dtlsEndpoint.Host,
+            (ushort)dtlsEndpoint.Port,
             joinAllocation.AllocationIdBytes,
             joinAllocation.Key,
             joinAllocation.ConnectionData,
@@ -179,7 +187,7 @@ public class LobbyModel
             true
         );
 
-        _onLobbyUpdated.OnNext(CurrentLobby);
+        Debug.Log($"[LobbyModel] クライアント側 Relay設定完了: IP={joinAllocation.RelayServer.IpV4}, Port={joinAllocation.RelayServer.Port}");
     }
 
     public async UniTask HeartbeatLobbyAsync(CancellationToken cancellationToken)
