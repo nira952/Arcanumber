@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -398,5 +400,37 @@ public class PlayerDataManager : NetworkBehaviour
         PlayerPrefs.SetString(NameSaveKey, newName);
         PlayerPrefs.Save();
         Debug.Log($"[PlayerDataManager] 新しい名前をローカルに保存しました: {newName}");
+    }
+
+    // ==========================================
+    // 🎬 シーン遷移（カーテン演出の同期）用のRPC
+    // ==========================================
+
+    [ServerRpc]
+    public void RequestStartGameServerRpc(string sceneName)
+    {
+        // サーバー（ホスト）から全クライアント（ホスト含む）に向けて指示を送る
+        StartGameClientRpc(sceneName);
+    }
+
+    [ClientRpc]
+    private void StartGameClientRpc(string sceneName)
+    {
+        // 全クライアント側で同時に実行される
+        HandleClientTransitionAsync(sceneName).Forget();
+    }
+
+    private async UniTaskVoid HandleClientTransitionAsync(string sceneName)
+    {
+        // 1. 各自の画面でカーテンを閉じる演出を実行
+        await CurtainManager.Instance.CloseAsync("シーンを移動します", "LobbyPresenter");
+        await UniTask.Delay(TimeSpan.FromSeconds(0.2f));
+
+        // 2. ホストだけが実際にネットワークシーンのロードを実行する
+        // （NGOの仕様上、LoadNetworkSceneはサーバー側からのみ呼び出す必要があるため）
+        if (IsServer)
+        {
+            GameSceneManager.Instance.LoadNetworkScene(sceneName);
+        }
     }
 }

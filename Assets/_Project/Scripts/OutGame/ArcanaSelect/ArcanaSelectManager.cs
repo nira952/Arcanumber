@@ -48,6 +48,8 @@ public class ArcanaSelectManager : NetworkBehaviour
 
     private void Start()
     {
+        CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
+
         // ローカルモードかどうかを判定
         isLocalMode = PlayerDataManager.Instance.IsLocalMode;
         arcanaDatabase = AssetLoader.Instance.LoadAllArcanas;

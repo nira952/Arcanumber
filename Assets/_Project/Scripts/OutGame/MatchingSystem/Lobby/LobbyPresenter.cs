@@ -300,11 +300,9 @@ public class LobbyPresenter : IDisposable
         PlayerDataManager.Instance.Server_BuildAndSyncPlayerData(finalizedList);
 
         await UniTask.Delay(TimeSpan.FromSeconds(0.3f), cancellationToken: _destroyToken);
-        await CurtainManager.Instance.CloseAsync("シーンを移動します", GetType().Name);
-        await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: _destroyToken);
 
-        GameSceneManager.Instance.LoadNetworkScene(_nextSceneName);
-        CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
+        // ホスト側が直接ロードするのではなく、ネットワーク経由で全クライアント（ホスト含む）に
+        PlayerDataManager.Instance.RequestStartGameServerRpc(_nextSceneName);
     }
 
     /// <summary>
