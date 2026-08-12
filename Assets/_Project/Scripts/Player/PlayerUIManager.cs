@@ -13,6 +13,7 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
     [SerializeField] private TextMeshProUGUI[] skillTimeTexts = new TextMeshProUGUI[6];
     [SerializeField] private GameObject[] skillFrame = new GameObject[5];
 
+
     /// <summary>
     /// 初期化
     /// </summary>
@@ -21,6 +22,12 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
         SkillUIInitialize(player[playerId]);
         FrameColorChange(player[playerId]);
     }
+    public void Initialize(PlayerDataManager player)
+    {
+        SkillUIInitialize(player);
+        FrameColorChange(player);
+    }
+
 
     /// <summary>
     /// スキルUIの初期化
@@ -45,6 +52,42 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
             skillTimeIcons[i + 1].sprite = pSkills[i].GetSprite();
         }
         SkillFrameChange(player);
+    }
+    void SkillUIInitialize(PlayerDataManager playerDataManager)
+    {
+        if (playerDataManager == null) return;
+
+        Skill[] mySkills = playerDataManager.GetMySkills();
+        if (mySkills == null) return;
+
+        // クールタイムを元に戻す
+        for (int i = 0; i < skillBlocks.Length; i++)
+        {
+            if (i < mySkills.Length)
+            {
+                if (i < skillTimeIcons.Length && skillTimeIcons[i] != null)
+                    skillTimeIcons[i].fillAmount = 1f;
+                if (i < skillTimeTexts.Length && skillTimeTexts[i] != null)
+                    skillTimeTexts[i].text = "";
+            }
+        }
+
+        // スキルのスプライトを変更
+        for (int i = 0; i < mySkills.Length; i++)
+        {
+            if (mySkills[i] != null)
+            {
+                int uiIndex = i + 1; // 0番通常攻撃などのオフセットに合わせて調整
+                if (uiIndex < skillIcons.Length && skillIcons[uiIndex] != null)
+                {
+                    skillIcons[uiIndex].sprite = mySkills[i].GetSprite();
+                }
+                if (uiIndex < skillTimeIcons.Length && skillTimeIcons[uiIndex] != null)
+                {
+                    skillTimeIcons[uiIndex].sprite = mySkills[i].GetSprite();
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -155,6 +198,42 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
         }
         foreach (var frame in skillFrame)
             frame.GetComponent<Image>().color = color;
+    }
+    public void FrameColorChange(PlayerDataManager playerDataManager)
+    {
+        if (playerDataManager == null) return;
+
+        // PlayerDataManager から自分のロビーインデックス（またはID）を取得する
+        int pIndex = playerDataManager.GetMyLobbyIndex();
+        Color color;
+        switch (pIndex)
+        {
+            case 1:
+                color = Color.blue;
+                break;
+            case 2:
+                color = Color.red;
+                break;
+            case 3:
+                color = Color.green;
+                break;
+            case 4:
+                color = Color.yellow;
+                break;
+            default:
+                color = Color.white;
+                break;
+        }
+
+        foreach (var frame in skillFrame)
+        {
+            if (frame != null)
+            {
+                var img = frame.GetComponent<Image>();
+                if (img != null)
+                    img.color = color;
+            }
+        }
     }
 }
 

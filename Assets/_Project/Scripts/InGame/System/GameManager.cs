@@ -77,7 +77,6 @@ namespace nira.Demo
                 // タイムアップ時の処理をメソッドに切り出し
                 HandleTimeUp();
             }).AddTo(this);
-
         }
 
         private void Start()
@@ -209,6 +208,12 @@ namespace nira.Demo
                     localPlayerCache.Add(player);
                 }
 
+                // 💡 ローカルモード時：自分のUIを初期化
+                if (PlayerUIManager.Instance != null && PlayerDataManager.Instance != null)
+                {
+                    PlayerUIManager.Instance.Initialize(PlayerDataManager.Instance);
+                }
+
                 if (localPlayerCache.Count >= 1)
                 {
                     StartGameSequenceAsync().Forget();
@@ -239,6 +244,16 @@ namespace nira.Demo
                     playerNetworkList.Add(new NetworkObjectReference(netObj));
                 }
 
+                // 💡 オンライン時：登録されたタイミングで自分のUIを初期化
+                // （各クライアントが自分の画面でこの処理を通る、またはローカルプレイヤーの判定が必要な場合は `netObj.IsOwner` を使います）
+                if (netObj.IsOwner)
+                {
+                    if (PlayerUIManager.Instance != null && PlayerDataManager.Instance != null)
+                    {
+                        PlayerUIManager.Instance.Initialize(PlayerDataManager.Instance);
+                    }
+                }
+
                 int totalPlayers = PlayerDataManager.Instance.GetLobbyPlayerCount();
 
                 Debug.Log($"[GameManager] サーバー登録完了: {player.name} (ID: {netObj.NetworkObjectId}). 現在の参加者数: {playerNetworkList.Count}/{totalPlayers}");
@@ -255,6 +270,7 @@ namespace nira.Demo
                 }
             }
         }
+        
         /// <summary>
         /// 自分以外の全プレイヤーを取得（クライアント側からも正常に呼べます）
         /// </summary>

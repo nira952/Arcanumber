@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using R3;
 using DG.Tweening;
+using NUnit.Framework.Constraints;
 
 public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
 {
