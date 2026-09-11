@@ -91,7 +91,11 @@ public class CurtainManager : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: destroyCancellationToken);
 
-        _activeCurtain.UpdateLoadingMessage(message);
+        if (message != null)
+        {
+            _activeCurtain.UpdateLoadingMessage(message);
+        }
+
         Debug.Log($"[CurtainManager] CloseAsync called: {caller}");
 
         await _activeCurtain.CloseAsync(destroyCancellationToken);

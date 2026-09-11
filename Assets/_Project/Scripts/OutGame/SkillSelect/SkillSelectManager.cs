@@ -14,7 +14,7 @@ public class SkillSelectManager : NetworkBehaviour
     [Header("UI Lineup")]
 
     [SerializeField] private SkillSelectUIManager uIManager; // UIを管理するスクリプト
-    [SerializeField] private Transform skillButtonParent;   // 全スキルボタンを生成する親のTransform
+    [SerializeField] private Transform[] skillButtonParents;   // スキルボタンを生成する親のTransform
     [SerializeField] private SkillButton skillButtonPrefab; // スキルボタンのプレハブ
 
     [Header("Preview Slots (UI上の1～4番目の枠)")]
@@ -29,6 +29,13 @@ public class SkillSelectManager : NetworkBehaviour
 
     // AssetLoaderからロードしたすべてのスキルリスト
     [SerializeField] private List<Skill> allSkills = new List<Skill>();
+
+    // 【サーバー専用】全員の準備完了数をカウントするための NetworkVariable
+    private readonly NetworkVariable<int> readyPlayerCount = new NetworkVariable<int>(
+        0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
 
     private readonly CompositeDisposable _disposables = new();
 
@@ -56,14 +63,16 @@ public class SkillSelectManager : NetworkBehaviour
             return;
         }
 
-        // --- ネットワーク接続時のみ実行される処理 ---
-        // ネットワークが未起動だと IsServer が例外を吐く場合があるため、安全対策
-        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening && IsServer)
+// 【サーバー側の初期化処理】
+        if (IsServer)
         {
             // 1. 新しいシーンに入ったので、一旦全員の準備状態を false に戻す
             ResetAllPlayersReadyStatus();
+        }
 
-            // 2. 【R3】全員がスキル選択を終えて準備完了になったかを NetworkList から監視
+        // 【全員共通】2. PlayerDataリストの変更（IsReadyの変化など）を監視
+        if (PlayerDataManager.Instance != null && PlayerDataManager.Instance.AllPlayerData != null)
+        {
             Observable.FromEvent<NetworkList<PlayerNetworkData>.OnListChangedDelegate, NetworkListEvent<PlayerNetworkData>>(
                 h => (ev) => h(ev),
                 h => PlayerDataManager.Instance.AllPlayerData.OnListChanged += h,
@@ -71,9 +80,52 @@ public class SkillSelectManager : NetworkBehaviour
             )
             .Subscribe(_ =>
             {
-                CheckAllPlayersReadyAndGoToBattle().Forget();
+                // ① 全員のUI（待機中... (x/y)）を更新
+                UpdateReadyStatusUI();
+
+                // ② サーバーのみ：全員準備完了したかチェックして遷移
+                if (IsServer)
+                {
+                    CheckAllPlayersReadyAndGoToBattle().Forget();
+                }
             })
             .AddTo(_disposables);
+        }
+
+        // 初期表示を反映（シーン開始時点の状態）
+        UpdateReadyStatusUI();
+    }
+
+    /// <summary>
+    /// AllPlayerData から準備完了人数を計算して UI を更新する
+    /// </summary>
+    private void UpdateReadyStatusUI()
+    {
+        if (PlayerDataManager.Instance == null || PlayerDataManager.Instance.AllPlayerData == null) return;
+
+        var playerDataList = PlayerDataManager.Instance.AllPlayerData;
+        int totalCount = playerDataList.Count;
+
+        if (totalCount == 0) return;
+
+        // LINQ等を使って IsReady が true の人数をカウント
+        int readyCount = 0;
+        foreach (var player in playerDataList)
+        {
+            if (player.IsReady) readyCount++;
+        }
+
+        if (readyCount == totalCount)
+        {
+            Debug.Log("[Server] 全プレイヤーが準備完了しました。");
+            CurtainManager.Instance.UpdateLoadingMessage("Ready!");
+
+        }
+        else
+        {
+            Debug.Log($"[Server] 準備完了人数: {readyCount}/{totalCount}");
+            // UIテキスト更新
+            CurtainManager.Instance.UpdateLoadingMessage($"待機中... ({readyCount}/{totalCount})");
         }
     }
 
@@ -142,7 +194,8 @@ public class SkillSelectManager : NetworkBehaviour
         // 3. サーバーへ「スキル構成」と「準備完了(Ready=true)」を送信 (オンライン時のみ)
         SubmitSelectedSkillsAndReadyServerRpc(skillNumbers);
 
-        CurtainManager.Instance.CloseAsync("Ready!", GetType().Name).Forget(); // カーテンを閉じる演出
+        CurtainManager.Instance.CloseAsync(null, GetType().Name).Forget(); // カーテンを閉じる演出
+
     }
 
     /// <summary>
@@ -214,14 +267,10 @@ public class SkillSelectManager : NetworkBehaviour
     {
         allSkills = AssetLoader.Instance.LoadAllSkills;
 
-        foreach (Transform child in skillButtonParent)
-        {
-            Destroy(child.gameObject);
-        }
-
         foreach (var skillData in allSkills)
         {
-            SkillButton btnInstance = Instantiate(skillButtonPrefab, skillButtonParent);
+            // カテゴリごとにボタンを生成する
+            SkillButton btnInstance = Instantiate(skillButtonPrefab, skillButtonParents[(int)skillData.GetSkillCategory()]);
             btnInstance.skill = skillData;
             btnInstance.skillName = skillData.GetSkillName();
             if (btnInstance.skillImage != null)
@@ -264,7 +313,7 @@ public class SkillSelectManager : NetworkBehaviour
         }
 
         Debug.LogWarning("選択スキル枠（4つ）が満杯です。どれかを外してください。");
-        uIManager.ShowWarningText("スキル枠が満杯です。どれかを外してください。");
+        uIManager.ShowWarningText("スキル枠がいっぱいです。どれかを外してください。");
     }
 
     /// <summary>

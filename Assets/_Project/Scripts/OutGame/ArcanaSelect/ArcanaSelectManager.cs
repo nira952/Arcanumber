@@ -60,23 +60,25 @@ public class ArcanaSelectManager : NetworkBehaviour
         // -------------------------
         if (!isLocalMode)
         {
-            if (IsServer) SetupGamePositions();
+            if (IsServer) 
+            {
+                SetupGamePositions();
+            }
 
             if (IsServer)
             {
                 Observable.FromEvent<NetworkList<PlayerNetworkData>.OnListChangedDelegate, NetworkListEvent<PlayerNetworkData>>(
-
                     h => (ev) => h(ev),
-
                     h => PlayerDataManager.Instance.AllPlayerData.OnListChanged += h,
-
                     h => PlayerDataManager.Instance.AllPlayerData.OnListChanged -= h
-
                 )
-
-                .Subscribe(_ => CheckAllPlayersReadyAndTransition().Forget())
-
+                .Subscribe(_ => {
+                    UpdateReadyStatusUI();
+                    CheckAllPlayersReadyAndTransition().Forget();
+                })
                 .AddTo(_disposables);
+
+                UpdateReadyStatusUI();
 
             }
 
@@ -129,6 +131,39 @@ public class ArcanaSelectManager : NetworkBehaviour
             .AddTo(_disposables);
     }
 
+    /// <summary>
+    /// AllPlayerData から準備完了人数を計算して UI を更新する
+    /// </summary>
+    private void UpdateReadyStatusUI()
+    {
+        if (PlayerDataManager.Instance == null || PlayerDataManager.Instance.AllPlayerData == null) return;
+
+        var playerDataList = PlayerDataManager.Instance.AllPlayerData;
+        int totalCount = playerDataList.Count;
+
+        if (totalCount == 0) return;
+
+        // LINQ等を使って IsReady が true の人数をカウント
+        int readyCount = 0;
+        foreach (var player in playerDataList)
+        {
+            if (player.IsReady) readyCount++;
+        }
+
+        if (readyCount == totalCount)
+        {
+            Debug.Log("[Server] 全プレイヤーが準備完了しました。");
+            CurtainManager.Instance.UpdateLoadingMessage("スキル選択");
+
+        }
+        else
+        {
+            Debug.Log($"[Server] 準備完了人数: {readyCount}/{totalCount}");
+            // UIテキスト更新
+            CurtainManager.Instance.UpdateLoadingMessage($"待機中... ({readyCount}/{totalCount})");
+        }
+
+    }
 
 
     // Viewから流れてきたArcanaデータを受け取る
@@ -152,7 +187,7 @@ public class ArcanaSelectManager : NetworkBehaviour
     {
         if (selectedArcana == null) return; // 選択されていない場合のフェールセーフ
 
-        CurtainManager.Instance.CloseAsync("待機中", GetType().Name, duration: 0.5f).Forget();
+        CurtainManager.Instance.CloseAsync(null, GetType().Name, duration: 0.5f).Forget();
 
         if (isLocalMode)
         {
