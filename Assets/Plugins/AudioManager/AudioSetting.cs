@@ -3,27 +3,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-
-// 必要なBGMを入力
-public enum BgmName
-{
-    Title,
-    Game,
-    num
-}
-
-// 必要なSEを入力
-public enum SeName
-{
-    Damege,
-    Attack,
-    Button,
-    num,
-}
-
-
-
-
 [System.Serializable]
 public class AudioDate
 {

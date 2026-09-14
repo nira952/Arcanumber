@@ -14,17 +14,98 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bgmList:
   - name: Title
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 37fde9bc1b3201c42897b2630f688b1c, type: 3}
     volume: 1
   - name: Game
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: e3822784a56410140be8d3cdf7623b4a, type: 3}
+    volume: 1
+  - name: Tutorial
+    clip: {fileID: 8300000, guid: cec5f3060fe594946b50ed3b2082c14c, type: 3}
+    volume: 1
+  - name: Practice
+    clip: {fileID: 8300000, guid: 3f0a94f705d26684c8017f94b3902ae0, type: 3}
+    volume: 1
+  - name: Gameend
+    clip: {fileID: 8300000, guid: a63686a8136b37c41900373653bad36b, type: 3}
+    volume: 1
+  - name: Blue
+    clip: {fileID: 8300000, guid: 8eb3f12c0cb84a24b90765c4de20a5e4, type: 3}
+    volume: 1
+  - name: Red
+    clip: {fileID: 8300000, guid: 1635b57ae63624b4f9fa7d8a7345361d, type: 3}
+    volume: 1
+  - name: Green
+    clip: {fileID: 8300000, guid: 31824653f586bcc44a156069802882e4, type: 3}
+    volume: 1
+  - name: Yellow
+    clip: {fileID: 8300000, guid: edeea3520facfa44cbecfdf554d8eb3e, type: 3}
     volume: 1
   seList:
+  - name: Select
+    clip: {fileID: 8300000, guid: 10a9228a79a64d7459a5b85c9b40bafd, type: 3}
+    volume: 1
+  - name: Click
+    clip: {fileID: 8300000, guid: 10a9228a79a64d7459a5b85c9b40bafd, type: 3}
+    volume: 1
+  - name: Walk
+    clip: {fileID: 8300000, guid: 6b5db6ae75c5a8e4d97338dab3d80864, type: 3}
+    volume: 1
+  - name: Jump
+    clip: {fileID: 8300000, guid: db3a2153944452f4d87e55f7ee911d08, type: 3}
+    volume: 1
+  - name: SetGround
+    clip: {fileID: 8300000, guid: b5677aa3c65e23045bb0d8ae6fb412ea, type: 3}
+    volume: 1
   - name: Damege
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f1de93ec80b209241913175dc2e4af88, type: 3}
     volume: 1
   - name: Attack
     clip: {fileID: 0}
+    volume: 1
+  - name: Thunder
+    clip: {fileID: 8300000, guid: 745d0e195d016e448906e75a89bfbe99, type: 3}
+    volume: 1
+  - name: Ice
+    clip: {fileID: 8300000, guid: 1a2ecc8246f77c44d93bd6228b9d9db9, type: 3}
+    volume: 1
+  - name: Shadow
+    clip: {fileID: 8300000, guid: 90007d1ee1c68b14d8e7c008927d15ef, type: 3}
+    volume: 1
+  - name: Poison
+    clip: {fileID: 8300000, guid: d4f20bfbbdfa23f45ae040ee452fe9d5, type: 3}
+    volume: 1
+  - name: Heal
+    clip: {fileID: 8300000, guid: 71637997359bc3240a5a91504ebb671b, type: 3}
+    volume: 1
+  - name: Buff
+    clip: {fileID: 8300000, guid: 87f57fb08a6fe164391a41c2741db753, type: 3}
+    volume: 1
+  - name: Debuff
+    clip: {fileID: 8300000, guid: 2a6ee47b1e002f94696834b25266f719, type: 3}
+    volume: 1
+  - name: Guard
+    clip: {fileID: 8300000, guid: f8f4c43f8a4ff2b4c9aaf303379f6c6b, type: 3}
+    volume: 1
+  - name: Warp
+    clip: {fileID: 8300000, guid: 03c41fc1e1090864886f716b5b283ce1, type: 3}
+    volume: 1
+  - name: TimeStop
+    clip: {fileID: 8300000, guid: 2b2c5f3bd0b1ae840b22a4d7369564c1, type: 3}
+    volume: 1
+  - name: Stan
+    clip: {fileID: 8300000, guid: 06c42004edeb2f849aabed37ef4dbdf4, type: 3}
+    volume: 1
+  - name: Purification
+    clip: {fileID: 8300000, guid: 5d66f3a1aa53935489f70ec66b99ec1b, type: 3}
+    volume: 1
+  - name: Alert
+    clip: {fileID: 8300000, guid: 293fdf8fe6f7ef54b9a7f67eecf9ab21, type: 3}
+    volume: 1
+  - name: Spear
+    clip: {fileID: 8300000, guid: dd06ce8da1b764b46a84403b611988ad, type: 3}
+    volume: 1
+  - name: Summon
+    clip: {fileID: 8300000, guid: 86b164665853b5e448b3583df2b2498a, type: 3}
     volume: 1
   - name: Button
     clip: {fileID: 0}
