@@ -18,10 +18,17 @@ public class MapManager : NetworkBehaviour
     {
         if (mapList.Count == 0)
             Debug.LogError("マップリストが空です。");
+
+        // ローカルモードなら即時にマップを適用する
+        if (PlayerDataManager.Instance.IsLocalMode)
+        {
+            SelectRandomMapServer();
+        }
     }
 
     public override void OnNetworkSpawn()
     {
+
         //値変更イベントの登録
         selectedMapIndex.OnValueChanged += OnMapIndexChanged;
 
@@ -40,6 +47,8 @@ public class MapManager : NetworkBehaviour
                 ApplyMapSelection(selectedMapIndex.Value);
         }
     }
+
+
 
     public override void OnNetworkDespawn()
     {

@@ -91,9 +91,6 @@ public class SkillSelectManager : NetworkBehaviour
             })
             .AddTo(_disposables);
         }
-
-        // 初期表示を反映（シーン開始時点の状態）
-        UpdateReadyStatusUI();
     }
 
     /// <summary>

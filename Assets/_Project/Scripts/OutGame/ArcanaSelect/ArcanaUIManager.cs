@@ -34,6 +34,13 @@ public class ArcanaUIManager : MonoBehaviour
     [Header("--- スキップ用の設定 ---")]
     [SerializeField] private Button skipButton;
 
+    [Header("ローカルモード時の設定")]
+    [SerializeField] private RectTransform frontAllCardParent;
+    [SerializeField] private RectTransform backAllCardParent;
+    [SerializeField] private Button backSideButton; // 裏面ボタンの参照
+    private bool isAllFront = true;
+    private bool isLocalMode = false; // ローカルモードかどうかのフラグ
+
     private const float cardRotationAngle = 90f;
     private Vector3 arcanaCardParantOriginPos = Vector3.zero;
     private Sprite cardSprite;
@@ -56,29 +63,67 @@ public class ArcanaUIManager : MonoBehaviour
     private readonly Subject<Arcana> _onCardSelectedSubject = new Subject<Arcana>();
     public Observable<Arcana> OnCardSelected => _onCardSelectedSubject;
 
+    public Observable<Unit> OnBackSideButtonRequested => backSideButton.OnClickAsObservable();
+
+
     private void Awake()
     {
-        arcanaCardParantOriginPos = arcanaCardParent.anchoredPosition;
-        arcanaCardParent.anchoredPosition = new Vector3(2000, arcanaCardParantOriginPos.y, 0);
+        // ローカルモードかどうかをPlayerDataManagerから取得
+        isLocalMode = PlayerDataManager.Instance.IsLocalMode;
 
-        SetArcanaEXText("", ""); // テキストも初期化
-        dragText.enabled = true;
-        selectText.enabled = false;
-
-        // ドラッグされたらアニメーション開始
-        dragActionTrigger.onDragTriggered.AddListener(() =>
-        {
-            dragActionTrigger.IsInteractable = false;
-            StartAnimation();
-            dragText.enabled = false;
-            _onAnimationStartSubject.OnNext(Unit.Default);
-        });
+        SetArcanaEXText("", ""); // テキストを初期化
 
         if (skipButton != null)
         {
             skipButton.gameObject.SetActive(false);
             skipButton.onClick.AddListener(OnSkipButtonClicked);
         }
+
+        // オンラインモードならアニメーションの初期化をする
+        if (!isLocalMode) 
+        {
+            arcanaCardParantOriginPos = arcanaCardParent.anchoredPosition;
+            arcanaCardParent.anchoredPosition = new Vector3(2000, arcanaCardParantOriginPos.y, 0);
+
+            dragText.enabled = true;
+            selectText.enabled = false;
+
+            // ドラッグされたらアニメーション開始
+            dragActionTrigger.onDragTriggered.AddListener(() =>
+            {
+                dragActionTrigger.IsInteractable = false;
+                StartAnimation();
+                dragText.enabled = false;
+                _onAnimationStartSubject.OnNext(Unit.Default);
+            });
+
+        }
+        else
+        {
+
+            OnBackSideButtonRequested.Subscribe(_ =>
+            {
+                if (isAllFront)
+                {
+                    isAllFront = false;
+                    // 裏面ボタンが押されたら、全カードの親を切り替えて表示する
+                    ShowAllCards(false);
+                }
+                else
+                {
+                    isAllFront = true;
+                    // 裏面ボタンが押されたら、全カードの親を切り替えて表示する
+                    ShowAllCards(true);
+                }
+            }).AddTo(this);
+
+            animationDefaultParent.gameObject.SetActive(false);
+            backSideButton.gameObject.SetActive(true);
+
+        }
+
+
+
     }
 
     private void OnDestroy()
@@ -103,6 +148,39 @@ public class ArcanaUIManager : MonoBehaviour
         }
     }
 
+
+    public void ChengeAllCardParent(bool isFront)
+    {
+        if (isFront)
+        {
+            cardDisplayParent = frontAllCardParent;
+        }
+        else
+        {
+            cardDisplayParent = backAllCardParent;
+        }
+    }
+
+    private void ShowAllCards(bool isFront)
+    {
+        if(isFront)
+        {
+            frontAllCardParent.gameObject.SetActive(true);
+            backAllCardParent.gameObject.SetActive(false);
+        }
+        else
+        {
+            backAllCardParent.gameObject.SetActive(true);
+            frontAllCardParent.gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// アルカナカードのUIを構築する
+    /// </summary>
+    /// <param name="myCards"></param>
+    /// <param name="arcanaDatabase"></param>
+    /// <param name="backSprite"></param>
     public void BuildCardsUI(IEnumerable<ArcanaSelectManager.ArcanaCard> myCards, List<Arcana> arcanaDatabase, Sprite backSprite)
     {
         foreach (Transform child in cardDisplayParent)
@@ -116,6 +194,7 @@ public class ArcanaUIManager : MonoBehaviour
 
         foreach (var card in myCards)
         {
+            // カードIDと表裏の情報を元に、arcanaDatabaseから該当するArcanaデータを取得
             Arcana arcanaData = arcanaDatabase.FirstOrDefault(a =>
                 a.GetArcanaListID() == (int)card.CardId && a.GetIsFront() == card.IsFace);
 

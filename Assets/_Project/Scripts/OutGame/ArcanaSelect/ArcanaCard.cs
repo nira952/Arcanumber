@@ -69,7 +69,7 @@ public class ArcanaCard : MonoBehaviour
     // HoverActionTrigger の OnHoverEnter から呼ばれる（裏返し演出）
     public void FlipToFront()
     {
-        DG.Tweening.Sequence currentSequence = DOTween.Sequence();
+        Sequence currentSequence = DOTween.Sequence();
 
         currentSequence.Append(transform.DOScale(1.2f, flipDuration * 0.5f).SetEase(Ease.OutQuad));
         currentSequence.Append(transform.DOScale(1.0f, flipDuration * 0.5f).SetEase(Ease.InQuad));
