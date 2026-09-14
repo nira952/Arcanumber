@@ -9,14 +9,41 @@ public enum BgmName
 {
     Title,
     Game,
+    Tutorial,
+    Practice,
+    Gameend,
+    Blue,
+    Red,
+    Green,
+    Yellow,
     num
 }
 
 // 必要なSEを入力
 public enum SeName
 {
+    Select,
+    Click,
+    Walk,
+    Jump,
+    SetGround,
     Damege,
     Attack,
+    Thunder,
+    Ice,
+    Shadow,
+    Poison,
+    Heal,
+    Buff,
+    Debuff,
+    Guard,
+    Warp,
+    TimeStop,
+    Stan,
+    Purification,
+    Alert,
+    Spear,
+    Summon,
     Button,
     num,
 }
