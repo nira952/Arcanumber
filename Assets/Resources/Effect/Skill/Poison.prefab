@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3295271936883593935}
   - component: {fileID: -6826841981451150137}
   - component: {fileID: 8237473635962487598}
+  - component: {fileID: 3877787762214374428}
   m_Layer: 0
   m_Name: Poison
   m_TagString: Untagged
@@ -58,7 +59,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -183,3 +184,21 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.23249501, y: 0.24343076}
   m_EdgeRadius: 0
+--- !u!114 &3877787762214374428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2355479593251735817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8f6d3c6e4250e84192f5b34ce9e71bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowColor: {r: 0.7155571, g: 0, b: 1, a: 1}
+  glowBrightness: 2
+  outlineWidth: 1
+  alphaThreshold: 0.01
+  drawOutside: 1
+  enableInstancing: 0
