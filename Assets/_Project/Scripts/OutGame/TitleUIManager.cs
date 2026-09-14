@@ -22,7 +22,9 @@ public class TitleUIManager : MonoBehaviour
 
     [SerializeField] private Button lanJoinPanelButton;
 
-  [SerializeField] private Button lanHostPanelButton;
+    [SerializeField] private Button lanHostPanelButton;
+
+    [SerializeField] private Button trainingSceneButton;
 
     // --- ボタンのクリックイベントをObservableとして公開 ---
     public Observable<Unit> OnOpenPrivateMatchPanelRequested => privateMatchPanelButton.OnClickAsObservable();
@@ -32,6 +34,8 @@ public class TitleUIManager : MonoBehaviour
     public Observable<Unit> OnOpenLanJoinPanelRequested => lanJoinPanelButton.OnClickAsObservable();
 
     public Observable<Unit> OnOpenLanHostPanelRequested => lanHostPanelButton.OnClickAsObservable();
+
+    public Observable<Unit> OnOpenTrainingSceneRequested => trainingSceneButton.OnClickAsObservable();
 
     private readonly CompositeDisposable _disposables = new();
 

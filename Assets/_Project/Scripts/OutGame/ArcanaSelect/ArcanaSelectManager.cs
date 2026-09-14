@@ -48,63 +48,24 @@ public class ArcanaSelectManager : NetworkBehaviour
 
     private void Start()
     {
+        // カーテンを開く
         CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
+
+        // アルカナデータベースをロード
+        arcanaDatabase = AssetLoader.Instance.LoadAllArcanas;
 
         // ローカルモードかどうかを判定
         isLocalMode = PlayerDataManager.Instance.IsLocalMode;
-        arcanaDatabase = AssetLoader.Instance.LoadAllArcanas;
 
-
-        // -------------------------
-        // 通信初期化・サブスクライブ
-        // -------------------------
+        // オンラインモードなら
         if (!isLocalMode)
         {
-            if (IsServer) 
-            {
-                SetupGamePositions();
-            }
-
-            if (IsServer)
-            {
-                Observable.FromEvent<NetworkList<PlayerNetworkData>.OnListChangedDelegate, NetworkListEvent<PlayerNetworkData>>(
-                    h => (ev) => h(ev),
-                    h => PlayerDataManager.Instance.AllPlayerData.OnListChanged += h,
-                    h => PlayerDataManager.Instance.AllPlayerData.OnListChanged -= h
-                )
-                .Subscribe(_ => {
-                    UpdateReadyStatusUI();
-                    CheckAllPlayersReadyAndTransition().Forget();
-                })
-                .AddTo(_disposables);
-
-                UpdateReadyStatusUI();
-
-            }
-
+            StartOnlineSetup();
         }
-
         else
-
         {
-
-            Debug.Log("[ArcanaSelectManager] DebugModeが有効です。オフラインで動作します。");
-
+            StartOfflineSetup();
         }
-
-
-
-        // UIManagerの初期化 (デバッグ時はデフォルトで0番とするなどの配慮)
-
-        int myLobbyIndex = isLocalMode ? 0 : PlayerDataManager.Instance.GetMyLobbyIndex();
-
-        Sprite myBackSprite = cardSprites[Mathf.Clamp(myLobbyIndex, 0, cardSprites.Length - 1)];
-
-        Color myGlowColor = glowColors[Mathf.Clamp(myLobbyIndex, 0, glowColors.Length - 1)];
-
-        arcanaUIManager.Initialize(myBackSprite, myGlowColor);
-
-
 
         // --- R3によるUIイベントの結合 ---
 
@@ -122,14 +83,84 @@ public class ArcanaSelectManager : NetworkBehaviour
             .Subscribe(_ => SubmitCardSetting())
 
             .AddTo(_disposables);
+    }
 
-        // 3. カードオープンアニメーション開始時の処理
+    // オンライン時の初期化処理
+    private void StartOnlineSetup()
+    {
+        // -------------------------
+        // 通信初期化・サブスクライブ
+        // -------------------------
+
+        if (IsServer)
+        {
+            SetupGamePositions();
+        }
+
+        if (IsServer)
+        {
+            Observable.FromEvent<NetworkList<PlayerNetworkData>.OnListChangedDelegate, NetworkListEvent<PlayerNetworkData>>(
+                h => (ev) => h(ev),
+                h => PlayerDataManager.Instance.AllPlayerData.OnListChanged += h,
+                h => PlayerDataManager.Instance.AllPlayerData.OnListChanged -= h
+            )
+            .Subscribe(_ => {
+                UpdateReadyStatusUI();
+                CheckAllPlayersReadyAndTransition().Forget();
+            })
+            .AddTo(_disposables);
+        }
+
+
+        // 自分のロビー番号ごとに、UIを初期化する
+        int myLobbyIndex = isLocalMode ? 0 : PlayerDataManager.Instance.GetMyLobbyIndex();
+
+        Sprite myBackSprite = cardSprites[Mathf.Clamp(myLobbyIndex, 0, cardSprites.Length - 1)];
+
+        Color myGlowColor = glowColors[Mathf.Clamp(myLobbyIndex, 0, glowColors.Length - 1)];
+
+        arcanaUIManager.Initialize(myBackSprite, myGlowColor);
+
+        // カードオープンアニメーション開始時の処理
         arcanaUIManager.OnAnimationStarted
 
             .Subscribe(_ => CardOpen())
 
             .AddTo(_disposables);
+
     }
+
+    // ローカル時の初期化処理
+    private void StartOfflineSetup()
+    {
+        // ロードしたアルカナデータベースをUIにすべて羅列する
+
+        List<ArcanaCard> arcanaAllCards = new List<ArcanaCard>();
+
+        arcanaUIManager.ChengeAllCardParent(true);
+
+        for (int i = 0; i < TotalUniqueCards; i++)
+        {
+            arcanaAllCards.Add(new ArcanaCard(i, true)); // 全て表向きで表示
+        }
+
+        arcanaUIManager.BuildCardsUI(arcanaAllCards, arcanaDatabase, cardSprites[0]);
+
+
+        arcanaAllCards.Clear();
+
+        arcanaUIManager.ChengeAllCardParent(false);
+
+        for (int i = 0; i < TotalUniqueCards; i++)
+        {
+            arcanaAllCards.Add(new ArcanaCard(i, false)); // 全て裏向きで表示
+        }
+
+        // UIに表示する
+        arcanaUIManager.BuildCardsUI(arcanaAllCards, arcanaDatabase, cardSprites[1]);
+
+    }
+
 
     /// <summary>
     /// AllPlayerData から準備完了人数を計算して UI を更新する
@@ -283,43 +314,42 @@ public class ArcanaSelectManager : NetworkBehaviour
     }
 
 
-
+    // --- ゲーム開始時のカード割り当て処理（サーバー専用） ---
     public void SetupGamePositions()
-
     {
 
         if (!IsServer) return;
 
+        // 既存の割り当てをクリア
         _playerAllocations.Clear();
 
         List<int> baseDeck = new List<int>();
 
         for (int i = 0; i < TotalUniqueCards; i++) baseDeck.Add(i);
 
+        //デッキをシャッフル
         Shuffle(baseDeck);
 
         int deckIndex = 0;
 
-
-
+        // 各クライアントにカードを割り当てる
         foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
-
         {
-
             List<ArcanaCard> assignedCards = new List<ArcanaCard>();
 
             for (int i = 0; i < CardsPerPlayer; i++)
-
             {
-
+                // デッキのカードが尽きた場合はループを抜ける
                 if (deckIndex >= baseDeck.Count) break;
 
+                // デッキからカードを取得
                 int cardId = baseDeck[deckIndex++];
 
+                // ランダムに表か裏かを決定
                 bool isFace = UnityEngine.Random.value > 0.5f;
 
+                // カードを割り当てリストに追加
                 assignedCards.Add(new ArcanaCard(cardId, isFace));
-
             }
 
             _playerAllocations[clientId] = assignedCards;
@@ -331,27 +361,17 @@ public class ArcanaSelectManager : NetworkBehaviour
 
 
     public void CardOpen()
-
     {
-
         if (isLocalMode)
-
         {
-
             // デバッグ時はサーバーへ問い合わせず、ローカルでカードを生成して表示する
-
             GenerateDebugCards();
-
         }
-
         else
-
         {
-
             RequestCardDrawServerRpc();
 
         }
-
     }
 
 
@@ -359,7 +379,6 @@ public class ArcanaSelectManager : NetworkBehaviour
     // --- デバッグ用：オフライン時のカード生成モック ---
 
     private void GenerateDebugCards()
-
     {
 
         _myCards.Clear();
@@ -389,25 +408,24 @@ public class ArcanaSelectManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
 
     private void RequestCardDrawServerRpc(ServerRpcParams rpcParams = default)
-
     {
 
         ulong clientId = rpcParams.Receive.SenderClientId;
 
+        // クライアントIDに対応するカードを取得して送信
         if (_playerAllocations.TryGetValue(clientId, out List<ArcanaCard> cards))
-
         {
-
             ArcanaCard[] cardsArray = cards.ToArray();
 
+            // クライアントにカード情報を送信するためのClientRpcParamsを作成
             ClientRpcParams clientRpcParams = new ClientRpcParams
-
             {
-
+                // 送信先を指定するためのTargetClientIdsを設定
                 Send = new ClientRpcSendParams { TargetClientIds = new ulong[] { clientId } }
 
             };
 
+            // クライアントにカード情報を送信
             TargetSendCardsClientRpc(cardsArray, clientRpcParams);
 
         }
@@ -452,14 +470,11 @@ public class ArcanaSelectManager : NetworkBehaviour
 
     }
 
-
-
+    // --- カードのシャッフル ---
     private void Shuffle(List<int> list)
-
     {
-
         int n = list.Count;
-
+        // Fisher-Yatesアルゴリズムを使用してリストをシャッフル
         while (n > 1) { n--; int k = UnityEngine.Random.Range(0, n + 1); int value = list[k]; list[k] = list[n]; list[n] = value; }
 
     }

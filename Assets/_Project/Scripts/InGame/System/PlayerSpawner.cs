@@ -123,7 +123,7 @@ public class PlayerSpawner : NetworkBehaviour
         GameManager.Instance.RegisterPlayer(spawnedPlayer);
 
         PlayerOfflineController controller = spawnedPlayer.gameObject.AddComponent<PlayerOfflineController>();
-        //spawnedPlayer.Initialize(controller);
+        spawnedPlayer.Initialize(controller);
 
         Debug.Log("[PlayerSpawner] PlayerOfflineController をアタッチし、オフライン生成を完了しました。");
     }
