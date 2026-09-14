@@ -152,6 +152,7 @@ namespace nira.Demo
                     break;
                 case GameState.Playing:
                     GameUIManager.Instance.UpdateGameStateText("Start!");
+                    NetWorkAudioManager.Instance.PlayGlobal(BgmName.Game);
                     break;
                 case GameState.Finish:
                     GameUIManager.Instance.UpdateGameStateText("Finish");
