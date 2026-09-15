@@ -52,7 +52,7 @@ public class ArcanaCard : MonoBehaviour
         if (dragTrigger != null) dragTrigger.IsInteractable = false;
     }
 
-    public void SetCardInfo(bool isFront, Sprite frontSprite, Sprite backSprite, Color glowColor)
+    public void SetCardInfo(bool isFront, Sprite frontSprite, Sprite backSprite, Sprite glowColor)
     {
         frontImage.sprite = frontSprite;
         backImage.sprite = backSprite;
