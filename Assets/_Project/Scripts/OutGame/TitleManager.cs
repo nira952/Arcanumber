@@ -9,7 +9,7 @@ public class TitleManager : MonoBehaviour
 
     private void Start()
     {
-        
+        NetWorkAudioManager.Instance.PlayLocal(BgmName.Title);
         titleUIManager.OnOpenTrainingSceneRequested.Subscribe(_ =>
         {
             // ローカルモードを有効にする
