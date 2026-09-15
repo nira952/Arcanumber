@@ -14,6 +14,7 @@ public class ArcanaCard : MonoBehaviour
     [SerializeField] private GameObject flontFaces;
     [SerializeField] private Image frontImage;
     [SerializeField] private Image backImage;
+    [SerializeField] private Image BackGlowImage;
     [SerializeField] private float flipDuration = 0.4f;
     [SerializeField] private HoverActionTrigger flipHoverTrigger;
     [SerializeField] private DragActionTrigger dragTrigger;
@@ -52,12 +53,12 @@ public class ArcanaCard : MonoBehaviour
         if (dragTrigger != null) dragTrigger.IsInteractable = false;
     }
 
-    public void SetCardInfo(bool isFront, Sprite frontSprite, Sprite backSprite, Color glowColor)
+    public void SetCardInfo(bool isFront, Sprite frontSprite, Sprite backSprite, Sprite glowColor)
     {
         frontImage.sprite = frontSprite;
         backImage.sprite = backSprite;
         //frontImage.glowColor = glowColor;
-        //backImage.glowColor = glowColor;
+        BackGlowImage.sprite = glowColor;
 
         if (!isFront)
         {

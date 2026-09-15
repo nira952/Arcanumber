@@ -18,7 +18,7 @@ public class NetWorkAudioManager : NetworkBehaviour
         }
     }
 
-    private AudioSetting audioData;
+    private SoundDatabase audioData;
     private AudioMixer audioMixer;
 
     [Header("Settings")]
@@ -59,7 +59,7 @@ public class NetWorkAudioManager : NetworkBehaviour
     private void InitAudioSources()
     {
         // AudioSettingとAudioMixerをResourcesフォルダからロード
-        audioData = Resources.Load<AudioSetting>("AudioSettings/AudioSetting");
+        audioData = Resources.Load<SoundDatabase>("SoundDatabase");
         audioMixer = Resources.Load<AudioMixer>("AudioSettings/MainAudioMixer");
 
 

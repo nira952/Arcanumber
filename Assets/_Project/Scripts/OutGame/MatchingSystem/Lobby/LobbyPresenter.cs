@@ -228,9 +228,9 @@ public class LobbyPresenter : IDisposable
 
                 string suffix = "";
                 if (player.Id == myPlayerId)
-                    suffix = (player.Id == lobby.HostId) ? " (あなた/ホスト)" : " (あなた)";
+                    suffix = (player.Id == lobby.HostId) ? "<br> (あなた/ホスト)" : "<br> (あなた)";
                 else if (player.Id == lobby.HostId)
-                    suffix = " (ホスト)";
+                    suffix = "<br> (ホスト)";
 
                 _view.UpdatePlayerList(pName + suffix, i + 1);
             }

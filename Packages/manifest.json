@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.coffee.ui-effect": "https://github.com/mob-sakai/UIEffect.git?path=Packages/src#5.9.0",
     "com.cysharp.r3": "1.3.1",
     "com.cysharp.unitask": "2.5.11",
     "com.elringus.spriteglow": "https://github.com/elringus/sprite-glow.git#package",

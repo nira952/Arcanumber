@@ -1,0 +1,221 @@
+fileFormatVersion: 2
+guid: 529fea351ef98e84094e660b219acffa
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -274307169919677852
+    second: SpadeArcanaWhite_0
+  - first:
+      213: 6192051218610850764
+    second: SpadeArcanaWhite_1
+  - first:
+      213: 4332810344109405072
+    second: SpadeArcanaWhite_2
+  - first:
+      213: -6260664956536752152
+    second: SpadeArcanaWhite_3
+  - first:
+      213: 2265522809250282674
+    second: SpadeArcanaWhite_4
+  - first:
+      213: -5379933965678879675
+    second: SpadeArcanaWhite_5
+  - first:
+      213: -333137324239314197
+    second: SpadeArcanaWhite_6
+  - first:
+      213: 7968153125256550205
+    second: SpadeArcanaWhite_7
+  - first:
+      213: 4184445640826063708
+    second: SpadeArcanaWhite_8
+  - first:
+      213: -3529640174424825787
+    second: SpadeArcanaWhite_9
+  - first:
+      213: 6025767147830522287
+    second: SpadeArcanaWhite_10
+  - first:
+      213: -4690358818355714320
+    second: SpadeArcanaWhite_11
+  - first:
+      213: -268620703588789191
+    second: SpadeArcanaWhite_12
+  - first:
+      213: -620213139655581278
+    second: SpadeArcanaWhite_13
+  - first:
+      213: 6026460394969995835
+    second: SpadeArcanaWhite_14
+  - first:
+      213: -7605566872684532818
+    second: SpadeArcanaWhite_15
+  - first:
+      213: -2045249507576715772
+    second: SpadeArcanaWhite_16
+  - first:
+      213: -1606222410081402819
+    second: SpadeArcanaWhite_17
+  - first:
+      213: -723397530219143740
+    second: SpadeArcanaWhite_18
+  - first:
+      213: -8550454250750013946
+    second: SpadeArcanaWhite_19
+  - first:
+      213: 5837267396419264206
+    second: SpadeArcanaWhite_20
+  - first:
+      213: -8487429952860829990
+    second: SpadeArcanaWhite_21
+  - first:
+      213: 5778375878487139571
+    second: SpadeArcanaWhite_22
+  - first:
+      213: 5687877779892519095
+    second: SpadeArcanaWhite_23
+  - first:
+      213: 7271150274202031030
+    second: SpadeArcanaWhite_24
+  - first:
+      213: 3211259007423554491
+    second: SpadeArcanaWhite_25
+  - first:
+      213: 447615879153172060
+    second: SpadeArcanaWhite_26
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SpadeArcanaWhite_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 600
+        height: 900
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4164b7523c10e2344970dd03e1c2c60d
+      internalID: -1632629155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 85df1a6c519a80f4781686c19eb12df4
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      SpadeArcanaWhite_0: -1632629155
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

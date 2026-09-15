@@ -41,7 +41,7 @@ public class ArcanaSelectManager : NetworkBehaviour
     private List<Arcana> arcanaDatabase = new List<Arcana>();
     [SerializeField] private ArcanaUIManager arcanaUIManager;
     [SerializeField] private Sprite[] cardSprites = new Sprite[4];
-    [SerializeField] private Color[] glowColors = new Color[4]; // 0:赤, 1:青, 2:緑, 3:黄
+    [SerializeField] private Sprite[] glowSprite = new Sprite[4]; // 0:赤, 1:青, 2:緑, 3:黄
 
     private Arcana selectedArcana;
     private readonly CompositeDisposable _disposables = new();
@@ -117,7 +117,7 @@ public class ArcanaSelectManager : NetworkBehaviour
 
         Sprite myBackSprite = cardSprites[Mathf.Clamp(myLobbyIndex, 0, cardSprites.Length - 1)];
 
-        Color myGlowColor = glowColors[Mathf.Clamp(myLobbyIndex, 0, glowColors.Length - 1)];
+        Sprite myGlowColor = glowSprite[Mathf.Clamp(myLobbyIndex, 0, glowSprite.Length - 1)];
 
         arcanaUIManager.Initialize(myBackSprite, myGlowColor);
 

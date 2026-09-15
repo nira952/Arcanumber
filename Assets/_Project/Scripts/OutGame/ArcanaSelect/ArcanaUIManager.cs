@@ -44,7 +44,8 @@ public class ArcanaUIManager : MonoBehaviour
     private const float cardRotationAngle = 90f;
     private Vector3 arcanaCardParantOriginPos = Vector3.zero;
     private Sprite cardSprite;
-    private Color glowColor;
+    private Sprite glowSprite;
+    public GameObject glowCard;
 
     private CancellationTokenSource animationCts;
     private bool isAnimationRunning = false;
@@ -133,10 +134,10 @@ public class ArcanaUIManager : MonoBehaviour
         animationCts?.Dispose();
     }
 
-    public void Initialize(Sprite cardSprite, Color glowColor)
+    public void Initialize(Sprite cardSprite, Sprite glowColor)
     {
         this.cardSprite = cardSprite;
-        this.glowColor = glowColor;
+        this.glowSprite = glowColor;
     }
 
     private void SetArcanaEXText(string text, string name)
@@ -211,7 +212,7 @@ public class ArcanaUIManager : MonoBehaviour
                 arcanaImage = defaultSprite;
             }
 
-            cardPrefabInstance.SetCardInfo(isFront, arcanaImage, backSprite, glowColor);
+            cardPrefabInstance.SetCardInfo(isFront, arcanaImage, backSprite, glowSprite);
 
             // スケール値の定義
             Vector3 defaultScale = Vector3.one;
@@ -348,6 +349,8 @@ public class ArcanaUIManager : MonoBehaviour
             chosenIndices.Add(randomIndex);
 
             animationCards[randomIndex].sprite = cardSprite;
+            GameObject glow = Instantiate(glowCard, animationCards[randomIndex].transform.position, Quaternion.identity, animationCards[randomIndex].transform);
+            glow.GetComponent<Image>().sprite = glowSprite;
             //animationCards[randomIndex].glowColor = glowColor;
 
             await UniTask.Delay(System.TimeSpan.FromSeconds(0.3f), cancellationToken: token);
