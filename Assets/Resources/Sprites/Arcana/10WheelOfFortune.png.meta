@@ -3,8 +3,344 @@ guid: 097ed9c313a25804883f7eebb094fe3c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5099292496197868168
-    second: 10_0
+      213: -6397479966304664429
+    second: 10WheelOfFortune_0
+  - first:
+      213: -4225872059167033861
+    second: 10WheelOfFortune_1
+  - first:
+      213: -8368225822552537083
+    second: 10WheelOfFortune_2
+  - first:
+      213: -5760468009282007264
+    second: 10WheelOfFortune_3
+  - first:
+      213: 8947247780496171344
+    second: 10WheelOfFortune_4
+  - first:
+      213: 9099470829357292483
+    second: 10WheelOfFortune_5
+  - first:
+      213: 6664961485081996213
+    second: 10WheelOfFortune_6
+  - first:
+      213: -3980663637596903527
+    second: 10WheelOfFortune_7
+  - first:
+      213: 2107150731427568811
+    second: 10WheelOfFortune_8
+  - first:
+      213: -1040188740711261804
+    second: 10WheelOfFortune_9
+  - first:
+      213: -303324237586850050
+    second: 10WheelOfFortune_10
+  - first:
+      213: 6633932251213398858
+    second: 10WheelOfFortune_11
+  - first:
+      213: 3965306894068028248
+    second: 10WheelOfFortune_12
+  - first:
+      213: 2876061811024969181
+    second: 10WheelOfFortune_13
+  - first:
+      213: 3191675452578203056
+    second: 10WheelOfFortune_14
+  - first:
+      213: 1071248868239891252
+    second: 10WheelOfFortune_15
+  - first:
+      213: 1025423907116508177
+    second: 10WheelOfFortune_16
+  - first:
+      213: -3239783603729406505
+    second: 10WheelOfFortune_17
+  - first:
+      213: -2576556060142714232
+    second: 10WheelOfFortune_18
+  - first:
+      213: 367008660699233336
+    second: 10WheelOfFortune_19
+  - first:
+      213: 1936117176904670280
+    second: 10WheelOfFortune_20
+  - first:
+      213: -5145631925631875659
+    second: 10WheelOfFortune_21
+  - first:
+      213: -2634570220372300178
+    second: 10WheelOfFortune_22
+  - first:
+      213: 8731003112807238650
+    second: 10WheelOfFortune_23
+  - first:
+      213: -5806556760041872668
+    second: 10WheelOfFortune_24
+  - first:
+      213: -7883403661946449144
+    second: 10WheelOfFortune_25
+  - first:
+      213: -7777612935228962487
+    second: 10WheelOfFortune_26
+  - first:
+      213: 1703426500164616685
+    second: 10WheelOfFortune_27
+  - first:
+      213: 6018617664590809145
+    second: 10WheelOfFortune_28
+  - first:
+      213: 1751573724968023705
+    second: 10WheelOfFortune_29
+  - first:
+      213: -1482605008446632630
+    second: 10WheelOfFortune_30
+  - first:
+      213: 1472707817129372451
+    second: 10WheelOfFortune_31
+  - first:
+      213: 2517451075331984040
+    second: 10WheelOfFortune_32
+  - first:
+      213: 212170623407504554
+    second: 10WheelOfFortune_33
+  - first:
+      213: 3901368814407357556
+    second: 10WheelOfFortune_34
+  - first:
+      213: -7463172378599912177
+    second: 10WheelOfFortune_35
+  - first:
+      213: 5594897321267519630
+    second: 10WheelOfFortune_36
+  - first:
+      213: 2415827971868691954
+    second: 10WheelOfFortune_37
+  - first:
+      213: -4381563329559893824
+    second: 10WheelOfFortune_38
+  - first:
+      213: 6062138537438811949
+    second: 10WheelOfFortune_39
+  - first:
+      213: -7823881152934479019
+    second: 10WheelOfFortune_40
+  - first:
+      213: -9194640862140088599
+    second: 10WheelOfFortune_41
+  - first:
+      213: -5852545072185719296
+    second: 10WheelOfFortune_42
+  - first:
+      213: 7959803313204047957
+    second: 10WheelOfFortune_43
+  - first:
+      213: 2298802011226421040
+    second: 10WheelOfFortune_44
+  - first:
+      213: 1254218298963573702
+    second: 10WheelOfFortune_45
+  - first:
+      213: 1314324597576776130
+    second: 10WheelOfFortune_46
+  - first:
+      213: -6978899519064903943
+    second: 10WheelOfFortune_47
+  - first:
+      213: -8288522710266067160
+    second: 10WheelOfFortune_48
+  - first:
+      213: -5584734966405026419
+    second: 10WheelOfFortune_49
+  - first:
+      213: -2392055421628284243
+    second: 10WheelOfFortune_50
+  - first:
+      213: -6377473243714727076
+    second: 10WheelOfFortune_51
+  - first:
+      213: -4555745011782067687
+    second: 10WheelOfFortune_52
+  - first:
+      213: 6819015167141431555
+    second: 10WheelOfFortune_53
+  - first:
+      213: -6870081076711697115
+    second: 10WheelOfFortune_54
+  - first:
+      213: 2867132303960222229
+    second: 10WheelOfFortune_55
+  - first:
+      213: -3514950273021543083
+    second: 10WheelOfFortune_56
+  - first:
+      213: 2488969057437190305
+    second: 10WheelOfFortune_57
+  - first:
+      213: -1464347965005018568
+    second: 10WheelOfFortune_58
+  - first:
+      213: -1561447967313207388
+    second: 10WheelOfFortune_59
+  - first:
+      213: -5731932012378697118
+    second: 10WheelOfFortune_60
+  - first:
+      213: -1926209823795333580
+    second: 10WheelOfFortune_61
+  - first:
+      213: -3183527793131757974
+    second: 10WheelOfFortune_62
+  - first:
+      213: 2175796164288654109
+    second: 10WheelOfFortune_63
+  - first:
+      213: -3911373354925283763
+    second: 10WheelOfFortune_64
+  - first:
+      213: -4175771978463881812
+    second: 10WheelOfFortune_65
+  - first:
+      213: -136269491985255184
+    second: 10WheelOfFortune_66
+  - first:
+      213: 2893277161397803792
+    second: 10WheelOfFortune_67
+  - first:
+      213: 1243749991714400772
+    second: 10WheelOfFortune_68
+  - first:
+      213: -7308268482473584122
+    second: 10WheelOfFortune_69
+  - first:
+      213: -746934175760776605
+    second: 10WheelOfFortune_70
+  - first:
+      213: 5165976644449662330
+    second: 10WheelOfFortune_71
+  - first:
+      213: -8439334814624783978
+    second: 10WheelOfFortune_72
+  - first:
+      213: 1661079598791218133
+    second: 10WheelOfFortune_73
+  - first:
+      213: 7905486230153030128
+    second: 10WheelOfFortune_74
+  - first:
+      213: -1543161993349257643
+    second: 10WheelOfFortune_75
+  - first:
+      213: 7118243158888834132
+    second: 10WheelOfFortune_76
+  - first:
+      213: 8482940437519837000
+    second: 10WheelOfFortune_77
+  - first:
+      213: 1009778686108018119
+    second: 10WheelOfFortune_78
+  - first:
+      213: 2563772680513650016
+    second: 10WheelOfFortune_79
+  - first:
+      213: 2113677542789040755
+    second: 10WheelOfFortune_80
+  - first:
+      213: 8101898334427153176
+    second: 10WheelOfFortune_81
+  - first:
+      213: -2531441436108176667
+    second: 10WheelOfFortune_82
+  - first:
+      213: -5849524449404584693
+    second: 10WheelOfFortune_83
+  - first:
+      213: -6848962357076423721
+    second: 10WheelOfFortune_84
+  - first:
+      213: 7192271201940703160
+    second: 10WheelOfFortune_85
+  - first:
+      213: 8230174275768365325
+    second: 10WheelOfFortune_86
+  - first:
+      213: -8015795314008750817
+    second: 10WheelOfFortune_87
+  - first:
+      213: -2589034444878786409
+    second: 10WheelOfFortune_88
+  - first:
+      213: -4401932477173240222
+    second: 10WheelOfFortune_89
+  - first:
+      213: -4112070679166663647
+    second: 10WheelOfFortune_90
+  - first:
+      213: -4003360391042799027
+    second: 10WheelOfFortune_91
+  - first:
+      213: -4900986411673784302
+    second: 10WheelOfFortune_92
+  - first:
+      213: -1144750573667916390
+    second: 10WheelOfFortune_93
+  - first:
+      213: 761790057928298211
+    second: 10WheelOfFortune_94
+  - first:
+      213: -3450237283582273079
+    second: 10WheelOfFortune_95
+  - first:
+      213: 987123362163265212
+    second: 10WheelOfFortune_96
+  - first:
+      213: 2298865322673653025
+    second: 10WheelOfFortune_97
+  - first:
+      213: -4081461910871389536
+    second: 10WheelOfFortune_98
+  - first:
+      213: 2603725368230547890
+    second: 10WheelOfFortune_99
+  - first:
+      213: 5621454494327449647
+    second: 10WheelOfFortune_100
+  - first:
+      213: 3564202830241822938
+    second: 10WheelOfFortune_101
+  - first:
+      213: -6407466656339247204
+    second: 10WheelOfFortune_102
+  - first:
+      213: 6484791001436709617
+    second: 10WheelOfFortune_103
+  - first:
+      213: -3527335497221522439
+    second: 10WheelOfFortune_104
+  - first:
+      213: 743500967674102140
+    second: 10WheelOfFortune_105
+  - first:
+      213: 2545806302551337502
+    second: 10WheelOfFortune_106
+  - first:
+      213: 3223040584381883124
+    second: 10WheelOfFortune_107
+  - first:
+      213: 909980823460422116
+    second: 10WheelOfFortune_108
+  - first:
+      213: -7753457518333364433
+    second: 10WheelOfFortune_109
+  - first:
+      213: 6446291023109651711
+    second: 10WheelOfFortune_110
+  - first:
+      213: 6589267430119585925
+    second: 10WheelOfFortune_111
+  - first:
+      213: 7073913137394059046
+    second: 10WheelOfFortune_112
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +436,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 10_0
+      name: 04Emperor_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 73
-        height: 113
+        width: 1520
+        height: 2420
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 875af4eed7cab39b0800000000000000
-      internalID: -5099292496197868168
+      spriteID: 3b641b6d83ddc5b478d804051da88349
+      internalID: -1109167291
       vertices: []
       indices: 
       edges: []
@@ -125,7 +461,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 0e831cd78e7cfec4d8c99e8939b38d31
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +471,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      10_0: -5099292496197868168
+      04Emperor_0: -1109167291
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

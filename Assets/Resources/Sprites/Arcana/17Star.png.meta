@@ -3,8 +3,215 @@ guid: c5dc920513242d84398e7a24993e3148
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6660783624410144326
-    second: 17_0
+      213: 6012810256945695163
+    second: 17Star_0
+  - first:
+      213: 4648582539082672308
+    second: 17Star_1
+  - first:
+      213: 1335086765955465387
+    second: 17Star_2
+  - first:
+      213: 3876181620867931891
+    second: 17Star_3
+  - first:
+      213: 7351307081918186591
+    second: 17Star_4
+  - first:
+      213: -7345970707337038499
+    second: 17Star_5
+  - first:
+      213: 8066586161631553263
+    second: 17Star_6
+  - first:
+      213: -2805551126353854176
+    second: 17Star_7
+  - first:
+      213: 6016405652357355549
+    second: 17Star_8
+  - first:
+      213: -6528920818125455638
+    second: 17Star_9
+  - first:
+      213: -6144305324792668287
+    second: 17Star_10
+  - first:
+      213: 3160088425247654432
+    second: 17Star_11
+  - first:
+      213: 8436192911246427582
+    second: 17Star_12
+  - first:
+      213: 5603557360724848835
+    second: 17Star_13
+  - first:
+      213: -2460655252700265699
+    second: 17Star_14
+  - first:
+      213: 5232538144481018049
+    second: 17Star_15
+  - first:
+      213: -3403736694743670304
+    second: 17Star_16
+  - first:
+      213: -8633904861160663148
+    second: 17Star_17
+  - first:
+      213: -8694301916848393577
+    second: 17Star_18
+  - first:
+      213: -3352223930314779389
+    second: 17Star_19
+  - first:
+      213: 5460713220020376200
+    second: 17Star_20
+  - first:
+      213: -6033382539607872237
+    second: 17Star_21
+  - first:
+      213: -7113230718852944159
+    second: 17Star_22
+  - first:
+      213: -408302225132014005
+    second: 17Star_23
+  - first:
+      213: 6132009196510517729
+    second: 17Star_24
+  - first:
+      213: -2273119878106083230
+    second: 17Star_25
+  - first:
+      213: -8733928072252892245
+    second: 17Star_26
+  - first:
+      213: -3193450417358967700
+    second: 17Star_27
+  - first:
+      213: -2148745459963633946
+    second: 17Star_28
+  - first:
+      213: -5589038047153056239
+    second: 17Star_29
+  - first:
+      213: 4881118581130715043
+    second: 17Star_30
+  - first:
+      213: 9198437845835644238
+    second: 17Star_31
+  - first:
+      213: 8515023473111098343
+    second: 17Star_32
+  - first:
+      213: -5948036917948979327
+    second: 17Star_33
+  - first:
+      213: -6082180593969807133
+    second: 17Star_34
+  - first:
+      213: -4038670047038382792
+    second: 17Star_35
+  - first:
+      213: 489485680321494186
+    second: 17Star_36
+  - first:
+      213: -1322149109161744091
+    second: 17Star_37
+  - first:
+      213: 4757428274311078420
+    second: 17Star_38
+  - first:
+      213: -3041597564917027936
+    second: 17Star_39
+  - first:
+      213: 2669031309340443069
+    second: 17Star_40
+  - first:
+      213: -3931153009612375434
+    second: 17Star_41
+  - first:
+      213: -1654817639008813164
+    second: 17Star_42
+  - first:
+      213: 8945420076981670089
+    second: 17Star_43
+  - first:
+      213: 6813551577902103315
+    second: 17Star_44
+  - first:
+      213: -4160315220685950476
+    second: 17Star_45
+  - first:
+      213: -8221419144256188637
+    second: 17Star_46
+  - first:
+      213: -269392208893985158
+    second: 17Star_47
+  - first:
+      213: -3385447838409897036
+    second: 17Star_48
+  - first:
+      213: 4629984525659438907
+    second: 17Star_49
+  - first:
+      213: 2618731254100578794
+    second: 17Star_50
+  - first:
+      213: 5358447368233620881
+    second: 17Star_51
+  - first:
+      213: 5964976327213635833
+    second: 17Star_52
+  - first:
+      213: 1629610670899776544
+    second: 17Star_53
+  - first:
+      213: 8997393564009889926
+    second: 17Star_54
+  - first:
+      213: -3609731387581710547
+    second: 17Star_55
+  - first:
+      213: 295768921830868692
+    second: 17Star_56
+  - first:
+      213: -4048368569895021612
+    second: 17Star_57
+  - first:
+      213: -2007908411629926410
+    second: 17Star_58
+  - first:
+      213: -4776844876230711058
+    second: 17Star_59
+  - first:
+      213: -2242041910474514884
+    second: 17Star_60
+  - first:
+      213: 5021529223888214097
+    second: 17Star_61
+  - first:
+      213: 4945803000375523459
+    second: 17Star_62
+  - first:
+      213: -7191166645591467325
+    second: 17Star_63
+  - first:
+      213: 3658893530451520594
+    second: 17Star_64
+  - first:
+      213: -7706273009247023807
+    second: 17Star_65
+  - first:
+      213: 3016590017082558020
+    second: 17Star_66
+  - first:
+      213: -2152147990283659184
+    second: 17Star_67
+  - first:
+      213: 120653331847761847
+    second: 17Star_68
+  - first:
+      213: -102365249619602388
+    second: 17Star_69
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +307,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 17_0
+      name: 04Emperor_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 73
-        height: 113
+        width: 1520
+        height: 2420
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 64e94b28a6bdf6c50800000000000000
-      internalID: 6660783624410144326
+      spriteID: 3b641b6d83ddc5b478d804051da88349
+      internalID: -1109167291
       vertices: []
       indices: 
       edges: []
@@ -125,7 +332,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 0e831cd78e7cfec4d8c99e8939b38d31
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +342,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      17_0: 6660783624410144326
+      04Emperor_0: -1109167291
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

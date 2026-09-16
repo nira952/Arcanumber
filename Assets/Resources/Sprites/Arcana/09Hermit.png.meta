@@ -3,8 +3,200 @@ guid: 47729ccf9cec22e4486b192144d9bcf5
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3356593810811537127
-    second: 09_0
+      213: 8922512555388951132
+    second: 09Hermit_0
+  - first:
+      213: 1139744116812395471
+    second: 09Hermit_1
+  - first:
+      213: -8193156976534901718
+    second: 09Hermit_2
+  - first:
+      213: -201734858624884947
+    second: 09Hermit_3
+  - first:
+      213: 7870456887382297410
+    second: 09Hermit_4
+  - first:
+      213: 4964400996223343726
+    second: 09Hermit_5
+  - first:
+      213: 1344609093871374579
+    second: 09Hermit_6
+  - first:
+      213: 893664738889840812
+    second: 09Hermit_7
+  - first:
+      213: 2336188209824942903
+    second: 09Hermit_8
+  - first:
+      213: 402090658359584323
+    second: 09Hermit_9
+  - first:
+      213: -8316131364881063104
+    second: 09Hermit_10
+  - first:
+      213: 7894782593463014642
+    second: 09Hermit_11
+  - first:
+      213: 8562582814314337757
+    second: 09Hermit_12
+  - first:
+      213: -3581099509080009560
+    second: 09Hermit_13
+  - first:
+      213: 1147981045040903798
+    second: 09Hermit_14
+  - first:
+      213: 4916707507914289737
+    second: 09Hermit_15
+  - first:
+      213: -9097725466864861598
+    second: 09Hermit_16
+  - first:
+      213: 1774174268850806908
+    second: 09Hermit_17
+  - first:
+      213: 4494955198635180163
+    second: 09Hermit_18
+  - first:
+      213: 1354597493307478675
+    second: 09Hermit_19
+  - first:
+      213: -6551030083808756952
+    second: 09Hermit_20
+  - first:
+      213: -4371070401120365623
+    second: 09Hermit_21
+  - first:
+      213: 1541123006151516960
+    second: 09Hermit_22
+  - first:
+      213: -6660544167544369978
+    second: 09Hermit_23
+  - first:
+      213: 8677508958761326475
+    second: 09Hermit_24
+  - first:
+      213: 1892239235621870207
+    second: 09Hermit_25
+  - first:
+      213: 1321161965837587394
+    second: 09Hermit_26
+  - first:
+      213: 5160864145511283912
+    second: 09Hermit_27
+  - first:
+      213: -5520718547419185355
+    second: 09Hermit_28
+  - first:
+      213: 5018985880409302077
+    second: 09Hermit_29
+  - first:
+      213: 8526315355632630758
+    second: 09Hermit_30
+  - first:
+      213: 833881079843492786
+    second: 09Hermit_31
+  - first:
+      213: 8426109730500240035
+    second: 09Hermit_32
+  - first:
+      213: 7656671244312834302
+    second: 09Hermit_33
+  - first:
+      213: -2909791098937999797
+    second: 09Hermit_34
+  - first:
+      213: 4894981265620563780
+    second: 09Hermit_35
+  - first:
+      213: 3890800178297275797
+    second: 09Hermit_36
+  - first:
+      213: -4582312904739250256
+    second: 09Hermit_37
+  - first:
+      213: 5898843024302881264
+    second: 09Hermit_38
+  - first:
+      213: -688703611205332428
+    second: 09Hermit_39
+  - first:
+      213: -4292281236267530353
+    second: 09Hermit_40
+  - first:
+      213: 8238582737782770612
+    second: 09Hermit_41
+  - first:
+      213: -194796680784170507
+    second: 09Hermit_42
+  - first:
+      213: -6068407633858168008
+    second: 09Hermit_43
+  - first:
+      213: 854182728186211815
+    second: 09Hermit_44
+  - first:
+      213: 5999249097467431485
+    second: 09Hermit_45
+  - first:
+      213: -6070348184252223181
+    second: 09Hermit_46
+  - first:
+      213: -2643366784059412512
+    second: 09Hermit_47
+  - first:
+      213: -8901095915179878140
+    second: 09Hermit_48
+  - first:
+      213: -4018155705256976519
+    second: 09Hermit_49
+  - first:
+      213: 2370388695462695137
+    second: 09Hermit_50
+  - first:
+      213: 4456957967783189982
+    second: 09Hermit_51
+  - first:
+      213: -4395822001933460733
+    second: 09Hermit_52
+  - first:
+      213: -8680943037019873612
+    second: 09Hermit_53
+  - first:
+      213: -4707073989164330692
+    second: 09Hermit_54
+  - first:
+      213: -5105177761040570911
+    second: 09Hermit_55
+  - first:
+      213: 3249923128459366428
+    second: 09Hermit_56
+  - first:
+      213: -4923773592354937770
+    second: 09Hermit_57
+  - first:
+      213: 2228054540836366123
+    second: 09Hermit_58
+  - first:
+      213: -1708038051603664034
+    second: 09Hermit_59
+  - first:
+      213: -2468381927111876481
+    second: 09Hermit_60
+  - first:
+      213: 3469043376745849436
+    second: 09Hermit_61
+  - first:
+      213: -246657748668303859
+    second: 09Hermit_62
+  - first:
+      213: -7595208230484321094
+    second: 09Hermit_63
+  - first:
+      213: -211291537624578688
+    second: 09Hermit_64
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +292,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 09_0
+      name: 04Emperor_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 73
-        height: 113
+        width: 1520
+        height: 2420
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 919bd4b86bbfa61d0800000000000000
-      internalID: -3356593810811537127
+      spriteID: 3b641b6d83ddc5b478d804051da88349
+      internalID: -1109167291
       vertices: []
       indices: 
       edges: []
@@ -125,7 +317,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 0e831cd78e7cfec4d8c99e8939b38d31
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +327,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      09_0: -3356593810811537127
+      04Emperor_0: -1109167291
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

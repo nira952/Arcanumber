@@ -3,8 +3,233 @@ guid: 209a2046f85446d499a06b0cd4698f40
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8793915729297761979
-    second: 03_0
+      213: 166529448177362901
+    second: 03Empress_0
+  - first:
+      213: 2228647882846622125
+    second: 03Empress_1
+  - first:
+      213: -2883922032261903973
+    second: 03Empress_2
+  - first:
+      213: -1876474592824224888
+    second: 03Empress_3
+  - first:
+      213: 8998571862384702138
+    second: 03Empress_4
+  - first:
+      213: -7584864626830626258
+    second: 03Empress_5
+  - first:
+      213: 9062486291501564775
+    second: 03Empress_6
+  - first:
+      213: 1165509987847028745
+    second: 03Empress_7
+  - first:
+      213: -8759264814219255576
+    second: 03Empress_8
+  - first:
+      213: 8427784810452598232
+    second: 03Empress_9
+  - first:
+      213: 7266919938657781405
+    second: 03Empress_10
+  - first:
+      213: 1303506956320530092
+    second: 03Empress_11
+  - first:
+      213: -3530173688794990178
+    second: 03Empress_12
+  - first:
+      213: 7297049272333254733
+    second: 03Empress_13
+  - first:
+      213: -1800501031497507412
+    second: 03Empress_14
+  - first:
+      213: -4372791057101889
+    second: 03Empress_15
+  - first:
+      213: 7989399900840079064
+    second: 03Empress_16
+  - first:
+      213: -7904854032036156292
+    second: 03Empress_17
+  - first:
+      213: -1356272794779461230
+    second: 03Empress_18
+  - first:
+      213: -4109185356274138040
+    second: 03Empress_19
+  - first:
+      213: 2827149532148126030
+    second: 03Empress_20
+  - first:
+      213: -464899032299651651
+    second: 03Empress_21
+  - first:
+      213: 9144594539483897053
+    second: 03Empress_22
+  - first:
+      213: -5636575761127891004
+    second: 03Empress_23
+  - first:
+      213: 5423513862885116480
+    second: 03Empress_24
+  - first:
+      213: -9090467754027194550
+    second: 03Empress_25
+  - first:
+      213: -649379584833559075
+    second: 03Empress_26
+  - first:
+      213: 375834541928268396
+    second: 03Empress_27
+  - first:
+      213: 2141360574186681032
+    second: 03Empress_28
+  - first:
+      213: 6125048631651531429
+    second: 03Empress_29
+  - first:
+      213: -8408015057222360221
+    second: 03Empress_30
+  - first:
+      213: 7327912761569871529
+    second: 03Empress_31
+  - first:
+      213: -6757156066030436027
+    second: 03Empress_32
+  - first:
+      213: -6854823271691502402
+    second: 03Empress_33
+  - first:
+      213: 5291056685959148470
+    second: 03Empress_34
+  - first:
+      213: -4467631626882216589
+    second: 03Empress_35
+  - first:
+      213: 5045455847081019782
+    second: 03Empress_36
+  - first:
+      213: -6346966368770460910
+    second: 03Empress_37
+  - first:
+      213: -8824960051053227148
+    second: 03Empress_38
+  - first:
+      213: -237998174208965451
+    second: 03Empress_39
+  - first:
+      213: 3576725319142292704
+    second: 03Empress_40
+  - first:
+      213: -82290518701572940
+    second: 03Empress_41
+  - first:
+      213: 2705500839768888940
+    second: 03Empress_42
+  - first:
+      213: 2504339033960585381
+    second: 03Empress_43
+  - first:
+      213: 2191360271657445001
+    second: 03Empress_44
+  - first:
+      213: -6990030037852955458
+    second: 03Empress_45
+  - first:
+      213: -6858787611387735416
+    second: 03Empress_46
+  - first:
+      213: 1887904028230810876
+    second: 03Empress_47
+  - first:
+      213: -4133251253926261041
+    second: 03Empress_48
+  - first:
+      213: 8789404948862541181
+    second: 03Empress_49
+  - first:
+      213: 4475250024066870723
+    second: 03Empress_50
+  - first:
+      213: -1913693722674294054
+    second: 03Empress_51
+  - first:
+      213: 5326894710016260537
+    second: 03Empress_52
+  - first:
+      213: -299289527708923284
+    second: 03Empress_53
+  - first:
+      213: -2383958236032237721
+    second: 03Empress_54
+  - first:
+      213: -3218698347614151857
+    second: 03Empress_55
+  - first:
+      213: -4208055735476447247
+    second: 03Empress_56
+  - first:
+      213: -6526115479883416623
+    second: 03Empress_57
+  - first:
+      213: 2549138231528151122
+    second: 03Empress_58
+  - first:
+      213: 4636602025048158159
+    second: 03Empress_59
+  - first:
+      213: 899040538869089447
+    second: 03Empress_60
+  - first:
+      213: -7014257167798799247
+    second: 03Empress_61
+  - first:
+      213: 7095034100136688237
+    second: 03Empress_62
+  - first:
+      213: 7893658923276299089
+    second: 03Empress_63
+  - first:
+      213: -4096015789192201148
+    second: 03Empress_64
+  - first:
+      213: 6999845499177670232
+    second: 03Empress_65
+  - first:
+      213: -35951758061684159
+    second: 03Empress_66
+  - first:
+      213: 5257820927730744474
+    second: 03Empress_67
+  - first:
+      213: 8423099359358248410
+    second: 03Empress_68
+  - first:
+      213: 2482795571930313407
+    second: 03Empress_69
+  - first:
+      213: -4335925204662998969
+    second: 03Empress_70
+  - first:
+      213: -3441017903810721287
+    second: 03Empress_71
+  - first:
+      213: -5610344904449365903
+    second: 03Empress_72
+  - first:
+      213: -2015102998229382624
+    second: 03Empress_73
+  - first:
+      213: -2188858347439496567
+    second: 03Empress_74
+  - first:
+      213: 7906587108700776820
+    second: 03Empress_75
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +325,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 03_0
+      name: 03Empress_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 73
-        height: 113
+        width: 1520
+        height: 2420
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: bb6638d73c34a0a70800000000000000
-      internalID: 8793915729297761979
+      spriteID: 5afdce7004434ce409c052ea375bbf40
+      internalID: 1410349290
       vertices: []
       indices: 
       edges: []
@@ -125,7 +350,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: d165f6082ec9a9241b86597afe14d858
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +360,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      03_0: 8793915729297761979
+      03Empress_0: 1410349290
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

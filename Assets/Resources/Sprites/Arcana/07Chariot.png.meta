@@ -3,8 +3,149 @@ guid: 8bb80144dd8eb8749b651913376f630b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7336298474659753992
-    second: 07_0
+      213: -8443507568350051399
+    second: 07Chariot_0
+  - first:
+      213: 8684760416280385490
+    second: 07Chariot_1
+  - first:
+      213: 7395068060986246254
+    second: 07Chariot_2
+  - first:
+      213: -6341523845482754426
+    second: 07Chariot_3
+  - first:
+      213: -6000615628077662513
+    second: 07Chariot_4
+  - first:
+      213: -837985017201118959
+    second: 07Chariot_5
+  - first:
+      213: 8193259780610038824
+    second: 07Chariot_6
+  - first:
+      213: 6424186257451090246
+    second: 07Chariot_7
+  - first:
+      213: -8058138019712988152
+    second: 07Chariot_8
+  - first:
+      213: -8169859133626529155
+    second: 07Chariot_9
+  - first:
+      213: 8472739260097879095
+    second: 07Chariot_10
+  - first:
+      213: 7606976399360464292
+    second: 07Chariot_11
+  - first:
+      213: -2511621026372292415
+    second: 07Chariot_12
+  - first:
+      213: 7857198679035056402
+    second: 07Chariot_13
+  - first:
+      213: 7824754572091976587
+    second: 07Chariot_14
+  - first:
+      213: 3120480878362618850
+    second: 07Chariot_15
+  - first:
+      213: 994082020596171037
+    second: 07Chariot_16
+  - first:
+      213: 1865993468589306682
+    second: 07Chariot_17
+  - first:
+      213: 9118852301732017120
+    second: 07Chariot_18
+  - first:
+      213: -5220900515056295181
+    second: 07Chariot_19
+  - first:
+      213: -8249675139413950688
+    second: 07Chariot_20
+  - first:
+      213: -5200673163566249238
+    second: 07Chariot_21
+  - first:
+      213: -6241257082128088236
+    second: 07Chariot_22
+  - first:
+      213: -485451429889644802
+    second: 07Chariot_23
+  - first:
+      213: -264337178342267095
+    second: 07Chariot_24
+  - first:
+      213: -1871480031117502747
+    second: 07Chariot_25
+  - first:
+      213: 3690200894937549558
+    second: 07Chariot_26
+  - first:
+      213: 3207955331756339429
+    second: 07Chariot_27
+  - first:
+      213: 2934640082331010229
+    second: 07Chariot_28
+  - first:
+      213: -5131007670464501124
+    second: 07Chariot_29
+  - first:
+      213: -4547118443588566786
+    second: 07Chariot_30
+  - first:
+      213: 697747557242823394
+    second: 07Chariot_31
+  - first:
+      213: 314692045917941686
+    second: 07Chariot_32
+  - first:
+      213: 5118045042620227950
+    second: 07Chariot_33
+  - first:
+      213: -3829239347860185583
+    second: 07Chariot_34
+  - first:
+      213: -8683811963565618065
+    second: 07Chariot_35
+  - first:
+      213: -3644872026176032752
+    second: 07Chariot_36
+  - first:
+      213: 4676081436568677600
+    second: 07Chariot_37
+  - first:
+      213: -4642727545485676366
+    second: 07Chariot_38
+  - first:
+      213: 7399661240933181812
+    second: 07Chariot_39
+  - first:
+      213: 1787996995327208720
+    second: 07Chariot_40
+  - first:
+      213: 8181008562599642140
+    second: 07Chariot_41
+  - first:
+      213: 5353979563196399793
+    second: 07Chariot_42
+  - first:
+      213: -1510763927273625575
+    second: 07Chariot_43
+  - first:
+      213: -3482901179804399882
+    second: 07Chariot_44
+  - first:
+      213: -6900367666551569783
+    second: 07Chariot_45
+  - first:
+      213: 4335059414054192765
+    second: 07Chariot_46
+  - first:
+      213: 3001387248945129510
+    second: 07Chariot_47
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +241,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 07_0
+      name: 04Emperor_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 73
-        height: 113
+        width: 1520
+        height: 2420
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 800b554e794cfc560800000000000000
-      internalID: 7336298474659753992
+      spriteID: 3b641b6d83ddc5b478d804051da88349
+      internalID: -1109167291
       vertices: []
       indices: 
       edges: []
@@ -125,7 +266,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 0e831cd78e7cfec4d8c99e8939b38d31
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +276,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      07_0: 7336298474659753992
+      04Emperor_0: -1109167291
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
