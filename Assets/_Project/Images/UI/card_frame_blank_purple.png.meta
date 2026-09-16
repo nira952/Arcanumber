@@ -1,43 +1,10 @@
 fileFormatVersion: 2
-guid: f98204d4b40bef0439ce4d5db8e3455b
+guid: 092bcc714958d48419f1b1016096a45c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3507500608855621361
-    second: 14Temperance_0
-  - first:
-      213: -4067051676975225425
-    second: 14Temperance_1
-  - first:
-      213: -6615177039221632081
-    second: 14Temperance_2
-  - first:
-      213: -6678145830813929168
-    second: 14Temperance_3
-  - first:
-      213: -8343090118665180927
-    second: 14Temperance_4
-  - first:
-      213: 1416981979491416445
-    second: 14Temperance_5
-  - first:
-      213: 5277583161141837871
-    second: 14Temperance_6
-  - first:
-      213: 6637806138190815098
-    second: 14Temperance_7
-  - first:
-      213: 3542325201309389715
-    second: 14Temperance_8
-  - first:
-      213: 7197051632345049209
-    second: 14Temperance_9
-  - first:
-      213: -3765608531687574395
-    second: 14Temperance_10
-  - first:
-      213: 1029797641674582033
-    second: 14Temperance_11
+      213: -5980121781298439847
+    second: card_frame_blank_purple_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -133,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 04Emperor_0
+      name: card_frame_blank_purple_0
       rect:
         serializedVersion: 2
         x: 0
@@ -146,10 +113,10 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 3b641b6d83ddc5b478d804051da88349
-      internalID: -1109167291
+      spriteID: 95951288ce6520da0800000000000000
+      internalID: -5980121781298439847
       vertices: []
       indices: 
       edges: []
@@ -158,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 0e831cd78e7cfec4d8c99e8939b38d31
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -167,8 +134,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      04Emperor_0: -1109167291
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

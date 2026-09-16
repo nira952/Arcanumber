@@ -3,8 +3,80 @@ guid: 7f614bd19fe77dc44bf8a67cc91d2898
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8389134475083476877
-    second: 13_0
+      213: -4670665056482528632
+    second: 13Death_0
+  - first:
+      213: 5095813158785806777
+    second: 13Death_1
+  - first:
+      213: 3235024480537311286
+    second: 13Death_2
+  - first:
+      213: -4123702890522698584
+    second: 13Death_3
+  - first:
+      213: 137921462909689945
+    second: 13Death_4
+  - first:
+      213: -7114468422874235876
+    second: 13Death_5
+  - first:
+      213: -2594840021509917390
+    second: 13Death_6
+  - first:
+      213: 6223324654395493134
+    second: 13Death_7
+  - first:
+      213: -3327349422467038250
+    second: 13Death_8
+  - first:
+      213: -1925499908485518192
+    second: 13Death_9
+  - first:
+      213: -1751360148634463046
+    second: 13Death_10
+  - first:
+      213: 494443409236009275
+    second: 13Death_11
+  - first:
+      213: -6824908867770162584
+    second: 13Death_12
+  - first:
+      213: 6478056076159714870
+    second: 13Death_13
+  - first:
+      213: 4404042180398561739
+    second: 13Death_14
+  - first:
+      213: -8789798178820705398
+    second: 13Death_15
+  - first:
+      213: 3201796700702456246
+    second: 13Death_16
+  - first:
+      213: -5344317663571690500
+    second: 13Death_17
+  - first:
+      213: 2484063785363050205
+    second: 13Death_18
+  - first:
+      213: -5389519662502755174
+    second: 13Death_19
+  - first:
+      213: -7931218580158734917
+    second: 13Death_20
+  - first:
+      213: -1834874085245336985
+    second: 13Death_21
+  - first:
+      213: -6226516764047678282
+    second: 13Death_22
+  - first:
+      213: 255678994284671362
+    second: 13Death_23
+  - first:
+      213: -4878512601506063690
+    second: 13Death_24
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +172,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 13_0
+      name: 04Emperor_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 73
-        height: 113
+        width: 1520
+        height: 2420
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: d8f65588b513c6470800000000000000
-      internalID: 8389134475083476877
+      spriteID: 3b641b6d83ddc5b478d804051da88349
+      internalID: -1109167291
       vertices: []
       indices: 
       edges: []
@@ -125,7 +197,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 0e831cd78e7cfec4d8c99e8939b38d31
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +207,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      13_0: 8389134475083476877
+      04Emperor_0: -1109167291
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

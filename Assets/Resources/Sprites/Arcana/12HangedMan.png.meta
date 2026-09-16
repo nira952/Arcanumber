@@ -3,8 +3,146 @@ guid: 42bd7de027dca0344be20258948436d2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1540426309290004842
-    second: 12_0
+      213: 9133261558675633200
+    second: 12HangedMan_0
+  - first:
+      213: 6260077739721127586
+    second: 12HangedMan_1
+  - first:
+      213: 2378848873812912422
+    second: 12HangedMan_2
+  - first:
+      213: 7118430532335561723
+    second: 12HangedMan_3
+  - first:
+      213: -4958133814207197234
+    second: 12HangedMan_4
+  - first:
+      213: 7058850030531704034
+    second: 12HangedMan_5
+  - first:
+      213: 2426687755282823024
+    second: 12HangedMan_6
+  - first:
+      213: 8049596672032769861
+    second: 12HangedMan_7
+  - first:
+      213: -1177545467230565637
+    second: 12HangedMan_8
+  - first:
+      213: 1355240401569674137
+    second: 12HangedMan_9
+  - first:
+      213: 3813445320684429593
+    second: 12HangedMan_10
+  - first:
+      213: -6965739582746861170
+    second: 12HangedMan_11
+  - first:
+      213: -3465717487353500926
+    second: 12HangedMan_12
+  - first:
+      213: 5933971506292477489
+    second: 12HangedMan_13
+  - first:
+      213: -5052190719564713716
+    second: 12HangedMan_14
+  - first:
+      213: 4920781713022796893
+    second: 12HangedMan_15
+  - first:
+      213: 1251481172711930100
+    second: 12HangedMan_16
+  - first:
+      213: -4900202938011918465
+    second: 12HangedMan_17
+  - first:
+      213: 3765664492682636333
+    second: 12HangedMan_18
+  - first:
+      213: 3057005329290926206
+    second: 12HangedMan_19
+  - first:
+      213: 3101015919164887986
+    second: 12HangedMan_20
+  - first:
+      213: 1343449243417351884
+    second: 12HangedMan_21
+  - first:
+      213: -5142693702810557288
+    second: 12HangedMan_22
+  - first:
+      213: -292498373439730522
+    second: 12HangedMan_23
+  - first:
+      213: 3515578499896665946
+    second: 12HangedMan_24
+  - first:
+      213: -5000543538435540140
+    second: 12HangedMan_25
+  - first:
+      213: 2235807833222135579
+    second: 12HangedMan_26
+  - first:
+      213: 2837176393120046232
+    second: 12HangedMan_27
+  - first:
+      213: -497930994382697217
+    second: 12HangedMan_28
+  - first:
+      213: 8457421916308538992
+    second: 12HangedMan_29
+  - first:
+      213: -8433100739180042835
+    second: 12HangedMan_30
+  - first:
+      213: 1222430724676758303
+    second: 12HangedMan_31
+  - first:
+      213: -5665387274909845197
+    second: 12HangedMan_32
+  - first:
+      213: -2622503293361618119
+    second: 12HangedMan_33
+  - first:
+      213: -4912973843418724149
+    second: 12HangedMan_34
+  - first:
+      213: -7669874264370355307
+    second: 12HangedMan_35
+  - first:
+      213: -7593088280409683176
+    second: 12HangedMan_36
+  - first:
+      213: 3799848856508753070
+    second: 12HangedMan_37
+  - first:
+      213: -4593168823625753457
+    second: 12HangedMan_38
+  - first:
+      213: -3188088493026080830
+    second: 12HangedMan_39
+  - first:
+      213: -1682226140744209737
+    second: 12HangedMan_40
+  - first:
+      213: 3064565761224633845
+    second: 12HangedMan_41
+  - first:
+      213: 253170545597345815
+    second: 12HangedMan_42
+  - first:
+      213: -4443600176901917580
+    second: 12HangedMan_43
+  - first:
+      213: 2755092375918649960
+    second: 12HangedMan_44
+  - first:
+      213: 3435506303535590926
+    second: 12HangedMan_45
+  - first:
+      213: 1356423861748825826
+    second: 12HangedMan_46
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +238,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 12_0
+      name: 04Emperor_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 73
-        height: 113
+        width: 1520
+        height: 2420
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 69e6a18ee6e4f9ae0800000000000000
-      internalID: -1540426309290004842
+      spriteID: 3b641b6d83ddc5b478d804051da88349
+      internalID: -1109167291
       vertices: []
       indices: 
       edges: []
@@ -125,7 +263,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 0e831cd78e7cfec4d8c99e8939b38d31
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +273,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      12_0: -1540426309290004842
+      04Emperor_0: -1109167291
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

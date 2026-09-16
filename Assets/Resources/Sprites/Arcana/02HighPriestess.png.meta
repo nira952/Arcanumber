@@ -3,8 +3,341 @@ guid: 5c1e6425ada44014caf9678f6c154a4a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5225540622116197949
-    second: 02_0
+      213: -8496341857107223867
+    second: 02HighPriestess_0
+  - first:
+      213: -6268128678069948784
+    second: 02HighPriestess_1
+  - first:
+      213: 2266285460267877600
+    second: 02HighPriestess_2
+  - first:
+      213: -6105974764941457740
+    second: 02HighPriestess_3
+  - first:
+      213: -3083062009714823304
+    second: 02HighPriestess_4
+  - first:
+      213: 3694338097394956731
+    second: 02HighPriestess_5
+  - first:
+      213: 9162103666366632449
+    second: 02HighPriestess_6
+  - first:
+      213: 6736398948069125919
+    second: 02HighPriestess_7
+  - first:
+      213: -5456638840784260875
+    second: 02HighPriestess_8
+  - first:
+      213: -6665650563764955652
+    second: 02HighPriestess_9
+  - first:
+      213: -7719749304004118048
+    second: 02HighPriestess_10
+  - first:
+      213: -1668461106198581076
+    second: 02HighPriestess_11
+  - first:
+      213: -7337654119122934899
+    second: 02HighPriestess_12
+  - first:
+      213: 2274083681428704399
+    second: 02HighPriestess_13
+  - first:
+      213: -1270437073952783370
+    second: 02HighPriestess_14
+  - first:
+      213: 5587746631889374229
+    second: 02HighPriestess_15
+  - first:
+      213: -5332475372882676622
+    second: 02HighPriestess_16
+  - first:
+      213: -1808126814077768308
+    second: 02HighPriestess_17
+  - first:
+      213: 1303379518073289082
+    second: 02HighPriestess_18
+  - first:
+      213: 6329143027338642299
+    second: 02HighPriestess_19
+  - first:
+      213: 4196485686572485282
+    second: 02HighPriestess_20
+  - first:
+      213: -4501016791224156230
+    second: 02HighPriestess_21
+  - first:
+      213: 7344751455918654739
+    second: 02HighPriestess_22
+  - first:
+      213: -5353258861694563489
+    second: 02HighPriestess_23
+  - first:
+      213: 1882123216628260273
+    second: 02HighPriestess_24
+  - first:
+      213: -1671000917684821415
+    second: 02HighPriestess_25
+  - first:
+      213: -4805324524537978862
+    second: 02HighPriestess_26
+  - first:
+      213: 2355443801827444900
+    second: 02HighPriestess_27
+  - first:
+      213: -4480486547097752885
+    second: 02HighPriestess_28
+  - first:
+      213: 9099659925548795867
+    second: 02HighPriestess_29
+  - first:
+      213: 2937808590228090244
+    second: 02HighPriestess_30
+  - first:
+      213: 7953322700896223959
+    second: 02HighPriestess_31
+  - first:
+      213: 7032541421865915458
+    second: 02HighPriestess_32
+  - first:
+      213: 5792864426602748690
+    second: 02HighPriestess_33
+  - first:
+      213: 3868206596634627354
+    second: 02HighPriestess_34
+  - first:
+      213: 5932170319849342192
+    second: 02HighPriestess_35
+  - first:
+      213: 4243362298910674278
+    second: 02HighPriestess_36
+  - first:
+      213: 1135559853684363704
+    second: 02HighPriestess_37
+  - first:
+      213: -8100259762591346395
+    second: 02HighPriestess_38
+  - first:
+      213: 7921454789852208754
+    second: 02HighPriestess_39
+  - first:
+      213: -9063603936439892924
+    second: 02HighPriestess_40
+  - first:
+      213: -9077393197082743714
+    second: 02HighPriestess_41
+  - first:
+      213: 1745403061298354736
+    second: 02HighPriestess_42
+  - first:
+      213: -8228767287658576499
+    second: 02HighPriestess_43
+  - first:
+      213: 636419300346236587
+    second: 02HighPriestess_44
+  - first:
+      213: 6018711159662348072
+    second: 02HighPriestess_45
+  - first:
+      213: 6806680807492665064
+    second: 02HighPriestess_46
+  - first:
+      213: -3525790872619306039
+    second: 02HighPriestess_47
+  - first:
+      213: 3696964373586638611
+    second: 02HighPriestess_48
+  - first:
+      213: -6419885660710596958
+    second: 02HighPriestess_49
+  - first:
+      213: 6440682715385365085
+    second: 02HighPriestess_50
+  - first:
+      213: 2315626601897639651
+    second: 02HighPriestess_51
+  - first:
+      213: -5234098628648769676
+    second: 02HighPriestess_52
+  - first:
+      213: -2675453093570501420
+    second: 02HighPriestess_53
+  - first:
+      213: 4855361489997525007
+    second: 02HighPriestess_54
+  - first:
+      213: -1484933768067897470
+    second: 02HighPriestess_55
+  - first:
+      213: -3085273973715889994
+    second: 02HighPriestess_56
+  - first:
+      213: -6045430907326972243
+    second: 02HighPriestess_57
+  - first:
+      213: -2768307801780925256
+    second: 02HighPriestess_58
+  - first:
+      213: -8666995927958765436
+    second: 02HighPriestess_59
+  - first:
+      213: -7374471563729989981
+    second: 02HighPriestess_60
+  - first:
+      213: 7456588341725510625
+    second: 02HighPriestess_61
+  - first:
+      213: 3527255751881430980
+    second: 02HighPriestess_62
+  - first:
+      213: 893086914264282111
+    second: 02HighPriestess_63
+  - first:
+      213: -4281549840295263950
+    second: 02HighPriestess_64
+  - first:
+      213: -6799261503675911214
+    second: 02HighPriestess_65
+  - first:
+      213: -3274662291969638446
+    second: 02HighPriestess_66
+  - first:
+      213: -4801273326183568226
+    second: 02HighPriestess_67
+  - first:
+      213: 2090339634331450311
+    second: 02HighPriestess_68
+  - first:
+      213: 3633959437443427873
+    second: 02HighPriestess_69
+  - first:
+      213: 4321221714271997429
+    second: 02HighPriestess_70
+  - first:
+      213: 9086976366425201378
+    second: 02HighPriestess_71
+  - first:
+      213: -5568369428093446331
+    second: 02HighPriestess_72
+  - first:
+      213: 5999230914012701368
+    second: 02HighPriestess_73
+  - first:
+      213: -8775930812769085695
+    second: 02HighPriestess_74
+  - first:
+      213: -8144681877138024732
+    second: 02HighPriestess_75
+  - first:
+      213: -7750286544551726948
+    second: 02HighPriestess_76
+  - first:
+      213: 7665965003560280282
+    second: 02HighPriestess_77
+  - first:
+      213: 489751565202244685
+    second: 02HighPriestess_78
+  - first:
+      213: -7522634392895959165
+    second: 02HighPriestess_79
+  - first:
+      213: 2140361159966966758
+    second: 02HighPriestess_80
+  - first:
+      213: -8451540801060161191
+    second: 02HighPriestess_81
+  - first:
+      213: 166407493003378307
+    second: 02HighPriestess_82
+  - first:
+      213: -2598740873055246330
+    second: 02HighPriestess_83
+  - first:
+      213: -2098136590714850285
+    second: 02HighPriestess_84
+  - first:
+      213: 6562134717155604908
+    second: 02HighPriestess_85
+  - first:
+      213: 254711025654388639
+    second: 02HighPriestess_86
+  - first:
+      213: -159543401468846796
+    second: 02HighPriestess_87
+  - first:
+      213: -2180016997228799897
+    second: 02HighPriestess_88
+  - first:
+      213: 369126888077537027
+    second: 02HighPriestess_89
+  - first:
+      213: 1503435129960554004
+    second: 02HighPriestess_90
+  - first:
+      213: -5347015986647746165
+    second: 02HighPriestess_91
+  - first:
+      213: -721027407226525104
+    second: 02HighPriestess_92
+  - first:
+      213: -7075761924093774349
+    second: 02HighPriestess_93
+  - first:
+      213: -8556667906093784778
+    second: 02HighPriestess_94
+  - first:
+      213: -6027910445889297603
+    second: 02HighPriestess_95
+  - first:
+      213: 8942409005201336625
+    second: 02HighPriestess_96
+  - first:
+      213: 1697936402339084096
+    second: 02HighPriestess_97
+  - first:
+      213: 3031882082631041040
+    second: 02HighPriestess_98
+  - first:
+      213: -1748788751187603114
+    second: 02HighPriestess_99
+  - first:
+      213: 6486498342590590734
+    second: 02HighPriestess_100
+  - first:
+      213: 7931893094478814765
+    second: 02HighPriestess_101
+  - first:
+      213: 8361518294912784060
+    second: 02HighPriestess_102
+  - first:
+      213: -7960900385287443502
+    second: 02HighPriestess_103
+  - first:
+      213: 7433210341722221407
+    second: 02HighPriestess_104
+  - first:
+      213: -5622299919769190816
+    second: 02HighPriestess_105
+  - first:
+      213: 1999757042954170408
+    second: 02HighPriestess_106
+  - first:
+      213: 5064032532337466447
+    second: 02HighPriestess_107
+  - first:
+      213: -8640673268317630938
+    second: 02HighPriestess_108
+  - first:
+      213: 7672622455262036585
+    second: 02HighPriestess_109
+  - first:
+      213: 7047413241577774486
+    second: 02HighPriestess_110
+  - first:
+      213: 7811581725931303070
+    second: 02HighPriestess_111
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +433,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 02_0
+      name: 02HighPriestess_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 73
-        height: 113
+        width: 1520
+        height: 2420
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 3c9e3638d762b77b0800000000000000
-      internalID: -5225540622116197949
+      spriteID: 319a1002e557e4144bb56ef84fe7c856
+      internalID: 767737561
       vertices: []
       indices: 
       edges: []
@@ -125,7 +458,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 8ebd2e54998c9b04ebac235fbc7dd4da
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +468,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      02_0: -5225540622116197949
+      02HighPriestess_0: 767737561
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

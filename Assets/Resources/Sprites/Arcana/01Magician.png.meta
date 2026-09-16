@@ -3,8 +3,284 @@ guid: 20015132122a3ae4fa43e66cf705c58d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3164809056393425246
-    second: 01_0
+      213: -6348046346463585936
+    second: 01Magician_0
+  - first:
+      213: -7125364324018379840
+    second: 01Magician_1
+  - first:
+      213: 6311942934182302193
+    second: 01Magician_2
+  - first:
+      213: -3604853445347528770
+    second: 01Magician_3
+  - first:
+      213: -8921294576178886424
+    second: 01Magician_4
+  - first:
+      213: -532633705841692434
+    second: 01Magician_5
+  - first:
+      213: -7069092532418016434
+    second: 01Magician_6
+  - first:
+      213: -1428344162494195799
+    second: 01Magician_7
+  - first:
+      213: 866325672561842940
+    second: 01Magician_8
+  - first:
+      213: 6394776799358568228
+    second: 01Magician_9
+  - first:
+      213: 7406683151826897957
+    second: 01Magician_10
+  - first:
+      213: -8008026572373780681
+    second: 01Magician_11
+  - first:
+      213: -1986448524269369391
+    second: 01Magician_12
+  - first:
+      213: 6067843872477461463
+    second: 01Magician_13
+  - first:
+      213: -762414725920381111
+    second: 01Magician_14
+  - first:
+      213: 2165223580285294768
+    second: 01Magician_15
+  - first:
+      213: -3765138253478797409
+    second: 01Magician_16
+  - first:
+      213: -8114641312445655323
+    second: 01Magician_17
+  - first:
+      213: -2668835889869428385
+    second: 01Magician_18
+  - first:
+      213: 4160917573966978731
+    second: 01Magician_19
+  - first:
+      213: -4982198716259062407
+    second: 01Magician_20
+  - first:
+      213: 6614518427873170752
+    second: 01Magician_21
+  - first:
+      213: -8588630206928042504
+    second: 01Magician_22
+  - first:
+      213: -1422402754035836911
+    second: 01Magician_23
+  - first:
+      213: 3591114999041511180
+    second: 01Magician_24
+  - first:
+      213: 4910477571476410237
+    second: 01Magician_25
+  - first:
+      213: -2609237465277126192
+    second: 01Magician_26
+  - first:
+      213: 3426183800053373818
+    second: 01Magician_27
+  - first:
+      213: 4174339341822385434
+    second: 01Magician_28
+  - first:
+      213: -343293508669786957
+    second: 01Magician_29
+  - first:
+      213: 2609285492000788568
+    second: 01Magician_30
+  - first:
+      213: -2423016595694825351
+    second: 01Magician_31
+  - first:
+      213: -8277670928027011354
+    second: 01Magician_32
+  - first:
+      213: 1310434102626373939
+    second: 01Magician_33
+  - first:
+      213: 6039384235864201678
+    second: 01Magician_34
+  - first:
+      213: -5876323285312350834
+    second: 01Magician_35
+  - first:
+      213: -3813808020609336603
+    second: 01Magician_36
+  - first:
+      213: -1150934466234447416
+    second: 01Magician_37
+  - first:
+      213: -4438169343713492291
+    second: 01Magician_38
+  - first:
+      213: -6589244886424037125
+    second: 01Magician_39
+  - first:
+      213: -2369840601149600508
+    second: 01Magician_40
+  - first:
+      213: 5710512221658587318
+    second: 01Magician_41
+  - first:
+      213: -3609093386321056079
+    second: 01Magician_42
+  - first:
+      213: -9125678629103254093
+    second: 01Magician_43
+  - first:
+      213: -4104194330984268854
+    second: 01Magician_44
+  - first:
+      213: 3202676354373083479
+    second: 01Magician_45
+  - first:
+      213: 4494109844636343496
+    second: 01Magician_46
+  - first:
+      213: -8697224112651324128
+    second: 01Magician_47
+  - first:
+      213: -3238717451014598298
+    second: 01Magician_48
+  - first:
+      213: -8632437543708029940
+    second: 01Magician_49
+  - first:
+      213: 5466084290286091579
+    second: 01Magician_50
+  - first:
+      213: -1051809643531654362
+    second: 01Magician_51
+  - first:
+      213: 6033313193380345883
+    second: 01Magician_52
+  - first:
+      213: -1962377517245430962
+    second: 01Magician_53
+  - first:
+      213: -4822272857244234387
+    second: 01Magician_54
+  - first:
+      213: 7684937824912774104
+    second: 01Magician_55
+  - first:
+      213: -6837596831412602876
+    second: 01Magician_56
+  - first:
+      213: -8775333582604770632
+    second: 01Magician_57
+  - first:
+      213: 4289895433586667718
+    second: 01Magician_58
+  - first:
+      213: -4388590241638213218
+    second: 01Magician_59
+  - first:
+      213: 3723502941302738119
+    second: 01Magician_60
+  - first:
+      213: -855870513666466288
+    second: 01Magician_61
+  - first:
+      213: -4722211029671598327
+    second: 01Magician_62
+  - first:
+      213: 1276233759379297308
+    second: 01Magician_63
+  - first:
+      213: 3254821269603676236
+    second: 01Magician_64
+  - first:
+      213: -5765785859891481479
+    second: 01Magician_65
+  - first:
+      213: -2460557043154280488
+    second: 01Magician_66
+  - first:
+      213: -6191945109153872959
+    second: 01Magician_67
+  - first:
+      213: 8387245677970895240
+    second: 01Magician_68
+  - first:
+      213: 6965895056896218785
+    second: 01Magician_69
+  - first:
+      213: 4033682925976148237
+    second: 01Magician_70
+  - first:
+      213: 3979567870554980551
+    second: 01Magician_71
+  - first:
+      213: 3938287940981075892
+    second: 01Magician_72
+  - first:
+      213: 4243495944086019428
+    second: 01Magician_73
+  - first:
+      213: 6876367623095575172
+    second: 01Magician_74
+  - first:
+      213: -8727270046379680567
+    second: 01Magician_75
+  - first:
+      213: -8535662963349657943
+    second: 01Magician_76
+  - first:
+      213: 7796710951038606348
+    second: 01Magician_77
+  - first:
+      213: 442280788702257205
+    second: 01Magician_78
+  - first:
+      213: 5810790636708067897
+    second: 01Magician_79
+  - first:
+      213: 7410935822162805897
+    second: 01Magician_80
+  - first:
+      213: 7491303167131193975
+    second: 01Magician_81
+  - first:
+      213: 8802635988521822586
+    second: 01Magician_82
+  - first:
+      213: -5570915619221600327
+    second: 01Magician_83
+  - first:
+      213: 630712318707512322
+    second: 01Magician_84
+  - first:
+      213: 8516204608967364934
+    second: 01Magician_85
+  - first:
+      213: -3149096145989103254
+    second: 01Magician_86
+  - first:
+      213: 8573141953188206858
+    second: 01Magician_87
+  - first:
+      213: 5942084119788429328
+    second: 01Magician_88
+  - first:
+      213: 4295112372428724178
+    second: 01Magician_89
+  - first:
+      213: 2980094877904284647
+    second: 01Magician_90
+  - first:
+      213: 3783028424848162253
+    second: 01Magician_91
+  - first:
+      213: 6730328095215556222
+    second: 01Magician_92
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +376,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 01_0
+      name: 01Magician_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 73
-        height: 113
+        width: 1520
+        height: 2420
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 2ae0bbb5ee65414d0800000000000000
-      internalID: -3164809056393425246
+      spriteID: 76154d3b2a8238645b4897726415078c
+      internalID: 267375350
       vertices: []
       indices: 
       edges: []
@@ -125,7 +401,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 6a691429efafaca4291cf98d667b4bca
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +411,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      01_0: -3164809056393425246
+      01Magician_0: 267375350
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
