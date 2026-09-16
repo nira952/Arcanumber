@@ -32585,7 +32585,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7973058405530808456}
   - component: {fileID: 5135148202314220203}
-  - component: {fileID: 2970743020818639320}
   - component: {fileID: 3113410975312320656}
   m_Layer: 7
   m_Name: EffectCamera
@@ -34977,14 +34976,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &2970743020818639320
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2161254064254852324}
-  m_Enabled: 1
 --- !u!4 &2984325374671169768
 Transform:
   m_ObjectHideFlags: 0

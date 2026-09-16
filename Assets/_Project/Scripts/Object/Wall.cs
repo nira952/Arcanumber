@@ -7,6 +7,7 @@ public class Wall : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        return;
         if(collision.tag != "Ground")
             Destroy(collision.gameObject);
     }

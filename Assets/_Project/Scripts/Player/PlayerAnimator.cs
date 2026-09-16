@@ -51,7 +51,7 @@ public class PlayerAnimator : NetworkBehaviour
     /// <summary>
     /// PlayerRoot から初期化され、入力・状態ストリームを購読する
     /// </summary>
-    public void Initialize(PlayerRoot root, PlayerInputController inputController,int playerIndex,IPlayerActionHandler actionHandler)
+    public void Initialize(PlayerRoot root, IPlayerInputHandler inputController,int playerIndex,IPlayerActionHandler actionHandler)
     {
         // playerIndex が配列の範囲外になっていないかチェック
         if (playerIndex < 0 || playerIndex >= animatorControllers.Length)

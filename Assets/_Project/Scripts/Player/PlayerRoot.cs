@@ -18,7 +18,6 @@ public class PlayerRoot : MonoBehaviour
     public ReactiveProperty<int> SelectedSkillIndex { get; } = new(0);
 
     [Header("Components")]
-    [SerializeField] private PlayerInputController inputController;
     [SerializeField] private PlayerMovement movement;
     [SerializeField] private PlayerRayInput rayInput;
     [SerializeField] private PlayerActionController actionController;
@@ -46,16 +45,17 @@ public class PlayerRoot : MonoBehaviour
     public ReactiveProperty<List<EffectAbility>> ActiveEffects { get; } = new(new List<EffectAbility>());
 
     private IPlayerActionHandler actionHandler;
-
+    private IPlayerInputHandler inputController;
 
     [SerializeField] bool previewInput = false;
 
     /// <summary>
     /// コントローラー（オフライン/オンライン）から呼ばれる初期化処理
     /// </summary>
-    public void Initialize(IPlayerActionHandler handler)
+    public void Initialize(IPlayerActionHandler handler, IPlayerInputHandler inputHandler)
     {
         actionHandler = handler;         // IPlayerActionHandler を保持
+        inputController = inputHandler;  // IPlayerInputHandler を保持
 
 
         CurrentArcana = PlayerDataManager.Instance.GetMyArcana();
@@ -102,6 +102,7 @@ public class PlayerRoot : MonoBehaviour
             {
                 if (!IsMove.Value) return;
                 float finalInput = !IsChangeMove.Value ? rawInput : -rawInput;
+
                 movement.SetMoveInput(finalInput);
             }).AddTo(this);
 

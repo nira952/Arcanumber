@@ -1,11 +1,14 @@
 using nira.Demo;
 using R3;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerRoot))]
 public class PlayerOfflineController : MonoBehaviour, IPlayerActionHandler
 {
     private PlayerRoot root;
+
+    private NetworkPlayer player;
 
     public bool CanProcessInput
     {
@@ -20,41 +23,72 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerActionHandler
     private void Awake()
     {
         root = GetComponent<PlayerRoot>();
+        player = GetComponent<NetworkPlayer>();
+
     }
 
     private void Start()
     {
-        // オフライン用 UI更新処理（PlayerIndexは便宜上0など固定で割り当てる）
+        // --- UIの初期化 ---
+
+        if (GameUIManager.Instance == null)
+        {
+            Debug.LogWarning("GameUIManager is not found in the scene.");
+            return;
+        }
+
+        // UIManagerのインスタンスを取得
+        GameUIManager uIManager = GameUIManager.Instance;
+
+        // プレイヤーの名前と体力バーの初期化
         root.PlayerIndex.Value = 0;
 
         root.PlayerIndex.Where(idx => idx != -1).Take(1).Subscribe(idx =>
         {
-            if (GameUIManager.Instance != null)
+            string playerName = PlayerDataManager.Instance.GetPlayerNameByIndex(idx);
+
+            uIManager.SetPlayerName(idx, playerName);
+            uIManager.SetHealthSliderMaxValue(idx, 100);
+        }).AddTo(this);
+
+        root.CurrentHealth.Subscribe(hp =>
+        {
+            if (root.PlayerIndex.Value != -1)
             {
-                string playerName = PlayerDataManager.Instance.GetPlayerNameByIndex(idx);
-
-
-                GameUIManager.Instance.SetPlayerName(idx, playerName);
-                GameUIManager.Instance.SetHealthSliderMaxValue(idx, 100);
+                uIManager.UpdateHealth(root.PlayerIndex.Value, hp);
             }
         }).AddTo(this);
 
-        root.CurrentHealth.Subscribe(hp => {
-            if (root.PlayerIndex.Value != -1 && GameUIManager.Instance != null)
-            {
-                GameUIManager.Instance.UpdateHealth(root.PlayerIndex.Value, hp);
-            }
-        }).AddTo(this);
+        PlayerInputController inputController = GetComponent<PlayerInputController>();
+
+        root.Initialize(this, inputController);
     }
 
-    // オフライン時は自分自身に直接ダメージ処理を行う
+    // --- ダメージ処理の要求 ---
     public void RequestTakeDamage(int damage)
     {
-        root.ApplyDamage(damage);
+        root.ApplyDamage(damage); // 直接処理
     }
 
-    public void RequestJump() => root.GetActionController().ExecuteJumpLocal();
-    public void RequestAttack() => root.GetActionController().ExecuteAttackLocal();
+    // --- 各アクション処理 ---
+    public void RequestJump()
+    {
+        root.GetActionController().ExecuteJumpLocal(); // ローカルでジャンプ処理を実行
+    }
+
+    public void RequestAttack()
+    {
+        root.GetActionController().ExecuteAttackLocal();
+        player.UseAttack(); // 攻撃のアクションを呼び出す
+
+    }
+
     public void RequestSkillSelect(int direction) => root.GetActionController().ExecuteSkillSelectLocal(direction);
-    public void RequestSkillUse() => root.GetActionController().ExecuteSkillUseLocal();
+
+    public void RequestSkillUse()
+    {
+        player.UseCurrentSkill(); // スキルのアクションを呼び出す
+
+
+    }
 }

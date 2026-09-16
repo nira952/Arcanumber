@@ -7,7 +7,7 @@ using UnityEngine;
 /// </summary>
 public class PlayerSpawner : NetworkBehaviour
 {
-    [SerializeField] private bool isLocalMode = false; // デバッグ・オフラインモードフラグ
+    [SerializeField] private bool isLocalMode = false; // オフラインモードフラグ
     [SerializeField] private Transform[] spawnPoints;   // 各プレイヤーの初期位置
     [SerializeField] private PlayerRoot playerPrefab;   // 生成するプレイヤーのプレハブ
 
@@ -115,17 +115,30 @@ public class PlayerSpawner : NetworkBehaviour
     /// </summary>
     private void SpawnPlayerOffline()
     {
-        int defaultIndex = 0;
+        int playerIndex = 0;
 
-        Transform spawnPoint = GetSpawnPoint(defaultIndex);
+        Transform spawnPoint = GetSpawnPoint(playerIndex);
         PlayerRoot spawnedPlayer = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
 
         GameManager.Instance.RegisterPlayer(spawnedPlayer);
 
         PlayerOfflineController controller = spawnedPlayer.gameObject.AddComponent<PlayerOfflineController>();
-        spawnedPlayer.Initialize(controller);
 
         Debug.Log("[PlayerSpawner] PlayerOfflineController をアタッチし、オフライン生成を完了しました。");
+
+
+        // オフラインモードでは、敵プレイヤーも生成する
+
+        int enemyIndex = 1;
+        Transform enemySpawnPoint = GetSpawnPoint(enemyIndex);
+        PlayerRoot spawnedEnemy = Instantiate(playerPrefab, enemySpawnPoint.position, enemySpawnPoint.rotation);
+
+        GameManager.Instance.RegisterPlayer(spawnedEnemy);
+
+        PlayerAutoController enemyController = spawnedEnemy.gameObject.AddComponent<PlayerAutoController>();
+
+        Debug.Log("[PlayerSpawner] PlayerAutoController をアタッチし、オフライン敵生成を完了しました。");
+
     }
 
     /// <summary>

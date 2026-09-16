@@ -18,12 +18,14 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
     private readonly NetworkVariable<bool> netIsDown = new(false);
     private readonly NetworkList<NetworkEffectData> netActiveEffects = new NetworkList<NetworkEffectData>();
 
-    // 入力受付用（ローカル操作者専用）
+    // 自分のプレイヤーを操作できるかどうかを判定するプロパティ
     public bool CanProcessInput
     {
         get
         {
+            // ネットワーク未生成、または所有者でない場合は入力を受け付けない
             if (!IsSpawned || !IsOwner) return false;
+            // ゲーム状態がPlaying かつ ダウンしていない時のみ入力を許可
             if (GameManager.Instance != null && GameManager.Instance.CurrentState.Value != GameState.Playing) return false;
             return !root.IsDown.Value;
         }
@@ -31,6 +33,12 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
 
     private void Awake()
     {
+        if (PlayerDataManager.Instance.IsLocalMode)
+        {
+            Destroy(this); // ローカルモードではこのコンポーネントを破棄
+            return;
+        }
+
         root = GetComponent<PlayerRoot>();
         player = GetComponent<NetworkPlayer>();
         rigidbody2D = GetComponent<Rigidbody2D>();
@@ -47,10 +55,13 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
 
     public override void OnNetworkSpawn()
     {
+        PlayerInputController playerIController = GetComponent<PlayerInputController>();
+
         // 所有者でない場合、Inputコンポーネントを停止
         if (!IsOwner)
         {
-            var playerInput = GetComponent<PlayerInput>();
+            if (playerIController != null) playerIController.enabled = false;
+            PlayerInput playerInput = GetComponent<PlayerInput>();
             if (playerInput != null) playerInput.enabled = false;
             root.gameObject.tag = "Enemy";
         }
@@ -65,7 +76,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
             root.PlayerIndex.Subscribe(v => netPlayerIndex.Value = v).AddTo(this);
             root.CurrentHealth.Subscribe(v => netCurrentHealth.Value = v).AddTo(this);
 
-            // 【修正箇所 1】サーバー側で IsDown が変更されたら NetworkVariable に同期し、勝敗判定を行う
+            // サーバー側で IsDown が変更されたら NetworkVariable に同期し、勝敗判定を行う
             root.IsDown.Subscribe(v =>
             {
                 netIsDown.Value = v;
@@ -106,7 +117,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
                 h => netCurrentHealth.OnValueChanged -= h
             ).Prepend(netCurrentHealth.Value).Subscribe(v => root.CurrentHealth.Value = v).AddTo(this);
 
-            // 【修正箇所 2】クライアント側は root.IsDown の同期のみを行う
+            // クライアント側は root.IsDown の同期のみを行う
             Observable.FromEvent<NetworkVariable<bool>.OnValueChangedDelegate, bool>(
                 h => (oldV, newV) => h(newV),
                 h => netIsDown.OnValueChanged += h,
@@ -131,7 +142,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
         }).AddTo(this);
 
         
-        root.Initialize(this);
+        root.Initialize(this, playerIController);
     }
 
 
@@ -231,7 +242,6 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
 
         foreach (var netData in netActiveEffects)
         {
-            // ★ 作成いただいた EffectRegistry.Get を呼び出してSOを取得！
             Effect effectSO = EffectRegistry.Get(netData.EffectType, netData.IsUp);
 
             if (effectSO != null)

@@ -170,3 +170,4 @@ public struct NetworkEffectData : INetworkSerializable, IEquatable<NetworkEffect
                Value == other.Value;
     }
 }
+

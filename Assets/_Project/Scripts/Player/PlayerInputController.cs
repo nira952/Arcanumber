@@ -6,7 +6,7 @@ using R3;
 /// <summary>
 /// 入力を検知し、R3のストリームとして発行するクラス
 /// </summary>
-public class PlayerInputController : NetworkBehaviour
+public class PlayerInputController : NetworkBehaviour , IPlayerInputHandler
 {
     private readonly Subject<float> moveSubject = new();
     public Observable<float> OnMoveAsObservable => moveSubject;
@@ -35,7 +35,7 @@ public class PlayerInputController : NetworkBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        Debug.Log($"[PlayerInputController] OnMove called with value: {context.ReadValue<float>()}");
+        //Debug.Log($"[PlayerInputController] OnMove called with value: {context.ReadValue<float>()}");
         moveSubject.OnNext(context.ReadValue<float>());
     }
 
