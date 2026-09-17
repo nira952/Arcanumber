@@ -182,7 +182,7 @@ public class ArcanaUIManager : MonoBehaviour
     /// <param name="myCards"></param>
     /// <param name="arcanaDatabase"></param>
     /// <param name="backSprite"></param>
-    public void BuildCardsUI(IEnumerable<ArcanaSelectManager.ArcanaCard> myCards, List<Arcana> arcanaDatabase, Sprite backSprite)
+    public void BuildCardsUI(IEnumerable<ArcanaSelectManager.ArcanaCard> myCards, List<Arcana> arcanaDatabase, Sprite backSprite, Sprite glowSprite)
     {
         foreach (Transform child in cardDisplayParent)
         {
@@ -349,9 +349,7 @@ public class ArcanaUIManager : MonoBehaviour
             chosenIndices.Add(randomIndex);
 
             animationCards[randomIndex].sprite = cardSprite;
-            GameObject glow = Instantiate(glowCard, animationCards[randomIndex].transform.position, Quaternion.identity, animationCards[randomIndex].transform);
-            glow.GetComponent<Image>().sprite = glowSprite;
-            //animationCards[randomIndex].glowColor = glowColor;
+            //animationCards[randomIndex].backImage.sprite = backSprite;
 
             await UniTask.Delay(System.TimeSpan.FromSeconds(0.3f), cancellationToken: token);
 

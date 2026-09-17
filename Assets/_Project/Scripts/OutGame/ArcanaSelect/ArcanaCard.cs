@@ -57,7 +57,6 @@ public class ArcanaCard : MonoBehaviour
     {
         frontImage.sprite = frontSprite;
         backImage.sprite = backSprite;
-        //frontImage.glowColor = glowColor;
         BackGlowImage.sprite = glowColor;
 
         if (!isFront)
