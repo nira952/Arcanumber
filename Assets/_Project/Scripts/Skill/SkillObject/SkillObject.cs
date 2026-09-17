@@ -16,8 +16,6 @@ public class SkillObject : MagicObject
         //発射元の決定
         Vector2 spawnPos = player.transform.position;
 
-        CommonInitialize(charaNo, finalDmg);
-
         keepTime = skill.GetKeepTime();
         moveSpeed = skill.GetMoveSpeed();
         isMoving = (moveSpeed > 0);
@@ -25,6 +23,9 @@ public class SkillObject : MagicObject
         reflectCount = skill.GetReflectCount();
         useAnimationEndEvent = skill.GetEffectAnimation() != null;
         effect = skill.GetEffect();
+        se = skill.GetSe();
+
+        CommonInitialize(charaNo, finalDmg);
 
         // 移動するかどうかで配置・向きを決定
         SetupPositionAndRotation(spawnPos, targetPos);
