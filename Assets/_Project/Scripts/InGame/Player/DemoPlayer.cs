@@ -33,11 +33,6 @@ namespace nira.Demo
                 //MoveLocal(Vector3.forward);
             }
 
-            // ダメージ処理：オンライン時はRpc通信が必要なので、インターフェースに委譲する
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                actionHandler.RequestTakeDamage(10);
-            }
         }
         /// <summary>
         /// 【ローカル/サーバー共通】純粋に自分の値を減らすロジック

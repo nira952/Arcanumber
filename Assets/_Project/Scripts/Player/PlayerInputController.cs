@@ -62,6 +62,16 @@ public class PlayerInputController : NetworkBehaviour , IPlayerInputHandler
         if (context.performed) skillUseSubject.OnNext(Unit.Default);
     }
 
+    public void ExecuteAttackLocal()
+    {
+        attackSubject.OnNext(Unit.Default);
+    }
+
+    public void ExecuteSkillUseLocal()
+    {
+        skillUseSubject.OnNext(Unit.Default);
+    }
+
     private void OnDestroy()
     {
         moveSubject.Dispose();

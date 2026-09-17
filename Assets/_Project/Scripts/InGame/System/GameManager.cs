@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using NPOI.SS.Formula.Functions;
 using R3;
 using System;
 using System.Collections.Generic;
@@ -361,8 +360,7 @@ namespace nira.Demo
             else
             {
                 // 複数人が生存している場合、最も体力の多いプレイヤーを探す
-                // 【注意】 PlayerRoot の体力プロパティ名（例: CurrentHealth.Value）に合わせて以下のプロパティを書き換えてください
-                int maxHp = alivePlayers.Max(p => p.CurrentHealth.Value);
+                float maxHp = alivePlayers.Max(p => p.CurrentHealth.Value);
 
                 // 最大HPを持つプレイヤーのリストを取得（同値による引き分けを考慮）
                 var topPlayers = alivePlayers.Where(p => p.CurrentHealth.Value == maxHp).ToList();

@@ -96,7 +96,7 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
     /// <summary>
     /// 指定したプレイヤーの体力スライダーの最大値を設定する
     /// </summary>
-    public void SetHealthSliderMaxValue(int playerIndex, int maxHealth)
+    public void SetHealthSliderMaxValue(int playerIndex, float maxHealth)
     {
         if (playerIndex < 0 || playerIndex >= healthSliders.Length) return;
 
@@ -110,7 +110,7 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
     /// <summary>
     /// 指定したプレイヤーの体力スライダーの値を更新する
     /// </summary>
-    public void UpdateHealth(int playerIndex, int health)
+    public void UpdateHealth(int playerIndex, float health)
     {
         if (playerIndex < 0 || playerIndex >= healthSliders.Length) return;
         healthSliders[playerIndex].value = health;

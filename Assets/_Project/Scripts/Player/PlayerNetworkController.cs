@@ -10,11 +10,12 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
 {
     private PlayerRoot root;
     private NetworkPlayer player;
+    private PlayerInputController inputController;
 
     private Rigidbody2D rigidbody2D;
 
     private readonly NetworkVariable<int> netPlayerIndex = new(-1);
-    private readonly NetworkVariable<int> netCurrentHealth = new(100);
+    private readonly NetworkVariable<float> netCurrentHealth = new(100);
     private readonly NetworkVariable<bool> netIsDown = new(false);
     private readonly NetworkList<NetworkEffectData> netActiveEffects = new NetworkList<NetworkEffectData>();
 
@@ -55,12 +56,12 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
 
     public override void OnNetworkSpawn()
     {
-        PlayerInputController playerIController = GetComponent<PlayerInputController>();
+        inputController = GetComponent<PlayerInputController>();
 
         // 所有者でない場合、Inputコンポーネントを停止
         if (!IsOwner)
         {
-            if (playerIController != null) playerIController.enabled = false;
+            if (inputController != null) inputController.enabled = false;
             PlayerInput playerInput = GetComponent<PlayerInput>();
             if (playerInput != null) playerInput.enabled = false;
             root.gameObject.tag = "Enemy";
@@ -73,6 +74,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
             int assignedIndex = PlayerDataManager.Instance.GetLobbyIndexByClientId(OwnerClientId);
             root.PlayerIndex.Value = assignedIndex;
 
+            // サーバー側で ReactiveProperty の変更を NetworkVariable に同期
             root.PlayerIndex.Subscribe(v => netPlayerIndex.Value = v).AddTo(this);
             root.CurrentHealth.Subscribe(v => netCurrentHealth.Value = v).AddTo(this);
 
@@ -111,7 +113,8 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
                 h => netPlayerIndex.OnValueChanged -= h
             ).Prepend(netPlayerIndex.Value).Subscribe(v => root.PlayerIndex.Value = v).AddTo(this);
 
-            Observable.FromEvent<NetworkVariable<int>.OnValueChangedDelegate, int>(
+            // クライアント側は root.CurrentHealth の同期のみを行う
+            Observable.FromEvent<NetworkVariable<float>.OnValueChangedDelegate, float>(
                 h => (oldV, newV) => h(newV),
                 h => netCurrentHealth.OnValueChanged += h,
                 h => netCurrentHealth.OnValueChanged -= h
@@ -142,7 +145,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
         }).AddTo(this);
 
         
-        root.Initialize(this, playerIController);
+        root.Initialize(this, inputController);
     }
 
 
@@ -156,44 +159,25 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
         GameUIManager.Instance.SetHealthSliderMaxValue(index, 100);
     }
 
-    // --- ダメージ処理の要求 ---
-    public void RequestTakeDamage(int damage)
-    {
-        if (IsServer) root.ApplyDamage(damage); // サーバーなら直接処理
-        else TakeDamageServerRpc(damage);       // クライアントならサーバーへ要請
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void TakeDamageServerRpc(int damage) => root.ApplyDamage(damage);
-
     // --- 各アクション処理 (前回の実装まま) ---
-    public void RequestJump()
-    {
-        root.GetActionController().ExecuteJumpLocal();
-        RequestJumpServerRpc();
-    }
-
-    [ServerRpc] private void RequestJumpServerRpc() => ExecuteJumpClientRpc();
-    [ClientRpc] private void ExecuteJumpClientRpc() { if (!IsOwner) root.GetActionController().ExecuteJumpLocal(); }
 
     public void RequestAttack()
     {
-        root.GetActionController().ExecuteAttackLocal();
+        inputController.ExecuteAttackLocal();
         player.UseAttack(); // 攻撃のアクションを呼び出す
         RequestAttackServerRpc();
     }
     [ServerRpc] private void RequestAttackServerRpc() => ExecuteAttackClientRpc();
     [ClientRpc] private void ExecuteAttackClientRpc() 
-    { 
+    {
+        // 自分のクライアントでは既に攻撃処理を行っているので、所有者でない場合のみ実行
         if (!IsOwner)
         {
-            root.GetActionController().ExecuteAttackLocal();
+            inputController.ExecuteAttackLocal();
             player.UseAttack(); // 攻撃のアクションを呼び出す
         }
 
     }
-
-    public void RequestSkillSelect(int direction) => root.GetActionController().ExecuteSkillSelectLocal(direction);
 
     public void RequestSkillUse()
     {
@@ -206,9 +190,6 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
     [ServerRpc]
     private void RequestSkillUseServerRpc(int skillIndex)
     {
-        // サーバー側での当たり判定やダメージ計算
-        // SkillLogic.Execute(root, root.SkillList[skillIndex]); など
-
         // 他クライアントへ演出の再生を指示
         ExecuteSkillUseClientRpc(skillIndex);
     }
@@ -220,7 +201,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
 
         player.UseCurrentSkill(); // スキルのアクションを呼び出す
 
-        root.GetActionController().ExecuteSkillUseLocal();
+        inputController.ExecuteSkillUseLocal();
     }
 
     public override void OnNetworkDespawn()

@@ -9,6 +9,7 @@ public class PlayerAutoController : MonoBehaviour, IPlayerActionHandler
 {
     private PlayerRoot root;
     private NetworkPlayer player;
+    private AutoInputController autoContoller;
 
     private Rigidbody2D rigidbody2D;
 
@@ -62,7 +63,7 @@ public class PlayerAutoController : MonoBehaviour, IPlayerActionHandler
         if (playerInput != null) playerInput.enabled = false;
 
         // AutoInputControllerを追加して、敵としての自動操作を行う
-        AutoInputController autoContoller = root.AddComponent<AutoInputController>();
+        autoContoller = root.AddComponent<AutoInputController>();
 
         root.gameObject.tag = "Enemy";
 
@@ -123,32 +124,15 @@ public class PlayerAutoController : MonoBehaviour, IPlayerActionHandler
         root.Initialize(this, autoContoller);
     }
 
-
-    // --- ダメージ処理の要求 ---
-    public void RequestTakeDamage(int damage)
-    {
-        root.ApplyDamage(damage); // 直接処理
-    }
-
-    // --- 各アクション処理 ---
-    public void RequestJump()
-    {
-        root.GetActionController().ExecuteJumpLocal(); // ローカルでジャンプ処理を実行
-    }
-
-    public void RequestAttack()
-    {
-        root.GetActionController().ExecuteAttackLocal();
-        player.UseAttack(); // 攻撃のアクションを呼び出す
-
-    }
-
-    public void RequestSkillSelect(int direction) => root.GetActionController().ExecuteSkillSelectLocal(direction);
-
     public void RequestSkillUse()
     {
         player.UseCurrentSkill(); // スキルのアクションを呼び出す
 
     }
 
+
+    public void RequestAttack()
+    {
+        player.UseAttack(); // 攻撃のアクションを呼び出す
+    }
 }
