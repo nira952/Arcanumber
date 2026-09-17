@@ -120,6 +120,11 @@ public class PlayerAutoController : MonoBehaviour, IPlayerActionHandler
             }
         }).AddTo(this);
 
+        if (PlayerUIManager.Instance != null && PlayerDataManager.Instance != null)
+        {
+            PlayerUIManager.Instance.Initialize(PlayerDataManager.Instance);
+        }
+
         // 全て終わったらrootの初期化処理を呼び出す
         root.Initialize(this, autoContoller);
     }
