@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -6826841981451150137}
   - component: {fileID: 8237473635962487598}
   - component: {fileID: 3877787762214374428}
+  - component: {fileID: -4625135051205862853}
   m_Layer: 0
   m_Name: Poison
   m_TagString: Untagged
@@ -202,3 +203,15 @@ MonoBehaviour:
   alphaThreshold: 0.01
   drawOutside: 1
   enableInstancing: 0
+--- !u!114 &-4625135051205862853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2355479593251735817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1619579118a294d4d938e6f63c6adcab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

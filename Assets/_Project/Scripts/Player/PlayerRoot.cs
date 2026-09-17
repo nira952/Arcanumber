@@ -63,6 +63,8 @@ public class PlayerRoot : MonoBehaviour
         actionController.Initialize();   // PlayerActionController の初期化
         CurrentHealth.Value = status.GetMaxHp(); // 初期体力を設定
 
+        playerAttack.Initialized(this); //PlayerAttack に PlayerRoot を渡す
+
         playerSkill.Initialize(this,false);
 
         GameUIManager.Instance. BindPlayerStatus(PlayerIndex.Value, ActiveEffects);// UIにプレイヤーのステータスをバインド
@@ -113,6 +115,7 @@ public class PlayerRoot : MonoBehaviour
             .Where(_ => actionHandler != null && actionHandler.CanProcessInput && IsMove.Value)
             .Subscribe(_ =>
             {
+                playerAttack.ResetList();
                 actionHandler.RequestAttack();
                 playerAttack.NormalAttackActive();
             }).AddTo(this);

@@ -40,8 +40,8 @@ public class ArcanaSelectManager : NetworkBehaviour
     private List<ArcanaCard> _myCards = new List<ArcanaCard>();
     private List<Arcana> arcanaDatabase = new List<Arcana>();
     [SerializeField] private ArcanaUIManager arcanaUIManager;
-    [SerializeField] private Sprite[] cardSprites = new Sprite[4];
-    [SerializeField] private Sprite[] glowSprite = new Sprite[4]; // 0:赤, 1:青, 2:緑, 3:黄
+    [SerializeField] private Sprite[] cardSprites = new Sprite[5];
+    [SerializeField] private Sprite[] glowSprite = new Sprite[5]; // 0:赤, 1:青, 2:緑, 3:黄
 
     private Arcana selectedArcana;
     private readonly CompositeDisposable _disposables = new();
@@ -144,7 +144,7 @@ public class ArcanaSelectManager : NetworkBehaviour
             arcanaAllCards.Add(new ArcanaCard(i, true)); // 全て表向きで表示
         }
 
-        arcanaUIManager.BuildCardsUI(arcanaAllCards, arcanaDatabase, cardSprites[0]);
+        arcanaUIManager.BuildCardsUI(arcanaAllCards, arcanaDatabase, cardSprites[4], glowSprite[4]);
 
 
         arcanaAllCards.Clear();
@@ -157,7 +157,7 @@ public class ArcanaSelectManager : NetworkBehaviour
         }
 
         // UIに表示する
-        arcanaUIManager.BuildCardsUI(arcanaAllCards, arcanaDatabase, cardSprites[1]);
+        arcanaUIManager.BuildCardsUI(arcanaAllCards, arcanaDatabase, cardSprites[4], glowSprite[4]);
 
     }
 
@@ -401,9 +401,10 @@ public class ArcanaSelectManager : NetworkBehaviour
 
 
 
-        Sprite backSprite = cardSprites[0]; // デバッグ用として0番を使用
+        Sprite backSprite = cardSprites[4]; // デバッグ用として0番を使用
+        Sprite backGrowSprite = glowSprite[4]; // デバッグ用として0番を使用
 
-        arcanaUIManager.BuildCardsUI(_myCards, arcanaDatabase, backSprite);
+        arcanaUIManager.BuildCardsUI(_myCards, arcanaDatabase, backSprite, backGrowSprite);
 
     }
 
@@ -447,8 +448,9 @@ public class ArcanaSelectManager : NetworkBehaviour
         _myCards = new List<ArcanaCard>(assignedCards);
 
         Sprite backSprite = cardSprites[PlayerDataManager.Instance.GetMyLobbyIndex()];
+        Sprite backGlowSprite = glowSprite[PlayerDataManager.Instance.GetMyLobbyIndex()];
 
-        arcanaUIManager.BuildCardsUI(_myCards, arcanaDatabase, backSprite);
+        arcanaUIManager.BuildCardsUI(_myCards, arcanaDatabase, backSprite, backGlowSprite);
 
     }
 

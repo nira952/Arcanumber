@@ -11,6 +11,7 @@ public abstract class MagicObject : MonoBehaviour
     protected float keepTime;     //持続時間
     protected Animator animator;  //アニメーター
     protected EffectAbility effect;    //付与するエフェクト
+    protected SeName se;          //再生するSE
 
     protected List<int> hitList = new List<int>();
     private Dictionary<int, float> stayTimers = new Dictionary<int, float>();
@@ -26,6 +27,7 @@ public abstract class MagicObject : MonoBehaviour
         haveCharaNo = charaNo;
         dmg = damage;
         animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
+        NetWorkAudioManager.Instance.PlayGlobal(se);
     }
 
     protected virtual void Update()

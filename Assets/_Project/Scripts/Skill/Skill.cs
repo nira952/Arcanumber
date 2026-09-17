@@ -23,7 +23,7 @@ public class Skill : ScriptableObject
     [Label("貫通")][SerializeField] bool isPenetrate;
     [Label("反射回数")][SerializeField] int reflectCount;
     [Label("スキルオブジェクト")][SerializeField] GameObject effectAnimation;
-    [Label("効果音")][SerializeField] AudioClip se;
+    [Label("効果音")][SerializeField] SeName se;
     [Label("付与するエフェクト")][SerializeField] EffectAbility effect;
 
     /// <summary>
@@ -63,7 +63,11 @@ public class Skill : ScriptableObject
         //リソースロード（パスが空ならnullを代入）
         this.skillSp = !string.IsNullOrEmpty(Get(11)) ? Resources.Load<Sprite>(Get(11)) : null;
         this.effectAnimation = !string.IsNullOrEmpty(Get(12)) ? Resources.Load<GameObject>(Get(12)) : null;
-        this.se = !string.IsNullOrEmpty(Get(12)) ? Resources.Load<AudioClip>(Get(13)) : null;
+        string seNameStr = Get(13); // 13列目がSEの名前（文字列）であると仮定
+        if (!string.IsNullOrEmpty(seNameStr) && System.Enum.TryParse<SeName>(seNameStr, true, out SeName parsedSeName))
+            this.se = parsedSeName; // 型が SeName になったのでそのまま代入できる
+        else
+            this.se = SeName.num; 
     }
 
     /**
@@ -83,7 +87,7 @@ public class Skill : ScriptableObject
     public bool GetIsPenetrate() { return isPenetrate; }
     public int GetReflectCount() { return reflectCount; }
     public GameObject GetEffectAnimation() {  return effectAnimation; }
-    public AudioClip GetSe() { return se; }
+    public SeName GetSe() { return se; }
     public EffectAbility GetEffect() {  return effect; }
 
 }

@@ -4401,11 +4401,13 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 0a13fa5477588aa40968684b9acf026f, type: 3}
   - {fileID: 21300000, guid: 2f58b327baacaa74da273dc1b2d4f4e8, type: 3}
   - {fileID: 21300000, guid: 973d3368ef220f645a2036669f61e169, type: 3}
+  - {fileID: 21300000, guid: d457a0ce468f5f44786dbc16104c97a7, type: 3}
   glowSprite:
   - {fileID: -1632629155, guid: 529fea351ef98e84094e660b219acffa, type: 3}
   - {fileID: -953401416, guid: 92e647081d7178646899f602de473e0d, type: 3}
   - {fileID: -1511312771, guid: 8f7a18150a80fe143aad14ff31147468, type: 3}
   - {fileID: -230230153, guid: f0398494e61e2a241810329c6c0dd4eb, type: 3}
+  - {fileID: 4160994520074914487, guid: 5b8e81e83d68e174bbe4fb7d6c52ea79, type: 3}
 --- !u!114 &1804831476
 MonoBehaviour:
   m_ObjectHideFlags: 0
