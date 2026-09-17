@@ -222,6 +222,7 @@ public class ArcanaSelectManager : NetworkBehaviour
 
         if (isLocalMode)
         {
+            SubmitSelectedLocalArcana();
             // デバッグ時は直接ローカルで遷移処理を呼ぶ
             DebugTransitionAsync().Forget();
         }
@@ -233,7 +234,10 @@ public class ArcanaSelectManager : NetworkBehaviour
 
     }
 
-
+    private void SubmitSelectedLocalArcana()
+    {
+        PlayerDataManager.Instance.SetLocalArcana(selectedArcana);
+    }
 
     // --- デバッグ用：オフライン時のシーン遷移モック ---
 

@@ -60,6 +60,11 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerActionHandler
             }
         }).AddTo(this);
 
+        if (PlayerUIManager.Instance != null && PlayerDataManager.Instance != null)
+        {
+            PlayerUIManager.Instance.Initialize(PlayerDataManager.Instance);
+        }
+
         inputController = GetComponent<PlayerInputController>();
 
         root.Initialize(this, inputController);

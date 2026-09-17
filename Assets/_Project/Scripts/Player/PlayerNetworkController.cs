@@ -134,7 +134,8 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
             RebuildEffectsFromNetworkList();
         }
 
-        // UIバインド
+        // --- UIの初期化 ---
+
         root.PlayerIndex.Where(idx => idx != -1).Take(1).Subscribe(idx => InitializeUI(idx)).AddTo(this);
 
         root.CurrentHealth.Subscribe(hp => {
@@ -144,7 +145,11 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
             }
         }).AddTo(this);
 
-        
+        if (PlayerUIManager.Instance != null && PlayerDataManager.Instance != null)
+        {
+            PlayerUIManager.Instance.Initialize(PlayerDataManager.Instance);
+        }
+
         root.Initialize(this, inputController);
     }
 
