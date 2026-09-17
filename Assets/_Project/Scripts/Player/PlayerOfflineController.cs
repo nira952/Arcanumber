@@ -37,6 +37,7 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerActionHandler
             Debug.LogWarning("GameUIManager is not found in the scene.");
             return;
         }
+        GameCameraManager.Instance.RegisterTarget(this.transform); // カメラにプレイヤーを登録
 
         // UIManagerのインスタンスを取得
         GameUIManager uIManager = GameUIManager.Instance;
