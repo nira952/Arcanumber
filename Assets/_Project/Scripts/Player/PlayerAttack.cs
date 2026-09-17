@@ -14,7 +14,16 @@ public class PlayerAttack : MonoBehaviour
             return;
         }
 
+        
+
         slashObject.gameObject.SetActive(false); // 初期状態では攻撃オブジェクトを非アクティブにする   
+    }
+
+    public void Initialized(PlayerRoot root)
+    {
+        int playerIndex = root.PlayerIndex.Value;
+
+        slashObject.Initialize(playerIndex, 1, -1);
     }
 
 

@@ -1,20 +1,24 @@
 using UnityEngine;
 
-public class NormalSlash : SkillObject
+public class NormalSlash : MagicObject
 {
-    private void Start()
+    public void Initialize(int charaNo, float damage, float lifetime = 1.0f)
     {
-        // スキルの初期化処理
-        isHitAndWaitingDestroy = false; // ヒット後にオブジェクトを破棄しないフラグを設定
+        CommonInitialize(charaNo, damage);
+        isPenetrate = true;
+        dmg = damage;
     }
 
+    // プレイヤーに当たったときに呼ばれる（MagicObject側で重複ヒット防止済み）
     protected override void OnHit(NetworkPlayer target)
     {
         NetworkPlayer player = PlayerUtility.FindPlayerByNo(haveCharaNo);
-        //ダメージを与える
+        if (player == null) return;
+
+        //ダメージを与える（エフェクト付与はなし）
         PlayerUtility.FinalDamage(target, player, dmg);
-        // エフェクトをつける
-        if (effect != null)
-            target.SetHaveEffect(effect.Clone());
+        Debug.Log("当たったよ");
     }
+
+    public void ResetList() => hitList.Clear();
 }
