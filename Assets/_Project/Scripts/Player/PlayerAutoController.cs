@@ -58,6 +58,8 @@ public class PlayerAutoController : MonoBehaviour, IPlayerActionHandler
 
     private void Initialize()
     {
+        GameCameraManager.Instance.RegisterTarget(this.transform); // カメラにプレイヤーを登録
+
         // Inputコンポーネントを無効化
         var playerInput = GetComponent<PlayerInput>();
         if (playerInput != null) playerInput.enabled = false;

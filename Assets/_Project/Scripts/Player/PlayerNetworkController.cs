@@ -56,6 +56,8 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
 
     public override void OnNetworkSpawn()
     {
+        GameCameraManager.Instance.RegisterTarget(this.transform); // カメラにプレイヤーを登録
+
         inputController = GetComponent<PlayerInputController>();
 
         // 所有者でない場合、Inputコンポーネントを停止

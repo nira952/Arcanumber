@@ -1,15 +1,63 @@
+using R3;
 using Unity.Cinemachine;
 using UnityEngine;
 
-public class GameCameraManager : SingletonMonoBehaviour<GameCameraManager>
+public class GameCameraManager : MonoBehaviour
 {
-    [SerializeField] CinemachineCamera stageCamera;
-    [SerializeField] CinemachineCamera zoomCamera;
+    // シングルトン処理
+    #region Singleton Pattern
+    public static GameCameraManager Instance { get; private set; }
 
-    Transform playerTransform;  //ズームターゲットプレイヤー
+    private static readonly Subject<Unit> onInitialized = new();
+    public static Observable<Unit> OnInitialized => onInitialized;
 
-    bool isZoomed = false;
-    bool isReversed = false;
+    private void SetUpSingleton()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            onInitialized.OnNext(Unit.Default);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+        Debug.Log("[GameCameraManager] Awake called. Instance set.");
+    }
+    #endregion
+
+
+    [SerializeField] private CinemachineCamera stageCamera;
+    [SerializeField] private CinemachineCamera zoomCamera;
+    [SerializeField] private CinemachineTargetGroup targetGroup;  // ターゲットグループ
+
+    private Transform playerTransform;  // ズームターゲットプレイヤー
+    private bool isZoomed = false;
+    private bool isReversed = false;
+
+    private void Awake()
+    {
+        SetUpSingleton();
+    }
+
+
+    /// <summary>
+    /// targetGroup にターゲットを重み 1、半径 1 で追加する。
+    /// </summary>
+    /// <param name="target">追加するターゲットの Transform。</param>
+    public void RegisterTarget(Transform target)
+    {
+        targetGroup.AddMember(target, 1f, 1f); // 重み1、半径1で追加
+    }
+
+    /// <summary>
+    /// targetGroup からターゲットを削除する。
+    /// </summary>
+    /// <param name="target"></param>
+    public void UnregisterTarget(Transform target)
+    {
+        targetGroup.RemoveMember(target);
+    }
 
     /// <summary>
     /// ズームの状態を更新

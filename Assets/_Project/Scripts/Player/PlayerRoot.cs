@@ -65,7 +65,7 @@ public class PlayerRoot : MonoBehaviour
 
         playerSkill.Initialize(this,false);
 
-        GameUIManager.Instance. BindPlayerStatus(PlayerIndex.Value, ActiveEffects);
+        GameUIManager.Instance. BindPlayerStatus(PlayerIndex.Value, ActiveEffects);// UIにプレイヤーのステータスをバインド
 
         if (playerAnimator != null)
         {
