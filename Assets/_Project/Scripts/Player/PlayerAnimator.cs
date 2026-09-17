@@ -51,7 +51,7 @@ public class PlayerAnimator : NetworkBehaviour
     /// <summary>
     /// PlayerRoot から初期化され、入力・状態ストリームを購読する
     /// </summary>
-    public void Initialize(PlayerRoot root, IPlayerInputHandler inputController,int playerIndex,IPlayerActionHandler actionHandler)
+    public void Initialize(int playerIndex)
     {
         // playerIndex が配列の範囲外になっていないかチェック
         if (playerIndex < 0 || playerIndex >= animatorControllers.Length)
@@ -70,42 +70,6 @@ public class PlayerAnimator : NetworkBehaviour
         }
 
         animator.runtimeAnimatorController = animatorControllers[playerIndex];
-
-        // ----------------------------------------------------
-        // 1. 移動アニメーション（IsDash）の制御
-        // ----------------------------------------------------
-        // 入力値に応じて IsDash の bool を変更
-        inputController.OnMoveAsObservable
-            .Where(_ => actionHandler != null && actionHandler.CanProcessInput)
-            .Subscribe(moveInput =>
-            {
-                // 移動入力がほぼ 0 でない場合、かつ移動可能状態（IsMove）なら True
-                bool isDashing = Mathf.Abs(moveInput) > 0.01f && root.IsMove.Value;
-                SetDash(isDashing);
-
-                // ★ 入力値に応じて左右の向き（Scale）を切り替える
-                if (root.IsMove.Value)
-                {
-                    Flip(moveInput);
-                }
-            }).AddTo(this);
-
-        // 状態の変化（ノックバックや死亡等で IsMove が false になった場合）にも対応
-        root.IsMove
-            .Where(canMove => !canMove)
-            .Subscribe(_ => SetDash(false))
-            .AddTo(this);
-
-
-        // ----------------------------------------------------
-        // 2. スキル使用アニメーション（Magic）の再生
-        // ----------------------------------------------------
-        inputController.OnSkillUseAsObservable
-            .Where(_ => actionHandler != null && actionHandler.CanProcessInput)
-            .Subscribe(_ =>
-            {
-                PlayMagicAnimation();
-            }).AddTo(this);
     }
 
     private void OnPlayerIndexChanged(int previousValue, int newValue)
@@ -130,7 +94,7 @@ public class PlayerAnimator : NetworkBehaviour
     /// <summary>
     /// Dashフラグの設定
     /// </summary>
-    private void SetDash(bool isDash)
+    public void SetDash(bool isDash)
     {
         animator.SetBool(IsDashHash, isDash);
     }
@@ -138,7 +102,7 @@ public class PlayerAnimator : NetworkBehaviour
     /// <summary>
     /// Magic アニメーションの再生処理
     /// </summary>
-    private void PlayMagicAnimation()
+    public void PlayMagicAnimation()
     {
         // 1. ローカルの Animator で再生
         animator.Play(MagicStateHash, 0, 0f);
@@ -153,7 +117,7 @@ public class PlayerAnimator : NetworkBehaviour
     /// <summary>
     /// 移動入力の方向に応じて Visual の Scale.x を反転させる
     /// </summary>
-    private void Flip(float moveInput)
+    public void Flip(float moveInput)
     {
         // 入力がほぼ 0 の場合は直前の向きを維持
         if (Mathf.Abs(moveInput) <= 0.01f) return;

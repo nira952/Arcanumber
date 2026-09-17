@@ -5,12 +5,9 @@ using UnityEngine;
 public class PlayerRoot : MonoBehaviour
 {
     [Header("Parameters")]
-    [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float jumpForce = 5f;
-    [SerializeField] private int maxHealth = 100;
     PlayerStatus status = new PlayerStatus();    //プレイヤーステータス
     [SerializeField] private GameObject magicStart; //予備動作用のオブジェクト
-
 
     [Header("Skill & Arcana")]
     public Arcana CurrentArcana;
@@ -20,6 +17,7 @@ public class PlayerRoot : MonoBehaviour
     [Header("Components")]
     [SerializeField] private PlayerMovement movement;
     [SerializeField] private PlayerRayInput rayInput;
+    [SerializeField] private PlayerAttack playerAttack;
     [SerializeField] private PlayerActionController actionController;
     [SerializeField] private PlayerAnimator playerAnimator;
     [SerializeField] private NetworkPlayer playerSkill;
@@ -30,7 +28,7 @@ public class PlayerRoot : MonoBehaviour
     // --- プレイヤー情報（ReactivePropertyで管理） ---
 
     public ReactiveProperty<int> PlayerIndex { get; } = new(-1);
-    public ReactiveProperty<int> CurrentHealth { get; } = new(100);
+    public ReactiveProperty<float> CurrentHealth { get; } = new(100);
     public ReactiveProperty<int> Nowjump { get; } = new(0);
 
     public ReactiveProperty<bool> IsDown { get; } = new(false);
@@ -63,7 +61,7 @@ public class PlayerRoot : MonoBehaviour
 
         movement.Initialize(this);       // PlayerMovement に PlayerRoot を渡す
         actionController.Initialize();   // PlayerActionController の初期化
-        CurrentHealth.Value = maxHealth; // 初期体力を設定
+        CurrentHealth.Value = status.GetMaxHp(); // 初期体力を設定
 
         playerSkill.Initialize(this,false);
 
@@ -91,7 +89,7 @@ public class PlayerRoot : MonoBehaviour
 
         if (playerAnimator != null)
         {
-            playerAnimator.Initialize(this, inputController, PlayerIndex.Value, actionHandler);
+            playerAnimator.Initialize(PlayerIndex.Value);
         }
         // --- 入力ストリームの購読 ---
 
@@ -104,33 +102,57 @@ public class PlayerRoot : MonoBehaviour
                 float finalInput = !IsChangeMove.Value ? rawInput : -rawInput;
 
                 movement.SetMoveInput(finalInput);
+
+                // 向きの反転
+                playerAnimator.Flip(rawInput);
+                playerAttack.Flip(rawInput);
+
+                // ダッシュアニメーションの切り替え
+                bool isDashing = Mathf.Abs(rawInput) > 0.01f;
+                playerAnimator.SetDash(isDashing);
+
             }).AddTo(this);
 
         IsMove.Where(canMove => !canMove)
-              .Subscribe(_ => movement.SetMoveInput(0f)).AddTo(this);
+              .Subscribe(_ => 
+              {
+                  movement.SetMoveInput(0f);
+                  playerAnimator.SetDash(false);
+              }).AddTo(this);
 
         // ジャンプ
         inputController.OnJumpAsObservable
             .Where(_ => actionHandler != null && actionHandler.CanProcessInput && IsJump.Value)
-            .Subscribe(_ => movement.ExecuteJump()).AddTo(this);
+            .Subscribe(_ => 
+            {
+                movement.ExecuteJump();
+            }).AddTo(this);
 
         // 攻撃
         inputController.OnAttackAsObservable
-            .Where(_ => actionHandler != null && actionHandler.CanProcessInput && IsNormalAttack.Value)
-            .Subscribe(_ => actionHandler.RequestAttack()).AddTo(this);
+            .Where(_ => actionHandler != null && actionHandler.CanProcessInput && IsMove.Value)
+            .Subscribe(_ =>
+            {
+                actionHandler.RequestAttack();
+                playerAttack.NormalAttackActive();
+            }).AddTo(this);
 
         // スキル選択
         inputController.OnSkillSelectAsObservable
             .Where(_ => actionHandler != null && actionHandler.CanProcessInput)
-            .Subscribe(dir => {
-                //actionHandler.RequestSkillSelect(dir);
+            .Subscribe(dir => 
+            {
                 playerSkill.ChangeSelectedSkill(dir);
             }).AddTo(this);
 
         // スキル使用
         inputController.OnSkillUseAsObservable
             .Where(_ => actionHandler != null && actionHandler.CanProcessInput)
-            .Subscribe(_ => actionHandler.RequestSkillUse()).AddTo(this);
+            .Subscribe(_ =>
+            {
+                actionHandler.RequestSkillUse();
+                playerAnimator.PlayMagicAnimation();
+            }).AddTo(this);
 
         // エフェクト管理
         ActiveEffects.Subscribe(effects =>
@@ -162,11 +184,11 @@ public class PlayerRoot : MonoBehaviour
     /// <summary>
     /// サーバーまたはオフライン時に呼ばれる純粋なダメージ計算処理
     /// </summary>
-    public void ApplyDamage(int damage)
+    public void ApplyDamage(float damage)
     {
         if (IsDown.Value) return;
 
-        CurrentHealth.Value = Mathf.Clamp(CurrentHealth.Value - damage, 0, maxHealth);
+        CurrentHealth.Value = Mathf.Clamp(CurrentHealth.Value - damage, 0, status.GetMaxHp());
 
         if (CurrentHealth.Value <= 0)
         {
@@ -175,10 +197,10 @@ public class PlayerRoot : MonoBehaviour
         }
     }
 
-    public void ApplyHeal(int healAmount)
+    public void ApplyHeal(float healAmount)
     {
         if (IsDown.Value) return;
-        CurrentHealth.Value = Mathf.Clamp(CurrentHealth.Value + healAmount, 0, maxHealth);
+        CurrentHealth.Value = Mathf.Clamp(CurrentHealth.Value + healAmount, 0, status.GetMaxHp());
     }
 
     // --- ロジックの移植 ---
@@ -191,8 +213,7 @@ public class PlayerRoot : MonoBehaviour
         ActiveEffects.Value = new List<EffectAbility>(currentList);
     }
 
-
-    public float GetMoveSpeed() => moveSpeed;
+    public float GetMoveSpeed() => status.GetSpeed();
     public float GetJumpForce() => jumpForce;
     public PlayerActionController GetActionController() => actionController;
     public AimCursor GetAimCursor() { return aim; }
@@ -219,7 +240,7 @@ public class PlayerRoot : MonoBehaviour
     /**
  * --------- セッター ---------
  */
-    public void SetMoveSpeed(float speed) { this.moveSpeed = speed; }
+    public void SetMoveSpeed(float speed) { status.SetSpeed(speed); }
     public void SetIsMove(bool isMove)
     {
         this.IsMove.Value = isMove;

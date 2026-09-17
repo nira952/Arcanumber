@@ -8,7 +8,7 @@ public class DebugPlayerPreview : MonoBehaviour
     private PlayerRoot root;
 
     [SerializeField] private int previewPlayerIndex;
-    [SerializeField] private int previewCurrentHealth;
+    [SerializeField] private float previewCurrentHealth;
 
     [SerializeField] private bool previewIsDown;
     [SerializeField] private bool previewIsMove;

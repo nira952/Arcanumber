@@ -1,13 +1,14 @@
 using nira.Demo;
 using R3;
-using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.InputSystem.XInput;
 
 [RequireComponent(typeof(PlayerRoot))]
 public class PlayerOfflineController : MonoBehaviour, IPlayerActionHandler
 {
     private PlayerRoot root;
 
+    private PlayerInputController inputController;
     private NetworkPlayer player;
 
     public bool CanProcessInput
@@ -59,36 +60,23 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerActionHandler
             }
         }).AddTo(this);
 
-        PlayerInputController inputController = GetComponent<PlayerInputController>();
+        inputController = GetComponent<PlayerInputController>();
 
         root.Initialize(this, inputController);
     }
 
-    // --- ダメージ処理の要求 ---
-    public void RequestTakeDamage(int damage)
-    {
-        root.ApplyDamage(damage); // 直接処理
-    }
 
     // --- 各アクション処理 ---
-    public void RequestJump()
-    {
-        root.GetActionController().ExecuteJumpLocal(); // ローカルでジャンプ処理を実行
-    }
 
     public void RequestAttack()
     {
-        root.GetActionController().ExecuteAttackLocal();
         player.UseAttack(); // 攻撃のアクションを呼び出す
 
     }
 
-    public void RequestSkillSelect(int direction) => root.GetActionController().ExecuteSkillSelectLocal(direction);
-
     public void RequestSkillUse()
     {
         player.UseCurrentSkill(); // スキルのアクションを呼び出す
-
-
     }
+
 }

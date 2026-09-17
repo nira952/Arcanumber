@@ -164,7 +164,7 @@ public class NetworkPlayer : MonoBehaviour
     /// </summary>
     public void TakeDamage(float damage)
     {
-        playerRoot.ApplyDamage((int)damage);
+        playerRoot.ApplyDamage(damage);
 
         if (playerRoot.CurrentHealth.Value <= 0)
             playerRoot.CurrentArcana.ExecuteArcanaEffect(ASkillCategory.DeathEffect, this);
