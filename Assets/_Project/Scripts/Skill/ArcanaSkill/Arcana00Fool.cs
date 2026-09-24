@@ -7,7 +7,6 @@
 /// </summary>
 public class Arcana00FoolFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //HP‚ð1.3”{‚É‚·‚é
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -21,7 +20,6 @@ public class Arcana00FoolFront : ArcanaLogic
 /// </summary>
 public class Arcana00FoolBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.DeathEffect;
     //‰½‚à•Ï‚í‚ç‚È‚¢
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {

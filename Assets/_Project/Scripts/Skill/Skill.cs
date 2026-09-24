@@ -25,6 +25,8 @@ public class Skill : ScriptableObject
     [Label("スキルオブジェクト")][SerializeField] GameObject effectAnimation;
     [Label("効果音")][SerializeField] SeName se;
     [Label("付与するエフェクト")][SerializeField] EffectAbility effect;
+    [Label("弾数")][SerializeField] int bulletCount = 1;
+    [Label("拡散角度")][SerializeField] float spreadAngle = 0f;
 
     /// <summary>
     /// Excelで入力した値を代入
@@ -48,6 +50,8 @@ public class Skill : ScriptableObject
         this.isPenetrate = (Get(9) == "1"); //1がTrue
         this.reflectCount = lm.ParseValue<int>(Get(10));
         this.skillEx = Get(18);
+        this.bulletCount = lm.ParseValue<int>(Get(19));
+        this.spreadAngle = lm.ParseValue<float>(Get(20));
 
         //Effectの変換
         if (System.Enum.TryParse(Get(14), true, out EffectList targetEnum))

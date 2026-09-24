@@ -10,7 +10,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana06LoversFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //魅了状態にする
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -25,7 +24,6 @@ public class Arcana06LoversFront : ArcanaLogic
 /// </summary>
 public class Arcana06LoversBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //画面を暗くする
     public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
     public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)

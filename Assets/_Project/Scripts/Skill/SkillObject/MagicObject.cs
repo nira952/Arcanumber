@@ -78,7 +78,7 @@ public abstract class MagicObject : MonoBehaviour
             return;
         }
 
-        // 2. ミニオン判定
+        //ミニオン判定
         FragileMinion targetMinion = collision.GetComponentInParent<FragileMinion>();
         if (targetMinion != null && targetMinion.GetwnerPlayerNo() != haveCharaNo)
         {
@@ -87,7 +87,7 @@ public abstract class MagicObject : MonoBehaviour
             return;
         }
 
-        // 3. 地形・壁判定（CompareTagで軽量化 & 反射切れてからの破棄）
+        //地形・壁判定（CompareTagで軽量化 & 反射切れてからの破棄）
         if (collision.CompareTag("Wall") || collision.CompareTag("Ground"))
         {
             if (reflectCount > 0)

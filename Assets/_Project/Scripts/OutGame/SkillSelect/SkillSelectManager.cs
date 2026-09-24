@@ -266,21 +266,30 @@ public class SkillSelectManager : NetworkBehaviour
 
         foreach (var skillData in allSkills)
         {
-            // カテゴリごとにボタンを生成する
-            SkillButton btnInstance = Instantiate(skillButtonPrefab, skillButtonParents[(int)skillData.GetSkillCategory()]);
+            //3つのカテゴリを2つのグループに分ける ---
+            int parentIndex = 0;
+            switch (skillData.GetSkillCategory())
+            {
+                case SkillCategory.Attack:
+                    parentIndex = 0; //グループ1
+                    break;
+                case SkillCategory.Heal:
+                case SkillCategory.Effection:
+                    parentIndex = 1; //グループ2
+                    break;
+            }
+
+            // 振り分けたインデックスの親を指定して生成
+            SkillButton btnInstance = Instantiate(skillButtonPrefab, skillButtonParents[parentIndex]);
             btnInstance.skill = skillData;
             btnInstance.skillName = skillData.GetSkillName();
             if (btnInstance.skillImage != null)
-            {
                 btnInstance.skillImage.sprite = skillData.GetSprite();
-            }
 
-            // スキル名とスキル説明文をUIManagerに渡すためのリスナーを設定
             string skillName = skillData.GetSkillName();
             string skillEx = skillData.GetSkillEx();
 
             btnInstance.selectHoverTrigger.onHoverEnter.AddListener(() => uIManager.SetSkillExText(skillEx, skillName));
-
             btnInstance.skillButton.onClick.AddListener(() => OnSkillButtonClicked(skillData));
         }
     }

@@ -9,7 +9,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana07ChariotFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //速度が上がる
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -23,7 +22,6 @@ public class Arcana07ChariotFront : ArcanaLogic
 /// </summary>
 public class Arcana07ChariotBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //スキル発動が50％速くなる
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {

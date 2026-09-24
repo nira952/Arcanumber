@@ -7,7 +7,6 @@
 /// </summary>
 public class Arcana04EmperorFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //スキルを使用禁止にする
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -23,7 +22,6 @@ public class Arcana04EmperorFront : ArcanaLogic
 /// </summary>
 public class Arcana04EmperorBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //通常攻撃が振れないが、ダメージが2倍になる
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {

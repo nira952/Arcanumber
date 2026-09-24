@@ -10,7 +10,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana12HangedManFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //カメラが反転する
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -30,7 +29,6 @@ public class Arcana12HangedManFront : ArcanaLogic
 /// </summary>
 public class Arcana12HangedManBack : ArcanaLogic 
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //運の確立を最大まで上げる
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {

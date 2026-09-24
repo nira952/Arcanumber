@@ -45,7 +45,7 @@ public class Arcana : ScriptableObject
         //ロジック更新
         this.arcanaLogic = CreateInstanceFromName(Get(9));
         if (arcanaLogic != null)
-            this.aCategory = arcanaLogic.GetCategory();
+            this.aCategory = ASkillCategory.DamageEffect;
     }
 
     /// <summary>
@@ -167,5 +167,6 @@ public enum ASkillCategory
     [InspectorName("ボタンを押すことで発動")] Command,
     [InspectorName("スキル発動に合わせて発動")] SkillEffect,
     [InspectorName("ダメージを受けたときに発動")] DamageEffect,
-    [InspectorName("死亡時に発動")] DeathEffect
+    [InspectorName("死亡時に発動")] DeathEffect,
+    [InspectorName("通常攻撃時に発動")] NormalAttackEffect
 }

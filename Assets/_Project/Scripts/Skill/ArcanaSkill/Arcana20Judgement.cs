@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class Arcana20JudgementFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //当たると現在体力が３０％減る
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -14,7 +13,6 @@ public class Arcana20JudgementFront : ArcanaLogic
 
 public class Arcana20JudgementBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //銃弾の雨が降る
     public float length = 15f;  //範囲
     Vector2 pos = new Vector2(0, 7.5f);

@@ -10,7 +10,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana03EmpressFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //自然回復
     public const float timeInterval = 5f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
@@ -29,7 +28,6 @@ public class Arcana03EmpressFront : ArcanaLogic
 /// </summary>
 public class Arcana03EmpressBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //ランダムな効果
     public EffectAbility randomEffect;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }

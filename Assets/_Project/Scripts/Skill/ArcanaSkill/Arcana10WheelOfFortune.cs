@@ -9,7 +9,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana10WheelOfFortuneFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //ランダムテレポート
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -59,7 +58,6 @@ public class Arcana10WheelOfFortuneFront : ArcanaLogic
 /// </summary>
 public class Arcana10WheelOfFortuneBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //ジャンプができないようにする
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {

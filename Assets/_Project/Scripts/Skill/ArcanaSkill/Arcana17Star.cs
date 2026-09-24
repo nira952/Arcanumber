@@ -10,7 +10,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana17StarFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //あなたはスターだ
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -29,7 +28,6 @@ public class Arcana17StarFront : ArcanaLogic
 /// </summary>
 public class Arcana17StarBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //無敵
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
