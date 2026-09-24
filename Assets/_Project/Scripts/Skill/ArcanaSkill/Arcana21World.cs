@@ -9,7 +9,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana21WorldFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //二段ジャンプができる
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -22,7 +21,6 @@ public class Arcana21WorldFront : ArcanaLogic
 /// </summary>
 public class Arcana21WorldBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //次元移動ができる
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {

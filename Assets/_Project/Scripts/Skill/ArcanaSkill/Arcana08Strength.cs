@@ -9,7 +9,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana08StrengthFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //攻撃力が上がる
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -23,7 +22,6 @@ public class Arcana08StrengthFront : ArcanaLogic
 /// </summary>
 public class Arcana08StrengthBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.DamageEffect;
     //等価交換
     private NetworkPlayer _owner;
     private Arcana sArcana;

@@ -6,7 +6,6 @@ using UnityEngine;
 /// </summary>
 public abstract class ArcanaLogic
 {
-    public abstract ASkillCategory GetCategory();
     /// <summary>
     /// アニメーションやSEの再生
     /// </summary>

@@ -10,7 +10,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana19SunFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //晴れ日和
     private float numValue = 0.5f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
@@ -30,7 +29,6 @@ public class Arcana19SunFront : ArcanaLogic
 /// </summary>
 public class Arcana19SunBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //スタンする
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {

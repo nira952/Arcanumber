@@ -7,7 +7,6 @@
 /// </summary>
 public class Arcana05HierophantFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //スキルの当たり判定がすこし大きくなる
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -23,7 +22,6 @@ public class Arcana05HierophantFront : ArcanaLogic
 /// </summary>
 public class Arcana05HierophantBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //左右移動が反転
     public override void Execute(NetworkPlayer player, Arcana sourceArcana) 
     {

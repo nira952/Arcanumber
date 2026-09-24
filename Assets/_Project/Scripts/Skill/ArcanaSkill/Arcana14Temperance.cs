@@ -10,7 +10,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana14TemperanceFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //自分のスキルのクールタイムを減らす
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -26,7 +25,6 @@ public class Arcana14TemperanceFront : ArcanaLogic
 /// </summary>
 public class Arcana14TemperanceBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //相手のスキルのクールタイムを増やす
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {

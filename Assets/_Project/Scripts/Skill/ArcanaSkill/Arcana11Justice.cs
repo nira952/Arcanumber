@@ -9,7 +9,6 @@ using System.Collections.Generic;
 /// </summary>
 public class Arcana11JusticeFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //全員にダメージを与える
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -24,7 +23,6 @@ public class Arcana11JusticeFront : ArcanaLogic
 /// </summary>
 public class Arcana11JusticeBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //半分のダメージを返す（カウンター）
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {

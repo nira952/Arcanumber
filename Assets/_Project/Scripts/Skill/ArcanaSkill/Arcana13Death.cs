@@ -9,7 +9,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana13DeathFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.SkillEffect;
     //攻撃を降るたびにダメージを受け、攻撃力を上げる
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -23,7 +22,6 @@ public class Arcana13DeathFront : ArcanaLogic
 /// </summary>
 public class Arcana13DeathBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //攻撃が当たるたびに回復する
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {

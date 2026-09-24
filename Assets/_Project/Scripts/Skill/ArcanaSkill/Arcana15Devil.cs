@@ -9,8 +9,7 @@ using UnityEngine;
 /// </summary>
 public class Arcana15DevilFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
-    //10秒は死なない
+    //通常攻撃にデバフがつく
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
 
@@ -22,7 +21,6 @@ public class Arcana15DevilFront : ArcanaLogic
 /// </summary>
 public class Arcana15DevilBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //デバフ・バフをすべて解除し、その数だけ攻撃力を上げる
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {

@@ -10,7 +10,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana02HighPriestessFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //だんだん攻撃力が上がる
     public const float timeInterval = 5f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
@@ -29,7 +28,6 @@ public class Arcana02HighPriestessFront : ArcanaLogic
 /// </summary>
 public class Arcana02HighPriestessBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //だんだん攻撃力が下がる
     public const float normalAtkValue = 10f;
     public const float timeInterval = 5f;

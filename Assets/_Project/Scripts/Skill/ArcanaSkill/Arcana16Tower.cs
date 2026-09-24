@@ -10,7 +10,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana16TowerFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //永続するタレットがおける
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -26,7 +25,6 @@ public class Arcana16TowerFront : ArcanaLogic
 /// </summary>
 public class Arcana16TowerBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.SkillEffect;
     //５０％の確率で同じスキルが発動する
     private float time = 3f;
     public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }

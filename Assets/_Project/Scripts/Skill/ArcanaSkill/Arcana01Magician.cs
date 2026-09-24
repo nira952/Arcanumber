@@ -9,7 +9,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana01MagicianFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //防御無視
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -24,7 +23,6 @@ public class Arcana01MagicianFront : ArcanaLogic
 /// </summary>
 public class Arcana01MagicianBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.Command;
     //自分のサポートをしてくれる敵を召喚する
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {

@@ -10,7 +10,6 @@ using UnityEngine;
 /// </summary>
 public class Arcana09HermitFront : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //回復をスティールする効果
     public override void Execute(NetworkPlayer player, Arcana sourceArcana)
     {
@@ -25,7 +24,6 @@ public class Arcana09HermitFront : ArcanaLogic
 /// </summary>
 public class Arcana09HermitBack : ArcanaLogic
 {
-    public override ASkillCategory GetCategory() => ASkillCategory.StartEffect;
     //トラップ設置
     public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
     public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
