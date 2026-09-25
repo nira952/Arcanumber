@@ -27,6 +27,7 @@ public class Skill : ScriptableObject
     [Label("付与するエフェクト")][SerializeField] EffectAbility effect;
     [Label("弾数")][SerializeField] int bulletCount = 1;
     [Label("拡散角度")][SerializeField] float spreadAngle = 0f;
+    [Label("挙動")][SerializeField] SkillBehaviorType skillBehavior;
 
     /// <summary>
     /// Excelで入力した値を代入
@@ -52,6 +53,7 @@ public class Skill : ScriptableObject
         this.skillEx = Get(18);
         this.bulletCount = lm.ParseValue<int>(Get(19));
         this.spreadAngle = lm.ParseValue<float>(Get(20));
+        this.skillBehavior = lm.ParseValue<SkillBehaviorType>(Get(21));
 
         //Effectの変換
         if (System.Enum.TryParse(Get(14), true, out EffectList targetEnum))
@@ -93,6 +95,7 @@ public class Skill : ScriptableObject
     public GameObject GetEffectAnimation() {  return effectAnimation; }
     public SeName GetSe() { return se; }
     public EffectAbility GetEffect() {  return effect; }
+    public SkillBehaviorType GetBehaviorType() { return skillBehavior; }
 
 }
 
@@ -104,4 +107,21 @@ public enum SkillCategory
     [InspectorName("通常攻撃")] Attack,
     [InspectorName("回復")] Heal,
     [InspectorName("バフ付与")] Effection
+}
+
+
+public enum SkillBehaviorType
+{
+    [InspectorName("未設定 / デフォルト（基本挙動）")] None,
+    [InspectorName("直線（カーソルの方向へ飛ぶ）")] Straight,
+    [InspectorName("通常（敵の位置や指定位置に直接出す）")] TargetPosition,
+    [InspectorName("範囲攻撃（指定位置の周囲を巻き込む）")] Area,
+    [InspectorName("設置型（その場に留まり続ける）")] Stationary,
+    [InspectorName("地雷型（敵が近づくまで待機して爆発）")] Mine,
+    [InspectorName("ホーミング（敵を追尾して曲がる）")] Homing,
+    [InspectorName("戻ってくる（ブーメランのように手元に戻る）")] Boomerang,
+    [InspectorName("連鎖型（敵から敵へピョンピョン跳ねる）")] Chain,
+    [InspectorName("分裂型（途中でいくつかの小弾に分かれる）")] Split,
+    [InspectorName("公転型（自分の周囲をぐるぐる回る）")] Orbit,
+    [InspectorName("ノックバック特化（大きく吹き飛ばす）")] Knockback
 }

@@ -27,8 +27,4 @@ public class EnvironmentObject : MagicObject
         if (isMoving)
             transform.position += transform.right * moveSpeed * Time.deltaTime;
     }
-
-    protected override void OnHit(NetworkPlayer target)
-    {
-    }
 }
