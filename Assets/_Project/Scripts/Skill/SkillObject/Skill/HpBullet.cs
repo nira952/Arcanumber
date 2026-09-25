@@ -15,7 +15,7 @@ public class HpBullet : EnvironmentObject
 
     protected override void OnHit(NetworkPlayer target)
     {
-        target.TakeDamage(target.GetNowHP() * value);
+        base.OnHit(target);
         Destroy(gameObject);
     }
 }

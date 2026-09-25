@@ -14,7 +14,7 @@ public class Bullet : EnvironmentObject
 
     protected override void OnHit(NetworkPlayer target)
     {
-        target.TakeDamage(dmg);
+        base.OnHit(target);
         Destroy(gameObject);
     }
 }

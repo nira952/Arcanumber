@@ -126,7 +126,16 @@ public abstract class MagicObject : MonoBehaviour
         transform.right = reflectDir;
     }
 
-    protected abstract void OnHit(NetworkPlayer target);
+    protected virtual void OnHit(NetworkPlayer target)
+    {
+        NetworkPlayer player = PlayerUtility.FindPlayerByNo(haveCharaNo);
+        //ダメージを与える
+        PlayerUtility.FinalDamage(target, player, dmg);
+        // エフェクトをつける
+        if (effect != null)
+            target.SetHaveEffect(effect.Clone());
+    }
+
 
     protected void AtkHeal()
     {
