@@ -38,6 +38,8 @@ public class EffectAbility
     //毒用のタイマー
     [System.NonSerialized] private float lastDamageTime = -1f;
 
+    [System.NonSerialized] private float lastTickTime = -1f;
+
     public EffectAbility(Effect effect, bool isDisplay, float time, float value)
     {
         this.effect = effect;
@@ -81,6 +83,45 @@ public class EffectAbility
     {
         if (time <= -1f) return;
         time -= deltaTime;
+    }
+    /// <summary>
+    /// 毒や回復などの Tick（継続実行）処理
+    /// サーバーまたはオフラインの Update から毎フレーム呼ばれる
+    /// </summary>
+    public void ExecuteTick(float deltaTime, PlayerRoot owner)
+    {
+        switch (effect.GetEffectList())
+        {
+            case EffectList.Poison:
+                if (CheckInterval(1.0f))
+                {
+                    owner.ApplyDamage(value); // 1秒ごとにダメージ
+                }
+                break;
+
+            case EffectList.Heal:
+                if (CheckInterval(1.0f))
+                {
+                    owner.ApplyHeal(value); // 1秒ごとに回復
+                }
+                break;
+        }
+    }
+
+    private bool CheckInterval(float interval)
+    {
+        if (lastTickTime < 0)
+        {
+            lastTickTime = Time.time;
+            return false;
+        }
+
+        if (Time.time - lastTickTime >= interval)
+        {
+            lastTickTime += interval;
+            return true;
+        }
+        return false;
     }
 
     /// <summary>

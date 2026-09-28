@@ -1,36 +1,22 @@
-using nira.Demo;
+using ObservableCollections;
 using R3;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(PlayerRoot))]
-public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
+[RequireComponent(typeof(PlayerInputBinder))]
+public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
 {
     private PlayerRoot root;
-    private NetworkPlayer player;
-    private PlayerInputController inputController;
+    private PlayerInputBinder inputBinder;
 
-    private Rigidbody2D rigidbody2D;
+    private PlayerInputController inputController;
 
     private readonly NetworkVariable<int> netPlayerIndex = new(-1);
     private readonly NetworkVariable<float> netCurrentHealth = new(100);
     private readonly NetworkVariable<bool> netIsDown = new(false);
     private readonly NetworkList<NetworkEffectData> netActiveEffects = new NetworkList<NetworkEffectData>();
 
-    // 自分のプレイヤーを操作できるかどうかを判定するプロパティ
-    public bool CanProcessInput
-    {
-        get
-        {
-            // ネットワーク未生成、または所有者でない場合は入力を受け付けない
-            if (!IsSpawned || !IsOwner) return false;
-            // ゲーム状態がPlaying かつ ダウンしていない時のみ入力を許可
-            if (GameManager.Instance != null && GameManager.Instance.CurrentState.Value != GameState.Playing) return false;
-            return !root.IsDown.Value;
-        }
-    }
 
     private void Awake()
     {
@@ -40,177 +26,218 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
             return;
         }
 
-        root = GetComponent<PlayerRoot>();
-        player = GetComponent<NetworkPlayer>();
-        rigidbody2D = GetComponent<Rigidbody2D>();
-    }
-
-    private void Update()
-    {
-        // 所有者でない場合
-        if (!CanProcessInput)
-        {
-            rigidbody2D.linearVelocity = Vector2.zero; // 移動を停止
-        }
     }
 
     public override void OnNetworkSpawn()
     {
-        GameCameraManager.Instance.RegisterTarget(this.transform); // カメラにプレイヤーを登録
-
-        inputController = GetComponent<PlayerInputController>();
+        // --- コンポーネントの取得 ---
+        inputController = GetComponent<PlayerInputController>(); // 入力コントローラーの取得
+        root            = GetComponent<PlayerRoot>();            // メインスクリプトを取得
+        inputBinder     = GetComponent<PlayerInputBinder>();     // 入力バインダーの取得
 
         // 所有者でない場合、Inputコンポーネントを停止
         if (!IsOwner)
         {
-            if (inputController != null) inputController.enabled = false;
-            PlayerInput playerInput = GetComponent<PlayerInput>();
-            if (playerInput != null) playerInput.enabled = false;
+            if (inputController != null) { inputController.enabled = false; }
+
+            // 所有者でない場合、タグを "Enemy" に設定
             root.gameObject.tag = "Enemy";
         }
 
-        Debug.Log($"[PlayerNetworkController] OnNetworkSpawn - IsOwner: {IsOwner}");
+        // --- 入力バインダーの初期化 ---
+
+        // バインダーに現在のコントローラーを設定し、入力イベントを購読する
+        inputBinder.Initialize(this);
+
+        // --- ネットワーク同期の初期化 ---
 
         if (IsServer)
         {
+            // サーバー側でプレイヤーのインデックスを設定
             int assignedIndex = PlayerDataManager.Instance.GetLobbyIndexByClientId(OwnerClientId);
             root.PlayerIndex.Value = assignedIndex;
 
             // サーバー側で ReactiveProperty の変更を NetworkVariable に同期
             root.PlayerIndex.Subscribe(v => netPlayerIndex.Value = v).AddTo(this);
             root.CurrentHealth.Subscribe(v => netCurrentHealth.Value = v).AddTo(this);
+            root.IsDown.Subscribe(v => netIsDown.Value = v).AddTo(this);
 
-            // サーバー側で IsDown が変更されたら NetworkVariable に同期し、勝敗判定を行う
-            root.IsDown.Subscribe(v =>
+            // --- NetworkList の同期処理 ---
+
+            // 要素が「追加」された時だけ NetworkList に Add する
+            root.ActiveEffects.ObserveAdd().Subscribe(e =>
             {
-                netIsDown.Value = v;
-                if (GameManager.Instance != null)
+                Effect effectSO = e.Value.GetEffect();
+                netActiveEffects.Add(new NetworkEffectData
                 {
-                    GameManager.Instance.CheckFinishCondition();
-                }
+                    EffectType = effectSO.GetEffectList(),
+                    IsUp = effectSO.GetIsUp(),
+                    IsDisplay = e.Value.IsDisplay(),
+                    Time = e.Value.GetTime(),
+                    Value = e.Value.GetValue()
+                });
             }).AddTo(this);
 
-            root.ActiveEffects.Subscribe(localList =>
+            // 要素が「削除」された時だけ NetworkList から RemoveAt する
+            root.ActiveEffects.ObserveRemove().Subscribe(e =>
+            {
+                netActiveEffects.RemoveAt(e.Index);
+            }).AddTo(this);
+
+            // 要素が「全削除」された時だけ NetworkList を Clear する
+            root.ActiveEffects.ObserveClear().Subscribe(_ =>
             {
                 netActiveEffects.Clear();
-                foreach (var ability in localList)
-                {
-                    Effect effectSO = ability.GetEffect();
-                    netActiveEffects.Add(new NetworkEffectData
-                    {
-                        EffectType = effectSO.GetEffectList(),
-                        IsUp = effectSO.GetIsUp(),
-                        IsDisplay = ability.IsDisplay(),
-                        Time = ability.GetTime(),
-                        Value = ability.GetValue()
-                    });
-                }
             }).AddTo(this);
+
         }
         else
         {
-            Observable.FromEvent<NetworkVariable<int>.OnValueChangedDelegate, int>(
-                h => (oldV, newV) => h(newV),
-                h => netPlayerIndex.OnValueChanged += h,
-                h => netPlayerIndex.OnValueChanged -= h
-            ).Prepend(netPlayerIndex.Value).Subscribe(v => root.PlayerIndex.Value = v).AddTo(this);
+            // クライアント側で NetworkVariable の変更を ReactiveProperty に同期
+            netPlayerIndex.AsObservable().Subscribe(v => root.PlayerIndex.Value = v).AddTo(this);
+            netCurrentHealth.AsObservable().Subscribe(v => root.CurrentHealth.Value = v).AddTo(this);
+            netIsDown.AsObservable().Subscribe(v => root.IsDown.Value = v).AddTo(this);
 
-            // クライアント側は root.CurrentHealth の同期のみを行う
-            Observable.FromEvent<NetworkVariable<float>.OnValueChangedDelegate, float>(
-                h => (oldV, newV) => h(newV),
-                h => netCurrentHealth.OnValueChanged += h,
-                h => netCurrentHealth.OnValueChanged -= h
-            ).Prepend(netCurrentHealth.Value).Subscribe(v => root.CurrentHealth.Value = v).AddTo(this);
-
-            // クライアント側は root.IsDown の同期のみを行う
-            Observable.FromEvent<NetworkVariable<bool>.OnValueChangedDelegate, bool>(
-                h => (oldV, newV) => h(newV),
-                h => netIsDown.OnValueChanged += h,
-                h => netIsDown.OnValueChanged -= h
-            ).Prepend(netIsDown.Value).Subscribe(v =>
-            {
-                root.IsDown.Value = v;
-            }).AddTo(this);
-
+            // イベントリスナーの登録
             netActiveEffects.OnListChanged += HandleNetworkListChanged;
-            RebuildEffectsFromNetworkList();
+
+            // 途中参加などで既にネットワークリストに要素がある場合の初期同期
+            InitializeEffectsFromNetworkList();
         }
 
-        // --- UIの初期化 ---
-
-        root.PlayerIndex.Where(idx => idx != -1).Take(1).Subscribe(idx => InitializeUI(idx)).AddTo(this);
-
-        root.CurrentHealth.Subscribe(hp => {
-            if (root.PlayerIndex.Value != -1 && GameUIManager.Instance != null)
-            {
-                GameUIManager.Instance.UpdateHealth(root.PlayerIndex.Value, hp);
-            }
-        }).AddTo(this);
-
-        if (PlayerUIManager.Instance != null && PlayerDataManager.Instance != null)
-        {
-            PlayerUIManager.Instance.Initialize(PlayerDataManager.Instance);
-        }
-
-        root.Initialize(this, inputController);
+        // プレイヤーの初期化を実行
+        root.Initialize();
     }
 
 
-    private void InitializeUI(int index)
+    // --- 各アクション処理 ---
+
+    /// <summary>
+    /// ローカルで攻撃入力を処理し、攻撃スキルを発動してサーバーへ攻撃要求を送信する。
+    /// </summary>
+    public void OnAttackTriggered()
     {
-        if (GameUIManager.Instance == null) return;
-        
-        string playerName = PlayerDataManager.Instance.GetPlayerNameByIndex(index);
+        // 攻撃を実行する
+        root.ExecuteAttack();
 
-        GameUIManager.Instance.SetPlayerName(index, playerName);
-        GameUIManager.Instance.SetHealthSliderMaxValue(index, 100);
-    }
-
-    // --- 各アクション処理 (前回の実装まま) ---
-
-    public void RequestAttack()
-    {
-        inputController.ExecuteAttackLocal();
-        player.UseAttack(); // 攻撃のアクションを呼び出す
+        // サーバーへ攻撃要求を送信
         RequestAttackServerRpc();
     }
+
     [ServerRpc] private void RequestAttackServerRpc() => ExecuteAttackClientRpc();
     [ClientRpc] private void ExecuteAttackClientRpc() 
     {
         // 自分のクライアントでは既に攻撃処理を行っているので、所有者でない場合のみ実行
         if (!IsOwner)
         {
-            inputController.ExecuteAttackLocal();
-            player.UseAttack(); // 攻撃のアクションを呼び出す
+            // 攻撃を実行する
+            root.ExecuteAttack();
         }
 
     }
 
-    public void RequestSkillUse()
+    // ローカルで移動入力を処理する
+    public void OnMoveTriggered(float direction)
     {
-        player.UseCurrentSkill(); // スキルのアクションを呼び出す
+        root.ExecuteMove(direction); // 移動のアクションを呼び出す
 
-        //// 2. サーバーへスキルの発動を要求
-        RequestSkillUseServerRpc(root.SelectedSkillIndex.Value);
+        // 位置の同期は NetworkTransform に任せる
     }
 
-    [ServerRpc]
-    private void RequestSkillUseServerRpc(int skillIndex)
+    public void OnJumpTriggered()
     {
-        // 他クライアントへ演出の再生を指示
-        ExecuteSkillUseClientRpc(skillIndex);
+        root.ExecuteJump();
+
+        // ジャンプの同期は NetworkTransform に任せる
     }
 
-    [ClientRpc]
-    private void ExecuteSkillUseClientRpc(int skillIndex)
+    public void OnSkillSelectTriggered(int skillIndex)
     {
-        if (IsOwner) return; // 自分は実行済みなので無視
-
-        player.UseCurrentSkill(); // スキルのアクションを呼び出す
-
-        inputController.ExecuteSkillUseLocal();
+        root.ExecuteSkillSelect(skillIndex);
     }
 
+    public void OnSkillUseTriggered()
+    {
+        if (!IsOwner) return;
+
+        root.ExecuteSkillUse();
+    }
+
+
+
+    // --- NetworkList の変更を処理するメソッド ---
+    private void HandleNetworkListChanged(NetworkListEvent<NetworkEffectData> changeEvent)
+    {
+        switch (changeEvent.Type)
+        {
+            case NetworkListEvent<NetworkEffectData>.EventType.Add:
+            case NetworkListEvent<NetworkEffectData>.EventType.Insert:
+                var newAbility = CreateEffectAbility(changeEvent.Value);
+                if (newAbility != null)
+                {
+                    // インデックス指定または末尾追加
+                    if (changeEvent.Index < root.ActiveEffects.Count)
+                    {
+                        root.ActiveEffects.Insert(changeEvent.Index, newAbility);
+                    }
+                    else
+                    {
+                        root.ActiveEffects.Add(newAbility);
+                    }
+                }
+                break;
+
+            case NetworkListEvent<NetworkEffectData>.EventType.Remove:
+            case NetworkListEvent<NetworkEffectData>.EventType.RemoveAt:
+                if (changeEvent.Index < root.ActiveEffects.Count)
+                {
+                    root.ActiveEffects.RemoveAt(changeEvent.Index);
+                }
+                break;
+
+            case NetworkListEvent<NetworkEffectData>.EventType.Value: // 値の更新
+                var updatedAbility = CreateEffectAbility(changeEvent.Value);
+                if (updatedAbility != null && changeEvent.Index < root.ActiveEffects.Count)
+                {
+                    root.ActiveEffects[changeEvent.Index] = updatedAbility;
+                }
+                break;
+
+            case NetworkListEvent<NetworkEffectData>.EventType.Clear:
+                root.ActiveEffects.Clear();
+                break;
+        }
+    }
+
+    // 初期化（途中参加クライアント用）
+    private void InitializeEffectsFromNetworkList()
+    {
+        root.ActiveEffects.Clear();
+        foreach (var netData in netActiveEffects)
+        {
+            var ability = CreateEffectAbility(netData);
+            if (ability != null)
+            {
+                root.ActiveEffects.Add(ability);
+            }
+        }
+    }
+
+    // EffectData から EffectAbility を生成する共通ヘルパーメソッド
+    private EffectAbility CreateEffectAbility(NetworkEffectData netData)
+    {
+        Effect effectSO = EffectRegistry.Get(netData.EffectType, netData.IsUp);
+        if (effectSO == null) return null;
+
+        return new EffectAbility(
+            effectSO,
+            netData.IsDisplay,
+            netData.Time,
+            netData.Value
+        );
+    }
+
+    // バインドの解除
     public override void OnNetworkDespawn()
     {
         if (IsClient && !IsServer)
@@ -219,31 +246,4 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerActionHandler
         }
     }
 
-    private void HandleNetworkListChanged(NetworkListEvent<NetworkEffectData> changeEvent)
-    {
-        RebuildEffectsFromNetworkList();
-    }
-
-    private void RebuildEffectsFromNetworkList()
-    {
-        var newList = new List<EffectAbility>();
-
-        foreach (var netData in netActiveEffects)
-        {
-            Effect effectSO = EffectRegistry.Get(netData.EffectType, netData.IsUp);
-
-            if (effectSO != null)
-            {
-                newList.Add(new EffectAbility(
-                    effectSO,
-                    netData.IsDisplay,
-                    netData.Time,
-                    netData.Value
-                ));
-            }
-        }
-
-        // クライアント側のRoot(ReactiveProperty)を更新
-        root.ActiveEffects.Value = newList;
-    }
 }

@@ -166,6 +166,39 @@ public class PlayerDataManager : NetworkBehaviour
         return null; // 見つからない場合
     }
 
+    public Skill[] GetPlayerSkillsByIndex(int index)
+    {
+        foreach (var data in _allPlayerData)
+        {
+            if (data.LobbyIndex == index)
+            {
+                Skill[] skills = new Skill[4];
+                for (int i = 0; i < 4; i++)
+                {
+                    int skillNo = data.GetSkill(i);
+                    // スキル番号からスキルオブジェクトを取得する処理をここに追加
+                    skills[i] = AssetLoader.Instance.GetSkill(skillNo);
+                }
+                return skills;
+            }
+        }
+        return null; // 見つからない場合
+    }
+
+    public Arcana GetPlayerArcanaByIndex(int index)
+    {
+        foreach (var data in _allPlayerData)
+        {
+            if (data.LobbyIndex == index)
+            {
+                // ArcanaListからArcanaオブジェクトを取得する処理をここに追加
+                return AssetLoader.Instance.GetArcana(data.arcana, data.IsFront);
+            }
+        }
+        return null; // 見つからない場合
+    }
+
+
     // ==========================================
     // 【サーバー専用】データをセットする処理
     // ==========================================
@@ -288,7 +321,7 @@ public class PlayerDataManager : NetworkBehaviour
     /// <summary>
     /// 【ホスト専用】指定されたClientIdのプレイヤーデータを探し、アルカナ情報を上書きして全クライアントへ同期する
     /// </summary>
-    public void Server_UpdatePlayerArcana(ulong clientId, ArcanaList selectedArcana)
+    public void Server_UpdatePlayerArcana(ulong clientId,bool isFace, ArcanaList selectedArcana)
     {
         if (!IsServer) return;
 

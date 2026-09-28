@@ -1,4 +1,4 @@
-using nira.Demo;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -23,106 +23,95 @@ public class PlayerSpawner : NetworkBehaviour
         if (isLocalMode)
         {
             Debug.Log("[PlayerSpawner] オフラインモードでプレイヤーを単体生成します。");
-            SpawnPlayerOffline();
+            SpawnAllPlayersOffline();
         }
     }
 
-    public override void OnNetworkSpawn()
-    {
-        // オフラインデバッグ時はネットワーク生成処理をスキップ
-        if (isLocalMode) return;
-
-        // サーバー（ホスト）側のみが、シーンロード完了イベントを監視する
-        if (IsServer)
-        {
-            if (NetworkManager.Singleton.SceneManager != null)
-            {
-                NetworkManager.Singleton.SceneManager.OnSceneEvent += OnSceneEvent;
-            }
-        }
-    }
-    public override void OnNetworkDespawn()
-    {
-        // イベントハンドラの解除（メモリリーク・多重登録防止）
-        if (IsServer && NetworkManager.Singleton != null && NetworkManager.Singleton.SceneManager != null)
-        {
-            NetworkManager.Singleton.SceneManager.OnSceneEvent -= OnSceneEvent;
-        }
-    }
-
-
-    /// <summary>
-    /// シーンイベントのハンドラ（サーバー専用）
-    /// </summary>
-    private void OnSceneEvent(SceneEvent sceneEvent)
-    {
-        // イベントが「全クライアントのロード完了 (LoadEventCompleted)」かつ「現在のシーン」の場合のみ実行
-        if (sceneEvent.SceneEventType == SceneEventType.LoadEventCompleted)
-        {
-            // 該当シーンロードイベントを発生させたのが自シーンかチェック
-            if (sceneEvent.SceneName == gameObject.scene.name)
-            {
-                Debug.Log($"[PlayerSpawner] 全クライアントのシーンロードが完了しました。一括生成を開始します。");
-
-                // 二重実行を防ぐため、一度実行したらイベント解除
-                NetworkManager.Singleton.SceneManager.OnSceneEvent -= OnSceneEvent;
-
-                SpawnAllPlayers();
-            }
-        }
-    }
     /// <summary>
     /// 現在接続されているすべてのクライアントのプレイヤーを一括生成・登録する (サーバー専用)
     /// </summary>
-    private void SpawnAllPlayers()
+    public List<PlayerRoot> SpawnAllPlayersOnline()
     {
+        // 接続されているクライアントの ID を取得
         var connectedClientIds = NetworkManager.Singleton.ConnectedClientsIds;
+
         Debug.Log($"[PlayerSpawner] 全プレイヤーの一括生成を開始します。現在の接続人数: {connectedClientIds.Count}人");
 
-        int index = 0;
+        PlayerUtility.SetIsServer(true); // サーバーとしてのフラグを設定
+
+        List<PlayerRoot> spawnedPlayers = new List<PlayerRoot>();
+
+        int index = 0; // 0～3のインデックスを順番に割り当てる
+
         foreach (ulong clientId in connectedClientIds)
         {
             // インデックスや ClientId に応じてスポーン位置を決定
             Transform spawnPoint = GetSpawnPoint(index);
+
+            // プレイヤーを生成
             PlayerRoot spawnedPlayer = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
 
-            // プレイヤー名を設定（デバッグ用）
-            string playerName = $"Player_{index}";
-            if (IsServer)
+            // プレイヤー名を設定
+            string playerName = PlayerDataManager.Instance.GetPlayerNameByIndex(index);
+
+            spawnedPlayer.gameObject.name = "Player" + index;
+
+            // プレイヤーをサーバーリストに登録
+            PlayerUtility.RegisterPlayer(spawnedPlayer);
+
+            // カメラにプレイヤーを登録
+            GameCameraManager.Instance.RegisterTarget(spawnedPlayer.transform);
+
+
+            if (!IsOwner)
             {
-                playerName += "Host";
+                // プレイヤーのスキルとアルカナを取得
+                Skill[] skills = PlayerDataManager.Instance.GetPlayerSkillsByIndex(index);
+                Arcana arcana = PlayerDataManager.Instance.GetPlayerArcanaByIndex(index);
+
+                // 自分以外のプレイヤーオブジェクトの場合、PlayerDataManagerから取得したArcanaとSkillを設定する
+                spawnedPlayer.SetSkills(skills);
+                spawnedPlayer.SetArcana(arcana);
+
             }
-            spawnedPlayer.gameObject.name = playerName;
 
             if (spawnedPlayer.TryGetComponent<NetworkObject>(out var networkObj))
             {
                 // 1. スポーン処理（これは全端末へ伝播する）
                 networkObj.SpawnAsPlayerObject(clientId);
-
-
-                // 2. サーバー側のみ GameManager に登録する
-                if (IsServer)
-                {
-                    GameManager.Instance.RegisterPlayer(spawnedPlayer);
-                }
             }
+            else
+            {
+                Debug.LogError($"[PlayerSpawner] プレイヤーオブジェクトに NetworkObject コンポーネントが見つかりません。ClientId: {clientId}, PlayerName: {playerName}");
+            }
+
+            spawnedPlayers.Add(spawnedPlayer);
+
             index++;
         }
+
+        return spawnedPlayers;
     }
 
     /// <summary>
     /// オフライン（単体テスト等）用にプレイヤーを生成・初期化する
     /// </summary>
-    private void SpawnPlayerOffline()
+    public List<PlayerRoot> SpawnAllPlayersOffline()
     {
+        PlayerUtility.SetIsServer(true); // サーバーとしてのフラグを設定
+
+        List<PlayerRoot> spawnedPlayers = new List<PlayerRoot>();
+
         int playerIndex = 0;
 
         Transform spawnPoint = GetSpawnPoint(playerIndex);
         PlayerRoot spawnedPlayer = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
 
-        GameManager.Instance.RegisterPlayer(spawnedPlayer);
+        PlayerUtility.RegisterPlayer(spawnedPlayer);
 
         PlayerOfflineController controller = spawnedPlayer.gameObject.AddComponent<PlayerOfflineController>();
+
+        spawnedPlayers.Add(spawnedPlayer);
 
         Debug.Log("[PlayerSpawner] PlayerOfflineController をアタッチし、オフライン生成を完了しました。");
 
@@ -133,12 +122,13 @@ public class PlayerSpawner : NetworkBehaviour
         Transform enemySpawnPoint = GetSpawnPoint(enemyIndex);
         PlayerRoot spawnedEnemy = Instantiate(playerPrefab, enemySpawnPoint.position, enemySpawnPoint.rotation);
 
-        GameManager.Instance.RegisterPlayer(spawnedEnemy);
-
         PlayerAutoController enemyController = spawnedEnemy.gameObject.AddComponent<PlayerAutoController>();
 
         Debug.Log("[PlayerSpawner] PlayerAutoController をアタッチし、オフライン敵生成を完了しました。");
 
+        spawnedPlayers.Add(spawnedEnemy);
+
+        return spawnedPlayers;
     }
 
     /// <summary>

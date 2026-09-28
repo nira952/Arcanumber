@@ -13,6 +13,7 @@ public static class GameConfig
     //スキルホッパー
     public const int SKILL_HOPPER_MAX = 4;
     public const int SKILL_ARCANA = 5;
+    public const int COOLTIME_HOPPER_MAX = 6;
 
     /*スキルUIの定数*/
     //スキルUIのパネルのフェード時間

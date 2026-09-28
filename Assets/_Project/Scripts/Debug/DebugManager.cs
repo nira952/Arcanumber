@@ -63,15 +63,15 @@ public class DebugManager : MonoBehaviour
             if (status != null)
             {
                 //PlayerUtilityの静的メソッドを使って最終的な計算後の値を取得
-                float finalAtk = PlayerUtility.GetFinalAtk(player);
-                float finalDef = PlayerUtility.GetFinalDef(player);
-                float finalSpd = PlayerUtility.GetFinalSpeed(player);
+                //float finalAtk = PlayerUtility.GetFinalAtk(player);
+                //float finalDef = PlayerUtility.GetFinalDef(player);
+                //float finalSpd = PlayerUtility.GetFinalSpeed(player);
 
-                //各テキストに反映（:F2 で小数点以下2桁に固定）
-                hpText.text = $"HP: {currentHp} / {status.GetMaxHp()}";
-                atkText.text = $"ATK: {finalAtk:F2}";
-                defText.text = $"DEF: {finalDef:F2}";
-                spdText.text = $"SPD: {finalSpd:F2}";
+                ////各テキストに反映（:F2 で小数点以下2桁に固定）
+                //hpText.text = $"HP: {currentHp} / {status.GetMaxHp()}";
+                //atkText.text = $"ATK: {finalAtk:F2}";
+                //defText.text = $"DEF: {finalDef:F2}";
+                //spdText.text = $"SPD: {finalSpd:F2}";
             }
         }
         else

@@ -1,13 +1,14 @@
+using DG.Tweening;
+using ObservableCollections;
+using R3;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using R3;
-using DG.Tweening;
-using NUnit.Framework.Constraints;
 
-public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
+public class GameUIManager :MonoBehaviour
 {
     [Serializable]
     private class PlayerEffectBlock
@@ -15,20 +16,18 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
         // 事前にインスペクターで5枚程度の Image をセットしておく
         public List<Image> availableImages = new List<Image>();
 
-        /// <summary>
-        /// 全てのイメージ枠を一旦非表示にする
-        /// </summary>
         public void HideAll()
         {
             foreach (var img in availableImages)
             {
-                if (img != null)
-                {
-                    img.gameObject.SetActive(false);
-                }
+                if (img != null) { img.gameObject.SetActive(false); }
             }
         }
     }
+
+    [SerializeField] private TextMeshProUGUI timerText;
+
+    [SerializeField] private TextMeshProUGUI gameStateText;
 
     [Header("ステータス関係 (プレイヤーごと)")]
     [SerializeField] private PlayerEffectBlock[] playerEffectBlocks = new PlayerEffectBlock[4];
@@ -38,9 +37,6 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
     [SerializeField] private Slider[] healthSliders = new Slider[4];
     [SerializeField] private TextMeshProUGUI[] hpText;
     [SerializeField] private TextMeshProUGUI[] playerNameTexts = new TextMeshProUGUI[4];
-    [SerializeField] private TextMeshProUGUI timerText;
-
-    [SerializeField] private TextMeshProUGUI gameStateText;
 
     [Header("リザルト関連")]
     [SerializeField] private CanvasGroup resultPanel;
@@ -48,44 +44,118 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
     public Button endButton;
     public Button reMatchButton;
 
+    private readonly CompositeDisposable playerSubscriptions = new();
 
-
-    protected override void Awake()
+    public void Initialize(GameManager gameManager,TimeManager timeManager,List<PlayerRoot> playerList)
     {
-        base.Awake();
-        // 起動時に全非表示にしておく
-        foreach (var block in playerEffectBlocks)
+        // --- ストリームを購読してUIを更新する処理 ---
+
+        // ゲーム状態の変更を購読し、UI更新とログ出力を行う
+        gameManager.StateRx.Subscribe(state =>
         {
-            block.HideAll();
+            switch (state)
+            {
+                case GameState.Playing:
+                    UpdateGameStateText("Start!");
+                    break;
+                case GameState.Finish:
+                    UpdateGameStateText("Finish");
+                    break;
+            }
+        }).AddTo(this);
+
+        // タイマーの初期表示を空にする
+        if (timerText != null) { timerText.text = ""; }
+
+        // タイマーの残り時間を購読し、UIのタイマー表示を更新する
+        timeManager.RemainingTime.Subscribe(time =>
+        {
+            UpdateTimerDisplay((int)time);
+        }).AddTo(this);
+
+        // プレイヤーリストの更新を購読し、UIを更新する
+        foreach (var root in playerList)
+        {
+            BindSinglePlayer(root);
+            // FIX: プレイヤーのステータス表示をバインドする処理を追加
+            BindPlayerStatus(root.PlayerIndex.Value, root.ActiveEffects);
+
+            // プレイヤーの名前とHPスライダーの初期設定
+            if (root.PlayerIndex.Value >= 0)
+            {
+                SetPlayerName(root.PlayerIndex.Value, root.name);
+                SetHealthSliderMaxValue(root.PlayerIndex.Value, 100);
+            }
+
+            // プレイヤーのHP変化を購読し、UIのHPスライダーを更新する
+            root.CurrentHealth.Subscribe(hp =>
+            {
+                if (root.PlayerIndex.Value >= 0)
+                {
+                    UpdateHealth(root.PlayerIndex.Value, hp);
+                }
+            }).AddTo(playerSubscriptions);
+
+            // プレイヤーのアクティブ効果の変更を購読し、UIのステータス表示を更新する
+            root.ActiveEffects.ObserveChanged()
+                .Subscribe(_ =>
+                {
+                    if (root.PlayerIndex.Value >= 0)
+                    {
+                        UpdateActiveEffects(root.PlayerIndex.Value, root.ActiveEffects.ToList());
+                    }
+                }).AddTo(playerSubscriptions);
+
+            // プレイヤーのインデックスが確定した時の処理（有効なインデックス >= 0 になった時）
+            root.PlayerIndex
+                .Where(index => index >= 0)
+                .Take(1)
+                .Subscribe(index =>
+                {
+                    SetPlayerName(index, root.name);
+                    SetHealthSliderMaxValue(index, 100);
+                })
+                .AddTo(playerSubscriptions);
         }
 
-        // 初期化時に全てのスライダーを非表示にする
-        foreach (var slider in healthSliders)
-        {
-            slider.gameObject.SetActive(false);
-        }
-
-        foreach (var obj in statusObjects)
-        {
-            obj.SetActive(false);
-        }
-
-        // 初期化時に全てのプレイヤー名テキストを非表示にする
-        foreach (var text in playerNameTexts)
-        {
-            text.gameObject.SetActive(false);
-        }
-
-        if (timerText != null)
-        {
-            timerText.text = "";
-        }
     }
+
+
+    // 単体プレイヤーのバインディング
+    private void BindSinglePlayer(PlayerRoot root)
+    {
+        if (root == null) return;
+
+        // 1. Index確定時の処理（有効なIndex >= 0 になった時）
+        root.PlayerIndex
+            .Where(index => index >= 0)
+            .Take(1)
+            .Subscribe(index =>
+            {
+                string playerName = root.name;
+                SetPlayerName(index, playerName);
+                SetHealthSliderMaxValue(index, 100);
+            })
+            .AddTo(playerSubscriptions);
+
+        // 2. HP変化時の処理
+        root.CurrentHealth
+            .Subscribe(hp =>
+            {
+                if (root.PlayerIndex.Value >= 0)
+                {
+                    UpdateHealth(root.PlayerIndex.Value, hp);
+                }
+            })
+            .AddTo(playerSubscriptions);
+    }
+
+
 
     /// <summary>
     /// 指定したプレイヤーの名前テキストを設定する
     /// </summary>
-    public void SetPlayerName(int playerIndex, string playerName)
+    private void SetPlayerName(int playerIndex, string playerName)
     {
         if (playerIndex < 0 || playerIndex >= playerNameTexts.Length) return;
 
@@ -96,7 +166,7 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
     /// <summary>
     /// 指定したプレイヤーの体力スライダーの最大値を設定する
     /// </summary>
-    public void SetHealthSliderMaxValue(int playerIndex, float maxHealth)
+    private void SetHealthSliderMaxValue(int playerIndex, float maxHealth)
     {
         if (playerIndex < 0 || playerIndex >= healthSliders.Length) return;
 
@@ -110,7 +180,7 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
     /// <summary>
     /// 指定したプレイヤーの体力スライダーの値を更新する
     /// </summary>
-    public void UpdateHealth(int playerIndex, float health)
+    private void UpdateHealth(int playerIndex, float health)
     {
         if (playerIndex < 0 || playerIndex >= healthSliders.Length) return;
         healthSliders[playerIndex].value = health;
@@ -123,7 +193,7 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
     /// <summary>
     /// タイマーの表示を更新する
     /// </summary>
-    public void UpdateTimer(string time)
+    private void UpdateTimer(string time)
     {
         if (timerText != null)
         {
@@ -167,21 +237,25 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
 
 
     /// <summary>
-    /// R3 の ReactiveProperty<List<EffectAbility>> を購読して UI とバインドする
+    /// プレイヤーのステータス表示を指定インデックスにバインドし、アクティブ効果の変更を監視して表示を更新します。
     /// </summary>
-    public void BindPlayerStatus(int playerIndex, ReactiveProperty<List<EffectAbility>> activeEffects)
+    ///
+    /// <param name="playerIndex">対象プレイヤーのインデックス。配列の範囲外の場合は処理を行いません。</param>
+    /// <param name="activeEffects">現在適用されている効果のコレクション。変更を監視して表示を更新します。</param>
+    public void BindPlayerStatus(int playerIndex,ObservableList<EffectAbility> activeEffects)
     {
-        if (playerIndex < 0 || playerIndex >= playerEffectBlocks.Length) return;
-        if (activeEffects == null) return;
+        if (playerIndex < 0 || playerIndex >= playerEffectBlocks.Length)
+            return;
 
-        activeEffects
-            .Subscribe(effects =>
-            {
-                UpdateActiveEffects(playerIndex, effects);
-            })
-            .AddTo(this);
+        UpdateActiveEffects(playerIndex, activeEffects.ToList());
+
+        activeEffects.ObserveChanged()
+        .Subscribe(_ =>
+        {
+            UpdateActiveEffects(playerIndex, activeEffects.ToList());
+        })
+        .AddTo(this);
     }
-
     /// <summary>
     /// エフェクト表示の更新処理
     /// </summary>
@@ -248,5 +322,10 @@ public class GameUIManager : SingletonMonoBehaviour<GameUIManager>
 
     }
 
+
+    private void OnDestroy()
+    {
+        playerSubscriptions.Dispose();
+    }
 }
 
