@@ -31,9 +31,7 @@ public class DebugPlayerPreview : MonoBehaviour
         root.IsDown.Subscribe(v => previewIsDown = v).AddTo(this);
         root.IsMove.Subscribe(v => previewIsMove = v).AddTo(this);
         root.IsJump.Subscribe(v => previewIsJump = v).AddTo(this);
-        root.IsChangeMove.Subscribe(v => previewIsChangeMove = v).AddTo(this);
-        root.IsNormalAttack.Subscribe(v => previewIsNormalAttack = v).AddTo(this);
-        root.ActiveEffects.Subscribe(v => previewActiveEffects = v).AddTo(this);
+
     }
 
 #endif

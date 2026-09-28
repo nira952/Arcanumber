@@ -67,6 +67,9 @@ public class PlayerAttack : MonoBehaviour
         slashObject.gameObject.SetActive(false); // 攻撃オブジェクトを非アクティブにする
     }
 
+    /// <summary>
+    /// 通常攻撃を振る前にヒット済み対象リストをリセットする
+    /// </summary>
     public void ResetList()
     {
         slashObject.ResetList();

@@ -228,7 +228,10 @@ public class ArcanaSelectManager : NetworkBehaviour
         }
         else
         {
-            SubmitSelectedArcanaServerRpc(selectedArcana.GetArcanaListID());
+
+
+
+            SubmitSelectedArcanaServerRpc(selectedArcana.GetArcanaListID(),selectedArcana.GetIsFront());
             SetReadyStatusServerRpc(true);
         }
 
@@ -460,7 +463,7 @@ public class ArcanaSelectManager : NetworkBehaviour
 
     [ServerRpc(RequireOwnership = false)]
 
-    private void SubmitSelectedArcanaServerRpc(int arcanaId, ServerRpcParams rpcParams = default)
+    private void SubmitSelectedArcanaServerRpc(int arcanaId,bool isFace, ServerRpcParams rpcParams = default)
 
     {
 
@@ -470,7 +473,7 @@ public class ArcanaSelectManager : NetworkBehaviour
 
         {
 
-            PlayerDataManager.Instance.Server_UpdatePlayerArcana(clientId, (ArcanaList)arcanaId);
+            PlayerDataManager.Instance.Server_UpdatePlayerArcana(clientId, isFace,(ArcanaList)arcanaId);
 
         }
 

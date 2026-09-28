@@ -8,6 +8,7 @@ public struct PlayerNetworkData : INetworkSerializable, IEquatable<PlayerNetwork
     public ulong ClientId;
     public FixedString32Bytes PlayerName;
     public ArcanaList arcana;
+    public bool IsFront;
     public bool IsReady;
 
     // 内部的には byte 配列（または固定数）で保持して参照型（配列）を排除する
@@ -86,7 +87,9 @@ public struct PlayerNetworkData : INetworkSerializable, IEquatable<PlayerNetwork
         serializer.SerializeValue(ref LobbyIndex);
         serializer.SerializeValue(ref ClientId);
         serializer.SerializeValue(ref PlayerName);
+        serializer.SerializeValue(ref arcana);
         serializer.SerializeValue(ref IsReady);
+        serializer.SerializeValue(ref IsFront);
         serializer.SerializeValue(ref skill0);
         serializer.SerializeValue(ref skill1);
         serializer.SerializeValue(ref skill2);
@@ -98,7 +101,8 @@ public struct PlayerNetworkData : INetworkSerializable, IEquatable<PlayerNetwork
                ClientId == other.ClientId &&
                PlayerName.Equals(other.PlayerName) &&
                arcana == other.arcana &&
-               IsReady == other.IsReady && 
+               IsReady == other.IsReady &&
+               IsFront == other.IsFront &&
                skill0 == other.skill0 &&
                skill1 == other.skill1 &&
                skill2 == other.skill2 &&

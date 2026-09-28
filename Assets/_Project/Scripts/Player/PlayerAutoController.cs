@@ -1,14 +1,12 @@
-using nira.Demo;
+using R3;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using R3;
-using Unity.VisualScripting;
 
-public class PlayerAutoController : MonoBehaviour, IPlayerActionHandler
+public class PlayerAutoController : MonoBehaviour, IPlayerInputMediator
 {
     private PlayerRoot root;
-    private NetworkPlayer player;
     private AutoInputController autoContoller;
 
     private Rigidbody2D rigidbody2D;
@@ -24,7 +22,7 @@ public class PlayerAutoController : MonoBehaviour, IPlayerActionHandler
         get
         {
             // ゲーム状態がPlaying かつ ダウンしていない時のみ入力を許可
-            if (GameManager.Instance != null && GameManager.Instance.CurrentState.Value != GameState.Playing) return false;
+            if (GameManager.Instance != null && GameManager.Instance.NetWorkGameState.Value != GameState.Playing) return false;
             return !root.IsDown.Value;
         }
     }
@@ -32,19 +30,19 @@ public class PlayerAutoController : MonoBehaviour, IPlayerActionHandler
 
     private void Awake()
     {
-        // もしオンラインモードならこのコンポーネントを破棄
-        if (!PlayerDataManager.Instance.IsLocalMode)
-        {
-            Destroy(this); 
-            return;
-        }
+        //// もしオンラインモードならこのコンポーネントを破棄
+        //if (!PlayerDataManager.Instance.IsLocalMode)
+        //{
+        //    Destroy(this); 
+        //    return;
+        //}
 
-        root = GetComponent<PlayerRoot>();
-        player = GetComponent<NetworkPlayer>();
-        rigidbody2D = GetComponent<Rigidbody2D>();
+        //root = GetComponent<PlayerRoot>();
+        //player = GetComponent<NetworkPlayer>();
+        //rigidbody2D = GetComponent<Rigidbody2D>();
 
-        // 生成時に初期化処理を行う
-        Initialize();
+        //// 生成時に初期化処理を行う
+        //Initialize();
     }
 
     private void Update()
@@ -58,88 +56,102 @@ public class PlayerAutoController : MonoBehaviour, IPlayerActionHandler
 
     private void Initialize()
     {
-        GameCameraManager.Instance.RegisterTarget(this.transform); // カメラにプレイヤーを登録
+        //GameCameraManager.Instance.RegisterTarget(this.transform); // カメラにプレイヤーを登録
 
-        // Inputコンポーネントを無効化
-        var playerInput = GetComponent<PlayerInput>();
-        if (playerInput != null) playerInput.enabled = false;
+        //// Inputコンポーネントを無効化
+        //var playerInput = GetComponent<PlayerInput>();
+        //if (playerInput != null) playerInput.enabled = false;
 
-        // AutoInputControllerを追加して、敵としての自動操作を行う
-        autoContoller = root.AddComponent<AutoInputController>();
+        //// AutoInputControllerを追加して、敵としての自動操作を行う
+        //autoContoller = root.AddComponent<AutoInputController>();
 
-        root.gameObject.tag = "Enemy";
+        //root.gameObject.tag = "Enemy";
 
-        // 敵のプレイヤーインデックスを設定
-        int assignedIndex = ENEMY_INDEX;
-        root.PlayerIndex.Value = assignedIndex;
+        //// 敵のプレイヤーインデックスを設定
+        //int assignedIndex = ENEMY_INDEX;
+        //root.PlayerIndex.Value = assignedIndex;
 
-        // このスクリプト内で IsDown が変更されたら、勝敗判定を行う
-        root.IsDown.Subscribe(v =>
-        {
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.CheckFinishCondition();
-            }
-        }).AddTo(this);
+        //// このスクリプト内で IsDown が変更されたら、勝敗判定を行う
+        //root.IsDown.Subscribe(v =>
+        //{
+        //    if (GameManager.Instance != null)
+        //    {
+        //        GameManager.Instance.CheckFinishCondition();
+        //    }
+        //}).AddTo(this);
 
-        // rootのActiveEffectsをこのスクリプトに反映する
-        root.ActiveEffects.Subscribe(localList =>
-        {
-            activeEffects.Clear();
-            // クローンを作成してコピー
-            activeEffects = localList;
+        //// rootのActiveEffectsをこのスクリプトに反映する
+        //root.ActiveEffects.Subscribe(localList =>
+        //{
+        //    activeEffects.Clear();
+        //    // クローンを作成してコピー
+        //    activeEffects = localList;
             
-        }).AddTo(this);
+        //}).AddTo(this);
 
 
-        // --- UIの初期化処理 ---
+        //// --- UIの初期化処理 ---
 
-        if (GameUIManager.Instance == null)
-        {
-            Debug.LogWarning("GameUIManager is not found in the scene.");
-            return;
-        }
+        //if (GameUIManager.Instance == null)
+        //{
+        //    Debug.LogWarning("GameUIManager is not found in the scene.");
+        //    return;
+        //}
 
-        // UIManagerのインスタンスを取得
-        GameUIManager uIManager = GameUIManager.Instance;
+        //// UIManagerのインスタンスを取得
+        //GameUIManager uIManager = GameUIManager.Instance;
 
-        // UIにIndex変化時の処理を登録
-        root.PlayerIndex.Where(idx => idx != -1).Take(1).Subscribe(idx => {
+        //// UIにIndex変化時の処理を登録
+        //root.PlayerIndex.Where(idx => idx != -1).Take(1).Subscribe(idx => {
 
-            string name = ENEMY_NAME;
-            // UIにプレイヤー名を設定
-            uIManager.SetPlayerName(idx, name);
-            // UIに最大HPを設定
-            uIManager.SetHealthSliderMaxValue(idx, 100);
+        //    string name = ENEMY_NAME;
+        //    // UIにプレイヤー名を設定
+        //    uIManager.SetPlayerName(idx, name);
+        //    // UIに最大HPを設定
+        //    uIManager.SetHealthSliderMaxValue(idx, 100);
 
-        }).AddTo(this);
+        //}).AddTo(this);
 
-        // UIにHPの変化時の処理を登録
-        root.CurrentHealth.Subscribe(hp => {
-            if (root.PlayerIndex.Value != -1)
-            {
-                uIManager.UpdateHealth(root.PlayerIndex.Value, hp);
-            }
-        }).AddTo(this);
+        //// UIにHPの変化時の処理を登録
+        //root.CurrentHealth.Subscribe(hp => {
+        //    if (root.PlayerIndex.Value != -1)
+        //    {
+        //        uIManager.UpdateHealth(root.PlayerIndex.Value, hp);
+        //    }
+        //}).AddTo(this);
 
-        if (PlayerUIManager.Instance != null && PlayerDataManager.Instance != null)
-        {
-            PlayerUIManager.Instance.Initialize(PlayerDataManager.Instance);
-        }
+        //if (PlayerUIManager.Instance != null && PlayerDataManager.Instance != null)
+        //{
+        //    PlayerUIManager.Instance.Initialize(PlayerDataManager.Instance);
+        //}
 
-        // 全て終わったらrootの初期化処理を呼び出す
-        root.Initialize(this, autoContoller);
-    }
-
-    public void RequestSkillUse()
-    {
-        player.UseCurrentSkill(); // スキルのアクションを呼び出す
-
+        //// 全て終わったらrootの初期化処理を呼び出す
+        //root.Initialize(this, autoContoller);
     }
 
 
-    public void RequestAttack()
+    public void OnMoveTriggered(float direction)
     {
-        player.UseAttack(); // 攻撃のアクションを呼び出す
+        throw new System.NotImplementedException();
+    }
+
+    public void OnJumpTriggered()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnAttackTriggered()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnSkillSelectTriggered(int skillIndex)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnSkillUseTriggered()
+    {
+        throw new System.NotImplementedException();
     }
 }

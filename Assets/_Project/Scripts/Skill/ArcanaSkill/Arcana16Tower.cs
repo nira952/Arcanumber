@@ -32,11 +32,13 @@ public class Arcana16TowerBack : ArcanaLogic
     public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
     public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
     {
-        int sNo = player.GetSkillNo();
+        Skill skill = player.GetCurrentSkill();
         if (Random.value <= sourceArcana.GetKeepValue())
         {
             yield return new WaitForSeconds(time);
-            SkillManager.Instance.RequestSkill(player, sNo);
+
+            // SkillManagerにスキル発動を依頼する
+            SkillManager.Instance.RequestSkill(player.GetPlayerController(), skill);
         }
     }
 }
