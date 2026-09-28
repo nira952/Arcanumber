@@ -24,7 +24,7 @@ public class PlayerRoot : MonoBehaviour
     [SerializeField] private PlayerActionController actionController;
     [SerializeField] private PlayerAnimator playerAnimator;
     [SerializeField] private AimCursor aim;
-    [SerializeField] private NetworkPlayer playerSkill;
+    [SerializeField] private PlayerSkiller playerSkill;
 
     // --- プレイヤー情報・入力状態 (省略せずにそのまま使用) ---
     public ReactiveProperty<int> PlayerIndex { get; } = new(-1);
@@ -34,6 +34,8 @@ public class PlayerRoot : MonoBehaviour
     public ReactiveProperty<bool> IsMove { get; } = new(true);
     public ReactiveProperty<bool> IsJump { get; } = new(false);
     public ObservableList<EffectAbility> ActiveEffects { get; } = new();
+    public ReactiveProperty<int> SelectedSkillIndex { get; } = new(0);
+
 
     public bool CanControl => !IsDown.Value && (GameManager.Instance == null || GameManager.Instance.NetWorkGameState.Value == GameState.Playing);
 
@@ -49,7 +51,7 @@ public class PlayerRoot : MonoBehaviour
             CurrentArcana = LoadManager.Instance.GetData(0, false);
 
         // 初期発動のアルカナを発動する
-        CurrentArcana.ExecuteArcanaEffect(ASkillCategory.StartEffect, playerSkill);
+        CurrentArcana.ExecuteArcanaEffect(ASkillCategory.StartEffect, this);
 
         // 最大体力を設定
         CurrentHealth.Value = status.GetMaxHp();
@@ -120,7 +122,7 @@ public class PlayerRoot : MonoBehaviour
 
     public void ExecuteAttack()
     {
-        // TODO : 後でNetWorkPlayerに移植する
+        // TODO : 後でPlayerRootに移植する
 
         //const int ATTACK_ACTION_INDEX = 0;
         //if (!IsActionReady(ATTACK_ACTION_INDEX)) return;
@@ -133,7 +135,7 @@ public class PlayerRoot : MonoBehaviour
 
         playerAttack.ResetList();
         playerAttack.NormalAttackActive();
-        CurrentArcana?.ExecuteArcanaEffect(ASkillCategory.SkillEffect,playerSkill);
+        CurrentArcana?.ExecuteArcanaEffect(ASkillCategory.SkillEffect,this);
     }
 
     /// <summary> 移動実行メソッド </summary>
@@ -256,15 +258,14 @@ public class PlayerRoot : MonoBehaviour
         return ActiveEffects.Any(e => e?.GetEffect() != null && e.GetEffect().GetEffectList() == effect);
     }
 
-    public bool HasEffect(EffectList effect, bool isUp)
+    public int GetAllEffectCount()
     {
-        foreach (EffectAbility e in ActiveEffects)
-        {
-            if (e == null || e.GetEffect() == null) continue;
-            if (e.GetEffect().GetEffectList() == effect && e.GetEffect().GetIsUp() == isUp)
-                return true;
-        }
-        return false;
+        return ActiveEffects.Count;
+    }
+
+    public void ClearAllEffects()
+    {
+        ActiveEffects.Clear();
     }
 
     public SpriteRenderer GetMagic() { return magicStart; }

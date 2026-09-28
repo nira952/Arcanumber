@@ -11,12 +11,12 @@ using UnityEngine;
 public class Arcana16TowerFront : ArcanaLogic
 {
     //永続するタレットがおける
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         GameObject turret = Object.Instantiate(sourceArcana.effectPrefab);
         turret.transform.position = player.transform.position;
         Turret t = turret.GetComponent<Turret>();
-        t.SetHaveNo(player.GetNetworkId());
+        t.SetHaveNo(player.PlayerIndex.Value);
     }
 }
 
@@ -27,16 +27,15 @@ public class Arcana16TowerBack : ArcanaLogic
 {
     //５０％の確率で同じスキルが発動する
     private float time = 3f;
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
-    public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
+    public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
-        Skill skill = player.GetCurrentSkill();
         if (Random.value <= sourceArcana.GetKeepValue())
         {
             yield return new WaitForSeconds(time);
 
             // SkillManagerにスキル発動を依頼する
-            SkillManager.Instance.RequestSkill(player.GetPlayerController(), skill);
+            SkillManager.Instance.RequestSkill(player);
         }
     }
 }

@@ -10,7 +10,7 @@ using UnityEngine;
 public class Arcana07ChariotFront : ArcanaLogic
 {
     //速度が上がる
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         float newSpeed = player.GetPlayerStatus().GetSpeed() * sourceArcana.GetKeepValue();
         player.GetPlayerStatus().SetSpeed(newSpeed);
@@ -23,12 +23,12 @@ public class Arcana07ChariotFront : ArcanaLogic
 public class Arcana07ChariotBack : ArcanaLogic
 {
     //スキル発動が50％速くなる
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         EffectAbility effect = new EffectAbility(
             EffectRegistry.Get(EffectList.SkillTimeReduction, true),
             false, -1, sourceArcana.GetKeepValue());
-        player.SetHaveEffect(effect.Clone());
+        player.AddEffect(effect.Clone());
     }
 }
 

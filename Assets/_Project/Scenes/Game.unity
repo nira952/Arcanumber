@@ -1758,12 +1758,12 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   gameUIManager: {fileID: 1590583902}
   timeManager: {fileID: 791172861}
-  CurrentState:
+  playerSpawner: {fileID: 1073344854}
+  NetWorkGameState:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 1
-  localPlayerCache: []
+    m_InternalValue: 0
 --- !u!1 &476566689
 GameObject:
   m_ObjectHideFlags: 0
@@ -3494,7 +3494,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   maxTimeInSeconds: 300
-  RemainingTime:
+  NetworkTime:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
@@ -6866,7 +6866,7 @@ Transform:
   m_GameObject: {fileID: 1437594177}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.022300178, y: 1.0731, z: -370}
+  m_LocalPosition: {x: 0.022300178, y: 1.0731, z: -580}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8771,6 +8771,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e017561bceaa2b49835e4234430d39e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timerText: {fileID: 1164723457}
+  gameStateText: {fileID: 1656099800}
   playerEffectBlocks:
   - availableImages:
     - {fileID: 1013361472}
@@ -8816,8 +8818,6 @@ MonoBehaviour:
   - {fileID: 522095613}
   - {fileID: 1083883453}
   - {fileID: 1651459506}
-  timerText: {fileID: 1164723457}
-  gameStateText: {fileID: 1656099800}
   resultPanel: {fileID: 131371113}
   resultText: {fileID: 371586744}
   endButton: {fileID: 5398206752629356966}
@@ -9241,7 +9241,7 @@ Transform:
   m_GameObject: {fileID: 1723005312}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.022300178, y: 0.07309997, z: -360}
+  m_LocalPosition: {x: 0.022300178, y: 0.07309997, z: -570}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -34168,7 +34168,7 @@ Transform:
   m_GameObject: {fileID: 4452598822952201906}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.022300178, y: 0.07309997, z: -370}
+  m_LocalPosition: {x: 0.022300178, y: 0.07309997, z: -580}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

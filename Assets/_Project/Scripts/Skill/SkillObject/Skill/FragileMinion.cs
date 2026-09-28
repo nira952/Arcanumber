@@ -68,15 +68,15 @@ public class FragileMinion : MonoBehaviour
     /// </summary>
     private Transform FindTarget()
     {
-        List<NetworkPlayer> players = PlayerUtility.GetOtherPlayers(
-            PlayerUtility.FindPlayerByNo(ownerPlayerNo));
+        List<PlayerRoot> players = PlayerUtility.GetOtherPlayers(
+            PlayerUtility.GetPlayerByIndex(ownerPlayerNo));
         Transform closest = null;
         float minDistance = Mathf.Infinity;
 
-        foreach (NetworkPlayer p in players)
+        foreach (PlayerRoot p in players)
         {
             //自分の持ち主ではないプレイヤーを探す
-            if (p.GetNetworkId() != ownerPlayerNo)
+            if (p.PlayerIndex.Value != ownerPlayerNo)
             {
                 float dist = Vector3.Distance(transform.position, p.transform.position);
                 if (dist < minDistance)
@@ -89,7 +89,7 @@ public class FragileMinion : MonoBehaviour
         return closest;
     }
 
-    public void TakeDamage()
+    public void ApplyDamage()
     {
         hitCount++;
 
@@ -123,12 +123,12 @@ public class FragileMinion : MonoBehaviour
         //クールタイムチェック
         if (Time.time - lastAttackTime < attackCooldown) return;
 
-        NetworkPlayer targetPlayer = collision.GetComponent<NetworkPlayer>();
+        PlayerRoot targetPlayer = collision.GetComponent<PlayerRoot>();
 
         //持ち主以外のプレイヤーに当たったらダメージ
-        if (targetPlayer != null && targetPlayer.GetNetworkId() != ownerPlayerNo)
+        if (targetPlayer != null && targetPlayer.PlayerIndex.Value != ownerPlayerNo)
         {
-            targetPlayer.TakeDamage(attackDmg);
+            targetPlayer.ApplyDamage(attackDmg);
 
             //攻撃時刻を更新
             lastAttackTime = Time.time;

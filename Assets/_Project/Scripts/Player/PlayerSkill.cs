@@ -9,7 +9,7 @@
 //    /// <summary>
 //    /// 近接攻撃の攻撃用メソッド
 //    /// </summary>
-//    public void ExecuteAttack(NetworkPlayer player)
+//    public void ExecuteAttack(PlayerRoot player)
 //    {
 //        //攻撃ができるか
 //        if (!player.IsActionReady(0)) return;
@@ -21,7 +21,7 @@
 //    /// <summary>
 //    /// スキル変更用のメソッド
 //    /// </summary>
-//    public void ExecuteSkillChange(NetworkPlayer player, int direction)
+//    public void ExecuteSkillChange(PlayerRoot player, int direction)
 //    {
 //        //現在の skillNo を取得
 //        int newSkillNo = player.GetSkillNo() + direction;
@@ -51,7 +51,7 @@
 //    /// <summary>
 //    /// スキル発動用のメソッド
 //    /// </summary>
-//    public void ExecuteSkill(NetworkPlayer player)
+//    public void ExecuteSkill(PlayerRoot player)
 //    {
 //        //スキルが発動できるか
 //        if (PlayerUtility.HaveEffect(player, EffectList.Silence, false))

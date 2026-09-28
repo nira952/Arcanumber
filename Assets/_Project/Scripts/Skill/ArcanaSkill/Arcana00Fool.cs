@@ -8,7 +8,7 @@
 public class Arcana00FoolFront : ArcanaLogic
 {
     //HP‚ð1.3”{‚É‚·‚é
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         float newHp = player.GetPlayerStatus().GetMaxHp() * sourceArcana.GetKeepValue();
         player.GetPlayerStatus().SetMaxHp(newHp);
@@ -21,7 +21,7 @@ public class Arcana00FoolFront : ArcanaLogic
 public class Arcana00FoolBack : ArcanaLogic
 {
     //‰½‚à•Ï‚í‚ç‚È‚¢
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
 
     }

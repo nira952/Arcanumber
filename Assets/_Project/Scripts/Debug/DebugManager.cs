@@ -13,7 +13,7 @@ public class DebugManager : MonoBehaviour
 
     [Header("設定")]
     [SerializeField] private string playerTag = "Player";
-    private NetworkPlayer player;
+    private PlayerRoot player;
 
     void Awake()
     {
@@ -31,7 +31,7 @@ public class DebugManager : MonoBehaviour
     void Start()
     {
         GameObject playerObj = GameObject.FindWithTag(playerTag);
-        player = playerObj != null ? playerObj.GetComponent<NetworkPlayer>() : null;
+        player = playerObj != null ? playerObj.GetComponent<PlayerRoot>() : null;
     }
 
     void Update()
@@ -57,7 +57,7 @@ public class DebugManager : MonoBehaviour
         if (player != null)
         {
             // プレイヤーの現在のHPと、ベースステータスを取得
-            float currentHp = player.GetNowHP();
+            float currentHp = player.CurrentHealth.Value;
             PlayerStatus status = player.GetPlayerStatus();
 
             if (status != null)
@@ -83,7 +83,6 @@ public class DebugManager : MonoBehaviour
             spdText.text = "SPD: --";
         }
         //チェック用
-        Debug.Log($"【デバッグ】現在の保持エフェクト数: {player.GetHaveEffect().Count}個");
     }
 
     public void HPDamage()
@@ -91,7 +90,7 @@ public class DebugManager : MonoBehaviour
         if (player != null)
         {
             //プレイヤーにダメージを与える
-            player.TakeDamage(10);
+            player.ApplyDamage(10);
         }
     }
 }

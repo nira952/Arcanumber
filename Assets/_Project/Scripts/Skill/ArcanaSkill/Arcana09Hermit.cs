@@ -11,11 +11,11 @@ using UnityEngine;
 public class Arcana09HermitFront : ArcanaLogic
 {
     //回復をスティールする効果
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         Effect e = EffectRegistry.Get(EffectList.HealSteal, true);
         EffectAbility ea = new EffectAbility(e, false, -1f, -1f);
-        player.SetHaveEffect(ea.Clone());
+        player.AddEffect(ea.Clone());
     }
 }
 
@@ -25,8 +25,8 @@ public class Arcana09HermitFront : ArcanaLogic
 public class Arcana09HermitBack : ArcanaLogic
 {
     //トラップ設置
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
-    public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
+    public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
         while (true)
         {

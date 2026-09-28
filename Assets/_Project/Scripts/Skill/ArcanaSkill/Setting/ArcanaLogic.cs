@@ -9,7 +9,7 @@ public abstract class ArcanaLogic
     /// <summary>
     /// アニメーションやSEの再生
     /// </summary>
-    protected void PlayArcanaVisuals(NetworkPlayer player, Arcana sourceArcana, Transform pos)
+    protected void PlayArcanaVisuals(PlayerRoot player, Arcana sourceArcana, Transform pos)
     {
         if (sourceArcana.effectPrefab != null)
         {
@@ -39,8 +39,8 @@ public abstract class ArcanaLogic
         //現在のステートの長さを返す
         return anim.GetCurrentAnimatorStateInfo(0).length;
     }
-    public abstract void Execute(NetworkPlayer player, Arcana sourceArcana); 
-    public virtual IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
+    public abstract void Execute(PlayerRoot player, Arcana sourceArcana); 
+    public virtual IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
         yield break;
     }

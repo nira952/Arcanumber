@@ -5,7 +5,7 @@ using UnityEngine;
 /// </summary>
 public class TrapObject : MagicObject
 {
-    protected override void OnHit(NetworkPlayer target)
+    protected override void OnHit(PlayerRoot target)
     {
         base.OnHit(target);
 

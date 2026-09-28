@@ -46,7 +46,7 @@ public class GameUIManager :MonoBehaviour
 
     private readonly CompositeDisposable playerSubscriptions = new();
 
-    public void Initialize(GameManager gameManager,TimeManager timeManager,List<PlayerRoot> playerList)
+    public void Initialize(GameManager gameManager,TimeManager timeManager)
     {
         // --- ストリームを購読してUIを更新する処理 ---
 
@@ -72,6 +72,8 @@ public class GameUIManager :MonoBehaviour
         {
             UpdateTimerDisplay((int)time);
         }).AddTo(this);
+
+        List<PlayerRoot> playerList = PlayerUtility.GetAllPlayer();
 
         // プレイヤーリストの更新を購読し、UIを更新する
         foreach (var root in playerList)

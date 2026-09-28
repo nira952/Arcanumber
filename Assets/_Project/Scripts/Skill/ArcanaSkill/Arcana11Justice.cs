@@ -10,11 +10,11 @@ using System.Collections.Generic;
 public class Arcana11JusticeFront : ArcanaLogic
 {
     //全員にダメージを与える
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        List<NetworkPlayer> list = PlayerUtility.GetOtherPlayers(player);
-        foreach (NetworkPlayer p in list)
-            p.TakeDamage(sourceArcana.GetKeepValue());
+        List<PlayerRoot> list = PlayerUtility.GetOtherPlayers(player);
+        foreach (PlayerRoot p in list)
+            p.ApplyDamage(sourceArcana.GetKeepValue());
     }
 }
 
@@ -24,10 +24,10 @@ public class Arcana11JusticeFront : ArcanaLogic
 public class Arcana11JusticeBack : ArcanaLogic
 {
     //半分のダメージを返す（カウンター）
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         Effect e = EffectRegistry.Get(EffectList.Counter, true);
         EffectAbility ea = new EffectAbility(e, true, sourceArcana.GetKeepValue(), -1f);
-        player.SetHaveEffect(ea.Clone());
+        player.AddEffect(ea.Clone());
     }
 }

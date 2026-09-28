@@ -35,7 +35,7 @@
 //            }).AddTo(this);
 //        }
 
-//        public void RequestTakeDamage(int damage)
+//        public void RequestApplyDamage(int damage)
 //        {
 //            // オフラインなので直接自分のデータを減らすだけ
 //            player.ApplyDamage(damage);

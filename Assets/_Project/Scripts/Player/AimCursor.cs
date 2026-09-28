@@ -164,12 +164,12 @@ public class AimCursor : NetworkBehaviour
     /// <summary>
     /// ロックオン中ならその相手を、そうでないなら自分以外のプレイヤーを返す
     /// </summary>
-    public NetworkPlayer GetLockOnNetworkPlayer()
+    public PlayerRoot GetLockOnPlayerRoot()
     {
         if (_currentMode != AimSelect.LookOn || _lockOnTarget == null)
             return null;
 
-        if (_lockOnTarget.TryGetComponent(out NetworkPlayer targetPlayer))
+        if (_lockOnTarget.TryGetComponent(out PlayerRoot targetPlayer))
             return targetPlayer;
         return null;
     }

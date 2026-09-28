@@ -1,3 +1,4 @@
+using R3;
 using UnityEngine;
 
 public class HpBullet : EnvironmentObject
@@ -13,9 +14,9 @@ public class HpBullet : EnvironmentObject
         base.Initialize(charaNo, pos, damage, speed, false, 0);
     }
 
-    protected override void OnHit(NetworkPlayer target)
+    protected override void OnHit(PlayerRoot target)
     {
         base.OnHit(target);
-        Destroy(gameObject);
+        onDestroyed.OnNext(Unit.Default);
     }
 }

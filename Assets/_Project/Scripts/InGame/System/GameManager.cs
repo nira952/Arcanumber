@@ -91,20 +91,6 @@ public class GameManager : NetworkBehaviour
 
         Debug.Log($"[GameManager] ネットワークモードで起動します。IsServer: {IsServer}, IsClient: {IsClient}");
 
-
-        List<PlayerRoot> Players = PlayerUtility.GetAllPlayer();
-
-        // CurrentStateの変更をReactivePropertyに反映
-        NetWorkGameState.AsObservable().Subscribe(state => stateRx.Value = state).AddTo(this);
-
-        // TimeManagerとGameUIManagerの設定
-        timeManager.Initialize(this);
-
-        gameUIManager.Initialize(this, timeManager, Players);
-
-        // タイムアップ時の処理を購読
-        timeManager.onTimeUp.Subscribe(_ => HandleTimeUp()).AddTo(this);
-
         // サーバー（ホスト）側のみが、シーンロード完了イベントを監視する
         if (IsServer)
         {
@@ -124,22 +110,39 @@ public class GameManager : NetworkBehaviour
             if (sceneEvent.SceneName == gameObject.scene.name)
             {
                 Debug.Log($"[PlayerSpawner] 全クライアントのシーンロードが完了しました。一括生成を開始します。");
-
                 // 二重実行を防ぐため、一度実行したらイベント解除
                 NetworkManager.Singleton.SceneManager.OnSceneEvent -= OnSceneEvent;
 
-                // 全プレイヤーを一括生成
-                playerSpawner.SpawnAllPlayersOnline();
-
-                // プレイヤーのダウン状態を監視する購読を設定
-                SettingPlayerObservable();
-
-                // ゲーム開始シーケンスを非同期で開始
-                StartGameSequenceAsync().Forget();
-
+                OnAllPlayerNetWorkSpawn(); // 全プレイヤーのネットワーク生成を開始
             }
         }
     }
+
+    private void OnAllPlayerNetWorkSpawn()
+    {
+        // 全プレイヤーを一括生成
+        playerSpawner.SpawnAllPlayersOnline();
+
+        // プレイヤーのダウン状態を監視する購読を設定
+        SettingPlayerObservable();
+
+
+        // CurrentStateの変更をReactivePropertyに反映
+        NetWorkGameState.AsObservable().Subscribe(state => stateRx.Value = state).AddTo(this);
+
+        // TimeManagerとGameUIManagerの設定
+        timeManager.Initialize(this);
+
+        gameUIManager.Initialize(this, timeManager);
+
+        // タイムアップ時の処理を購読
+        timeManager.onTimeUp.Subscribe(_ => HandleTimeUp()).AddTo(this);
+
+        // ゲーム開始シーケンスを非同期で開始
+        StartGameSequenceAsync().Forget();
+    }
+
+
 
     // Server専用 : プレイヤーのダウン状態を監視する購読を設定
     private void SettingPlayerObservable()

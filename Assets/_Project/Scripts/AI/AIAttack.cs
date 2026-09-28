@@ -4,7 +4,7 @@ using UnityEngine;
 public class AIAttack : MonoBehaviour
 {
     [SerializeField] private float coolTime = 5f;   //クールタイム
-    [SerializeField] private NetworkPlayer aiPlayer;    //攻撃するキャラクター
+    [SerializeField] private PlayerRoot aiPlayer;    //攻撃するキャラクター
     [SerializeField] private Transform pos; //攻撃を出す場所
     [SerializeField] private GameObject bullet;
 
@@ -33,7 +33,7 @@ public class AIAttack : MonoBehaviour
         GameObject s = Instantiate(bullet);
         s.transform.position = pos.position;
         Bullet magic = s.GetComponent<Bullet>();
-        magic.InitializeBullet(aiPlayer.GetNetworkId(), aiPlayer.transform.position);
+        magic.InitializeBullet(aiPlayer.PlayerIndex.Value, aiPlayer.transform.position);
 
         float directionX = transform.localScale.x;
 

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using R3;
 
 /// <summary>
 /// スキルの生成と管理を行うクラス
@@ -33,39 +34,43 @@ public class SkillManager : NetworkBehaviour
     /// <summary>
     /// スキルの使用リクエストを受け付ける（外部からの入口）
     /// </summary>
-    public void RequestSkill(PlayerRoot player,int skillIndex)
+    public void RequestSkill(PlayerRoot player)
     {
         if (player == null) return;
 
         Vector2 aimPos = player.GetAimCursor().GetTransform().position;
-
+        int skillIndex = player.SelectedSkillIndex.Value;
 
         // オフライン時、またはすでにサーバー上で動作している場合は直接実行
         if (isLocalMode || IsServer)
         {
-            Skill skill = player.GetCurrentSkill();
-
-            StartCoroutine(SkillSpawnDelayCoroutine(player, skill, aimPos));
+            var skills = player.GetSkill();
+            if (skills != null && skillIndex >= 0 && skillIndex < skills.Count)
+            {
+                Skill skill = skills[skillIndex];
+                StartCoroutine(SkillSpawnDelayCoroutine(player, skill, aimPos));
+            }
         }
         else
         {
             // クライアントからの要求の場合：ServerRpc を経由してサーバー側で処理を開始する
-            // ※必要であれば、ここでクライアントローカルの予兆エフェクト（ローカル先行表示）を再生する
             RequestSkillServerRpc(player.PlayerIndex.Value, skillIndex, aimPos);
         }
     }
 
-
-
     [ServerRpc(RequireOwnership = false)]
-    private void RequestSkillServerRpc(int playerIndex,int skillIndex ,Vector2 aimPos)
+    private void RequestSkillServerRpc(int playerIndex, int skillIndex, Vector2 aimPos)
     {
-        // PlayerIndex からそのプレイヤーの PlayerRoot を取得する
+        // 1. 安全に PlayerRoot を取得（Nullチェック）
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(playerIndex);
-        // SkillIndex からそのスキルを取得する
-        Skill skill = player.GetSkill()[skillIndex];
+        if (player == null) return;
 
-        if (player != null && skill != null)
+        // 2. インデックスの範囲チェックを行ってから Skill を取得
+        var skills = player.GetSkill();
+        if (skills == null || skillIndex < 0 || skillIndex >= skills.Count) return;
+
+        Skill skill = skills[skillIndex];
+        if (skill != null)
         {
             StartCoroutine(SkillSpawnDelayCoroutine(player, skill, aimPos));
         }
@@ -78,7 +83,7 @@ public class SkillManager : NetworkBehaviour
     {
         // 1. スキル短縮効果の計算（ゼロ除算防止）
         float reductionValue = player.GetEffectValue(EffectList.SkillTimeReduction);
-        if (reductionValue <= 0f) reductionValue = 1f; // 0以下なら倍率1（短縮なし）とする
+        if (reductionValue <= 0f) reductionValue = 1f;
 
         float delayTime = activeSkill.GetDelayTime() / reductionValue;
 
@@ -92,7 +97,6 @@ public class SkillManager : NetworkBehaviour
             yield return new WaitForSeconds(waitTime);
         }
 
-        // 予備動作オブジェクトがあればその位置、なければエイム位置をスポーン位置とする
         Vector2 finalSpawnPos = activePreview != null ? (Vector2)activePreview.transform.position : pos;
 
         // 4. スキルの本生成
@@ -107,6 +111,16 @@ public class SkillManager : NetworkBehaviour
         if (skill.GetAimSelect() == AimSelect.LookOn && player.GetMagic() != null)
         {
             GameObject mStart = Instantiate(player.GetMagic().gameObject, pos, Quaternion.identity);
+
+            // ネットワークオブジェクトの場合は全クライアントに同期スポーンする
+            if (!isLocalMode && IsServer)
+            {
+                if (mStart.TryGetComponent(out NetworkObject netObj))
+                {
+                    netObj.Spawn();
+                }
+            }
+
             Destroy(mStart, delayTime);
             return mStart;
         }
@@ -156,6 +170,16 @@ public class SkillManager : NetworkBehaviour
         if (skillObj.TryGetComponent(out SkillObject magic))
         {
             magic.Initialize(playerRoot.PlayerIndex.Value, skill, pos);
+
+            magic.OnDestroyed
+                .Subscribe(_ =>
+                {
+                    if (skillObj != null) Destroy(skillObj);
+                })
+                .AddTo(skillObj);
+
+            float keepTime = skill.GetKeepTime();
+            Destroy(skillObj, keepTime);
         }
 
         // 4. オンライン時のネットワークスポーン同期
@@ -163,59 +187,95 @@ public class SkillManager : NetworkBehaviour
         {
             if (skillObj.TryGetComponent(out NetworkObject networkObject))
             {
-                // サーバー上で Spawn を呼ぶことで、全クライアントの画面へ一斉に同期生成される
                 networkObject.Spawn();
             }
         }
     }
 
-    // 対象プレイヤーを回復する（サーバー側で実行）
     private void Heal(PlayerRoot playerRoot, Skill skill)
     {
         float baseHealAmount = skill.GetAtk();
 
-        // 1. 自分自身を回復
         playerRoot.ApplyHeal(baseHealAmount);
-        AnimationInstance(playerRoot, skill);
+        PlayAnimation(playerRoot, skill);
 
-        // 2. HealStealを持っている場合、半分回復を適用
         float sharedHealAmount = baseHealAmount * 0.5f;
-
         List<PlayerRoot> targets = PlayerUtility.GetAllPlayer();
 
         foreach (var target in targets)
         {
             if (target == null) continue;
 
-            // HealSteal効果を持っている場合に回復を適用
-            if (target != playerRoot && target.HasEffect(EffectList.HealSteal,true))
+            if (target != playerRoot && target.HaveEffect(EffectList.HealSteal, true))
             {
                 target.ApplyHeal(sharedHealAmount);
-
-                // 回復を受けたエフェクトを再生
-                AnimationInstance(target, skill);
+                PlayAnimation(target, skill);
             }
         }
     }
+
     private void EffectBuffPlayer(PlayerRoot playerRoot, Skill skill)
     {
         playerRoot.AddEffect(skill.GetEffect().Clone());
-        AnimationInstance(playerRoot, skill);
+        PlayAnimation(playerRoot, skill);
     }
 
-    private void AnimationInstance(PlayerRoot playerRoot, Skill skill)
+    /// <summary>
+    /// 【サーバー専用】演出再生の呼び出し口
+    /// </summary>
+    private void PlayAnimation(PlayerRoot playerRoot, Skill skill)
     {
         if (skill.GetEffectAnimation() == null) return;
 
-        GameObject animObj = Instantiate(skill.GetEffectAnimation(), playerRoot.transform);
-
-        // クライアント側へもアニメーションエフェクトを同期したい場合（NetworkObjectがない演出用プレハブの場合）
-        if (!isLocalMode && IsServer)
+        // ローカル（オフライン）実行時
+        if (isLocalMode)
         {
-            if (animObj.TryGetComponent(out NetworkObject netObj))
-            {
-                netObj.Spawn();
-            }
+            SpawnLocalAnimation(playerRoot, skill.GetEffectAnimation());
+            return;
         }
+
+        // サーバー（オンライン）実行時：全クライアントへ再生命令を送信
+        if (IsServer)
+        {
+            // スキルIDやプレイヤーIndexを渡して全クライアントで一斉再生させる
+            PlayAnimationClientRpc(playerRoot.PlayerIndex.Value, skill.GetSkillNo());
+        }
+    }
+
+    /// <summary>
+    /// 【全クライアントで実行】演出プレハブをローカル生成する ClientRpc
+    /// </summary>
+    [ClientRpc]
+    private void PlayAnimationClientRpc(int targetPlayerIndex, int skillId)
+    {
+        // 1. 対象のプレイヤーを取得
+        PlayerRoot targetPlayer = PlayerUtility.GetPlayerByIndex(targetPlayerIndex);
+        if (targetPlayer == null) return;
+
+        // 2. スキル情報またはデータベースから対応するエフェクトプレハブを取得
+        Skill skill = AssetLoader.Instance.GetSkill(skillId);
+        if (skill == null || skill.GetEffectAnimation() == null) return;
+
+        // 3. ローカル上で生成（NetworkObjectを持たない純粋なGameObject）
+        SpawnLocalAnimation(targetPlayer, skill.GetEffectAnimation());
+    }
+
+    /// <summary>
+    /// 実際の Instantiate と Destroy 処理（ローカル専用）
+    /// </summary>
+    private void SpawnLocalAnimation(PlayerRoot targetPlayer, GameObject animPrefab)
+    {
+        // プレイヤーの位置に生成（必要に応じて親に設定）
+        GameObject animObj = Instantiate(animPrefab, targetPlayer.transform.position, Quaternion.identity, targetPlayer.transform);
+
+        // パーティクルシステムがアタッチされている場合は長さを取得して自動破棄
+        float destroyTime = 2.0f; // デフォルト生存時間
+        if (animObj.TryGetComponent(out ParticleSystem ps))
+        {
+            destroyTime = ps.main.duration + ps.main.startLifetime.constantMax;
+        }
+
+        // 各クライアントの画面上で独立して破棄される（ネットワーク通信不要）
+        Destroy(animObj, destroyTime);
     }
 }

@@ -10,11 +10,11 @@ using UnityEngine;
 public class Arcana01MagicianFront : ArcanaLogic
 {
     //防御無視
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         Effect e = EffectRegistry.Get(EffectList.IgnoreDefense, false);
         EffectAbility ea = new EffectAbility(e, false, -1f, -1f);
-        player.SetHaveEffect(ea.Clone());
+        player.AddEffect(ea.Clone());
     }
 }
 
@@ -24,7 +24,7 @@ public class Arcana01MagicianFront : ArcanaLogic
 public class Arcana01MagicianBack : ArcanaLogic
 {
     //自分のサポートをしてくれる敵を召喚する
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         for (int i = 0; i < (int)sourceArcana.GetKeepValue(); i++)
         {

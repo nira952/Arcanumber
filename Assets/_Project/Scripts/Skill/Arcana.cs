@@ -68,7 +68,7 @@ public class Arcana : ScriptableObject
     /// <summary>
     /// アルカナ発動
     /// </summary>
-    public void ExecuteArcanaEffect(ASkillCategory currentCategory, NetworkPlayer player)
+    public void ExecuteArcanaEffect(ASkillCategory currentCategory, PlayerRoot player)
     {
         // それでもnullなら諦める
         if (arcanaLogic == null) return;

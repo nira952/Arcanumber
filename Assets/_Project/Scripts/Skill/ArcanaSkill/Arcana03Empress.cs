@@ -12,13 +12,13 @@ public class Arcana03EmpressFront : ArcanaLogic
 {
     //自然回復
     public const float timeInterval = 5f;
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
-    public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
+    public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
         while (true)
         {
             yield return new WaitForSeconds(timeInterval);
-            PlayerUtility.FinalHeal(player, sourceArcana.GetKeepValue());
+            player.ApplyHeal(sourceArcana.GetKeepValue());
         }
     }
 }
@@ -30,10 +30,10 @@ public class Arcana03EmpressBack : ArcanaLogic
 {
     //ランダムな効果
     public EffectAbility randomEffect;
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
-    public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
+    public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
-        Transform pos = player.GetPlayerController().GetAimCursor().GetEfeUpperPos();
+        Transform pos = player.GetAimCursor().GetEfeUpperPos();
         while (true)
         {
             PlayArcanaVisuals(player, sourceArcana, pos);
@@ -53,7 +53,7 @@ public class Arcana03EmpressBack : ArcanaLogic
             {
                 //レジストリから得たマスターデータを元に、能力インスタンスを生成
                 randomEffect = new EffectAbility(masterEffect, true, sourceArcana.GetKeepValue(), finalNum);
-                player.SetHaveEffect(randomEffect.Clone()); 
+                player.AddEffect(randomEffect.Clone()); 
             }
 
             yield return new WaitForSeconds(sourceArcana.GetKeepValue() - GetVisualDuration(sourceArcana));

@@ -29,7 +29,7 @@
 //    /// <summary>
 //    /// 初期化
 //    /// </summary>
-//    public void Initialize(NetworkPlayer[] player, int playerId)
+//    public void Initialize(PlayerRoot[] player, int playerId)
 //    {
 //        hpSliderMax(player);
 //        SkillUIInitialize(player[playerId]);
@@ -39,11 +39,11 @@
 //    /// <summary>
 //    /// 初期のHP設定
 //    /// </summary>
-//    void hpSliderMax(NetworkPlayer[] player)
+//    void hpSliderMax(PlayerRoot[] player)
 //    {
-//        foreach(NetworkPlayer p in player)
+//        foreach(PlayerRoot p in player)
 //        {
-//            int pId = p.GetNetworkId();
+//            int pId = p.PlayerIndex.Value;
 //            hpSlider[pId].maxValue = p.GetPlayerStatus().GetMaxHp();
 //            hpSlider[pId].value = hpSlider[pId].maxValue;
 //            hpText[pId].text = hpSlider[pId].value.ToString();
@@ -53,7 +53,7 @@
 //    /// <summary>
 //    /// スキルUIの初期化
 //    /// </summary>
-//    void SkillUIInitialize(NetworkPlayer player)
+//    void SkillUIInitialize(PlayerRoot player)
 //    {
 //        //クールタイムを元に戻す
 //        for (int i = 0; i < skillBlocks.Length; i++)
@@ -78,7 +78,7 @@
 //    /// <summary>
 //    /// スキルとアルカナのクールタイム状態をUIにリアルタイム反映する
 //    /// </summary>
-//    public void UpdateSkillCoolTimeUI(NetworkPlayer player)
+//    public void UpdateSkillCoolTimeUI(PlayerRoot player)
 //    {
 //        //通常攻撃のクールタイム更新
 //        float currentAttack = player.GetSkillCoolTime(0);
@@ -141,7 +141,7 @@
 //    /// <summary>
 //    /// HP変更時のUI
 //    /// </summary>
-//    public void hpSliderChange(NetworkPlayer player, int pId)
+//    public void hpSliderChange(PlayerRoot player, int pId)
 //    {
 //        hpSlider[pId].value = player.GetNowHP();
 //        hpText[pId].text = hpSlider[pId].value.ToString("F0");
@@ -150,17 +150,17 @@
 //    /// <summary>
 //    /// プレイヤーのステータスを追加
 //    /// </summary>
-//    public void StatusAddUpdate(NetworkPlayer player, EffectAbility e)
+//    public void StatusAddUpdate(PlayerRoot player, EffectAbility e)
 //    {
 //        //なかったらやらない
 //        if (player == null || e == null) return;
 //        //表示するエフェクトの場合入れる
 //        if (!e.IsDisplay() || e.GetEffect().GetEffectImage() == null) return;
 //        //キー設定
-//        var key = (player.GetNetworkId(), e);
+//        var key = (player.PlayerIndex.Value, e);
 //        //エフェクトのステータスを追加
 //        GameObject efe
-//            = Instantiate(effectPrefab, effectBlock[player.GetNetworkId()].transform);
+//            = Instantiate(effectPrefab, effectBlock[player.PlayerIndex.Value].transform);
 //        efe.GetComponent<Image>().sprite = e.GetEffect().GetEffectImage();
 //        //辞書に追加
 //        activeEffectIcons[key] = efe;
@@ -169,7 +169,7 @@
 //    /// <summary>
 //    /// エフェクト全削除
 //    /// </summary>
-//    public void RemoveStatusUI(NetworkPlayer player, List<EffectAbility> eList)
+//    public void RemoveStatusUI(PlayerRoot player, List<EffectAbility> eList)
 //    {
 //        foreach(EffectAbility e  in eList)
 //            RemoveStatusUI(player, e);
@@ -178,10 +178,10 @@
 //    /// <summary>
 //    /// 削除用メソッド
 //    /// </summary>
-//    public void RemoveStatusUI(NetworkPlayer player, EffectAbility e)
+//    public void RemoveStatusUI(PlayerRoot player, EffectAbility e)
 //    {
 //        //辞書の中にそのエフェクトがあれば削除する
-//        var key = (player.GetNetworkId(), e);
+//        var key = (player.PlayerIndex.Value, e);
 //        if (activeEffectIcons.ContainsKey(key))
 //        {
 //            Destroy(activeEffectIcons[key]);
@@ -192,7 +192,7 @@
 //    /// <summary>
 //    /// フレーム変更
 //    /// </summary>
-//    public void SkillFrameChange(NetworkPlayer player)
+//    public void SkillFrameChange(PlayerRoot player)
 //    {
 //        int index = player.GetSkillNo();
 //        if (index >= 0 && index < skillFrame.Length)
@@ -209,9 +209,9 @@
 //    /// <summary>
 //    /// 枠の色変更
 //    /// </summary>
-//    public void FrameColorChange(NetworkPlayer player)
+//    public void FrameColorChange(PlayerRoot player)
 //    {
-//        int pIndex = player.GetNetworkId();
+//        int pIndex = player.PlayerIndex.Value;
 //        Color color;
 //        switch (pIndex)
 //        {

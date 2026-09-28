@@ -10,7 +10,7 @@ using UnityEngine;
 public class Arcana10WheelOfFortuneFront : ArcanaLogic
 {
     //ランダムテレポート
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         //安全な場所を探す
         Vector2 safePos = FindSafePosition(player);
@@ -24,7 +24,7 @@ public class Arcana10WheelOfFortuneFront : ArcanaLogic
     /// <summary>
     /// テレポート先を探す処理
     /// </summary>
-    private Vector2 FindSafePosition(NetworkPlayer player)
+    private Vector2 FindSafePosition(PlayerRoot player)
     {
         CapsuleCollider2D cap = player.GetComponent<CapsuleCollider2D>();
         Camera cam = Camera.main;
@@ -59,11 +59,11 @@ public class Arcana10WheelOfFortuneFront : ArcanaLogic
 public class Arcana10WheelOfFortuneBack : ArcanaLogic
 {
     //ジャンプができないようにする
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         Effect e = EffectRegistry.Get(EffectList.NoJump, false);
         EffectAbility ea = new EffectAbility(e, true, sourceArcana.GetKeepValue(), 0);
         //自分以外にかける
-        PlayerUtility.ApplyEffectToOthers(player, ea);
+        PlayerUtility.ApplyEffectToOtherPlayers(player, ea);
     }
 }

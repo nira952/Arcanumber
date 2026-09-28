@@ -12,14 +12,14 @@ public class Arcana19SunFront : ArcanaLogic
 {
     //晴れ日和
     private float numValue = 0.5f;
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        List<NetworkPlayer> others = PlayerUtility.GetOtherPlayers(player);
-        foreach (NetworkPlayer other in others)
+        List<PlayerRoot> others = PlayerUtility.GetOtherPlayers(player);
+        foreach (PlayerRoot other in others)
         {
             Effect e = EffectRegistry.Get(EffectList.SunBurn, false);
             EffectAbility effect = new EffectAbility(e, false, sourceArcana.GetKeepValue(), numValue);
-            other.SetHaveEffect(effect);
+            other.AddEffect(effect);
         }
     }
 }
@@ -30,14 +30,14 @@ public class Arcana19SunFront : ArcanaLogic
 public class Arcana19SunBack : ArcanaLogic
 {
     //スタンする
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        List<NetworkPlayer> others = PlayerUtility.GetOtherPlayers(player);
-        foreach (NetworkPlayer other in others)
+        List<PlayerRoot> others = PlayerUtility.GetOtherPlayers(player);
+        foreach (PlayerRoot other in others)
         {
             Effect e = EffectRegistry.Get(EffectList.Stun, false);
             EffectAbility effect = new EffectAbility(e, false, sourceArcana.GetKeepValue(), -1);
-            other.SetHaveEffect(effect);
+            other.AddEffect(effect);
         }
     }
 }

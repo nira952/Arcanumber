@@ -7,7 +7,7 @@
 //    /// <summary>
 //    /// 近接攻撃の攻撃用メソッド
 //    /// </summary>
-//    public static void ExecuteAttack(NetworkPlayer player)
+//    public static void ExecuteAttack(PlayerRoot player)
 //    {
 //        //攻撃ができるか
 //        if (!player.IsActionReady(ATTACK_ACTION_INDEX)) return;
@@ -19,7 +19,7 @@
 //    /// <summary>
 //    /// スキル変更用のメソッド
 //    /// </summary>
-//    public static void ExecuteSkillChange(NetworkPlayer player, int direction)
+//    public static void ExecuteSkillChange(PlayerRoot player, int direction)
 //    {
 //        //スキル変更の方向に応じて次のスロット番号を計算
 //        //int newSkillNo = CalculateNextSkillNo(player, direction);
@@ -34,7 +34,7 @@
 //    /// <summary>
 //    /// スキル発動用のメソッド
 //    /// </summary>
-//    public static void ExecuteSkill(NetworkPlayer player)
+//    public static void ExecuteSkill(PlayerRoot player)
 //    {
 //        //デバフがあったらスキル発動できない
 //        if (PlayerUtility.HaveEffect(player, EffectList.Silence, false)) return;
@@ -59,7 +59,7 @@
 //    /// <summary>
 //    /// 次のスロット番号を計算するメソッド
 //    /// </summary>
-//    private static int CalculateNextSkillNo(NetworkPlayer player, int direction)
+//    private static int CalculateNextSkillNo(PlayerRoot player, int direction)
 //    {
 //        //現在のスキル番号に方向を加算して新しいスキル番号を計算
 //        int newSkillNo = player.GetSkillNo() + direction;
@@ -82,7 +82,7 @@
 //    /// <summary>
 //    /// スキルのエイム設定とUI更新を行うメソッド
 //    /// </summary>
-//    private static void UpdateSkillAimAndUI(NetworkPlayer player, int newSkillNo)
+//    private static void UpdateSkillAimAndUI(PlayerRoot player, int newSkillNo)
 //    {
 //        //アルカナスキルが選択されていない場合、エイム設定を更新
 //        if (newSkillNo != GameConfig.SKILL_HOPPER_MAX)
@@ -98,7 +98,7 @@
 //    /// <summary>
 //    /// 指定されたスキルを実行するメソッド
 //    /// </summary>
-//    private static void ExecuteSpecificSkill(NetworkPlayer player, int currentNo, int actionIndex)
+//    private static void ExecuteSpecificSkill(PlayerRoot player, int currentNo, int actionIndex)
 //    {
 //        if (currentNo == GameConfig.SKILL_HOPPER_MAX)
 //        {

@@ -6,7 +6,7 @@
 ///// </summary>
 //public class TrainingManager : SingletonMonoBehaviour<TrainingManager>
 //{
-//    [SerializeField] private NetworkPlayer[] all;
+//    [SerializeField] private PlayerRoot[] all;
 //    [SerializeField] private MapManager mapManager;
 //    private List<Arcana> allArcana = new List<Arcana>();
 //    private List<Skill> allSkill = new List<Skill>();
@@ -29,13 +29,13 @@
 //    void Initialise()
 //    {
 //        //プレイヤーを辞書登録する
-//        foreach (NetworkPlayer p in all)
+//        foreach (PlayerRoot p in all)
 //            PlayerUtility.RegisterPlayer(p);
 
 //        //自分が操作しているプレイヤーだけの処理
-//        foreach (NetworkPlayer p in all)
+//        foreach (PlayerRoot p in all)
 //        {
-//            if(p.GetNetworkId() == pNum)
+//            if(p.PlayerIndex.Value == pNum)
 //            {
 //                p.SetArcana(AssetLoader.Instance.GetArcana(ArcanaList.Fool, false));
 //                for(int i = 0; i < 4; i++)
@@ -43,7 +43,7 @@
 //                    p.SetSkill(AssetLoader.Instance.GetSkill(i + 1), i);
 //                }
 //            }
-//            //p.Initialize(p.GetNetworkId() == pNum);
+//            //p.Initialize(p.PlayerIndex.Value == pNum);
 //        }
 
 //        PlayerUIManager.Instance.Initialize(all, pNum);
@@ -66,7 +66,7 @@
 //    void Update()
 //    {
 //        //プレイヤーの状態を更新
-//        foreach(NetworkPlayer p in all)
+//        foreach(PlayerRoot p in all)
 //            PlayerUtility.UpdatePlayerSystem(p);
 
 //        //クールタイムの更新
@@ -92,7 +92,7 @@
 //    /// </summary>
 //    public void ResetPlayerStatus(int playerNum)
 //    {
-//        NetworkPlayer p = GetPlayer(playerNum);
+//        PlayerRoot p = GetPlayer(playerNum);
 
 //        p.ResetToInitialState();    //ステータスをリセットする
 //        p.SetSkillNo(0);    //最初のスキルに戻す
@@ -111,8 +111,8 @@
 //    }
 
 //    //ゲッター
-//    public NetworkPlayer GetPlayer(int num) => all[num];
-//    public NetworkPlayer[] GetNetworkPlayers() => all;
+//    public PlayerRoot GetPlayer(int num) => all[num];
+//    public PlayerRoot[] GetPlayerRoots() => all;
 //    public List<Arcana> GetArcanas() => allArcana;
 //    public List<Skill> GetSkills() => allSkill;
 //}

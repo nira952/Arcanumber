@@ -14,8 +14,10 @@ public class TranpSkill : SkillObject
 
     void RollTranp()
     {
+        var player = PlayerUtility.GetPlayerByIndex(haveAttackerIndex);
+
         //運があるかどうか
-        bool hasLuck = PlayerUtility.HaveEffect(PlayerUtility.FindPlayerByNo(haveCharaNo), EffectList.Lacky, true);
+        bool hasLuck = player.HaveEffect( EffectList.Lacky, true);
 
         //確率テーブル
         int[] weights = hasLuck
@@ -59,9 +61,9 @@ public class TranpSkill : SkillObject
         }
 
         //生成先を取得
-        var player = PlayerUtility.FindPlayerByNo(haveCharaNo);
+        var player = PlayerUtility.GetPlayerByIndex(haveAttackerIndex);
         if (player == null) return;
-        Transform parentTransform = player.GetPlayerController().GetAimCursor().GetEfeUpperPos().transform;
+        Transform parentTransform = player.GetAimCursor().GetEfeUpperPos().transform;
 
         //インスタンス化
         GameObject card = Instantiate(cardObj, parentTransform);

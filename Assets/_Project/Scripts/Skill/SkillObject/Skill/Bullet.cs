@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using R3;
 public class Bullet : EnvironmentObject
 {
     private float speed = 10f;
@@ -12,9 +12,9 @@ public class Bullet : EnvironmentObject
         base.Initialize(charaNo, pos, damage, speed, false, 0);
     }
 
-    protected override void OnHit(NetworkPlayer target)
+    protected override void OnHit(PlayerRoot target)
     {
         base.OnHit(target);
-        Destroy(gameObject);
+        onDestroyed.OnNext(Unit.Default);
     }
 }

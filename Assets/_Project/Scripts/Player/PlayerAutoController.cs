@@ -38,7 +38,7 @@ public class PlayerAutoController : MonoBehaviour, IPlayerInputMediator
         //}
 
         //root = GetComponent<PlayerRoot>();
-        //player = GetComponent<NetworkPlayer>();
+        //player = GetComponent<PlayerRoot>();
         //rigidbody2D = GetComponent<Rigidbody2D>();
 
         //// 生成時に初期化処理を行う

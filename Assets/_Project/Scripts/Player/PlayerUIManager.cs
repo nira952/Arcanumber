@@ -17,7 +17,7 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
     /// <summary>
     /// 初期化
     /// </summary>
-    public void Initialize(NetworkPlayer[] player, int playerId)
+    public void Initialize(PlayerRoot[] player, int playerId)
     {
         SkillUIInitialize(player[playerId]);
         FrameColorChange(player[playerId]);
@@ -32,26 +32,26 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
     /// <summary>
     /// スキルUIの初期化
     /// </summary>
-    void SkillUIInitialize(NetworkPlayer player)
+    void SkillUIInitialize(PlayerRoot player)
     {
-        //クールタイムを元に戻す
-        for (int i = 0; i < skillBlocks.Length; i++)
-        {
-            if (i < player.GetSkill().Count())
-            {
-                skillTimeIcons[i].fillAmount = 1f;
-                skillTimeTexts[i].text = "";
-            }
-        }
+        ////クールタイムを元に戻す
+        //for (int i = 0; i < skillBlocks.Length; i++)
+        //{
+        //    if (i < player.GetSkill().Count())
+        //    {
+        //        skillTimeIcons[i].fillAmount = 1f;
+        //        skillTimeTexts[i].text = "";
+        //    }
+        //}
 
-        //スキルのスプライトを変更
-        Skill[] pSkills = player.GetSkill();
-        for (int i = 0; i < pSkills.Length; i++)
-        {
-            skillIcons[i + 1].sprite = pSkills[i].GetSprite();
-            skillTimeIcons[i + 1].sprite = pSkills[i].GetSprite();
-        }
-        SkillFrameChange(player);
+        ////スキルのスプライトを変更
+        //Skill[] pSkills = player.GetSkill();
+        //for (int i = 0; i < pSkills.Length; i++)
+        //{
+        //    skillIcons[i + 1].sprite = pSkills[i].GetSprite();
+        //    skillTimeIcons[i + 1].sprite = pSkills[i].GetSprite();
+        //}
+        //SkillFrameChange(player);
     }
     void SkillUIInitialize(PlayerDataManager playerDataManager)
     {
@@ -93,41 +93,41 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
     /// <summary>
     /// スキルとアルカナのクールタイム状態をUIにリアルタイム反映する
     /// </summary>
-    public void UpdateSkillCoolTimeUI(NetworkPlayer player)
+    public void UpdateSkillCoolTimeUI(PlayerRoot player)
     {
-        //通常攻撃のクールタイム更新
-        float currentAttack = player.GetSkillCoolTime(0);
-        float maxAttack = player.GetAttackCoolTimeDuration();
-        UpdateBlockUI(0, currentAttack, maxAttack);
+        ////通常攻撃のクールタイム更新
+        //float currentAttack = player.GetSkillCoolTime(0);
+        //float maxAttack = player.GetAttackCoolTimeDuration();
+        //UpdateBlockUI(0, currentAttack, maxAttack);
 
-        //通常スキル
-        Skill[] skills = player.GetSkill();
-        for (int i = 0; i < skills.Length; i++)
-        {
-            //１～４までのUI更新
-            int uiIndex = PlayerUtility.GetCoolTimeIndex(i);
+        ////通常スキル
+        //Skill[] skills = player.GetSkill();
+        //for (int i = 0; i < skills.Length; i++)
+        //{
+        //    //１～４までのUI更新
+        //    int uiIndex = PlayerUtility.GetCoolTimeIndex(i);
 
-            if (uiIndex < skillBlocks.Length && skills[i] != null)
-            {
-                float currentCoolTime = player.GetSkillCoolTime(uiIndex);
-                float maxCoolTime = PlayerUtility.CoolTimeValue(player, skills[i].GetCoolTime());
+        //    if (uiIndex < skillBlocks.Length && skills[i] != null)
+        //    {
+        //        float currentCoolTime = player.GetSkillCoolTime(uiIndex);
+        //        float maxCoolTime = PlayerUtility.CoolTimeValue(player, skills[i].GetCoolTime());
 
-                //UIの配列番号をそのまま渡す
-                UpdateBlockUI(uiIndex, currentCoolTime, maxCoolTime);
-            }
-        }
+        //        //UIの配列番号をそのまま渡す
+        //        UpdateBlockUI(uiIndex, currentCoolTime, maxCoolTime);
+        //    }
+        //}
 
-        //アルカナ枠のUI更新
-        int arcanaUIIndex = 5;
-        Arcana playerArcana = player.GetArcana();
-        if (playerArcana != null && arcanaUIIndex < skillBlocks.Length)
-        {
-            //クールタイムを更新
-            float currentCoolTime = player.GetSkillCoolTime(5);
-            float maxCoolTime = playerArcana.GetCoolTime();
+        ////アルカナ枠のUI更新
+        //int arcanaUIIndex = 5;
+        //Arcana playerArcana = player.GetArcana();
+        //if (playerArcana != null && arcanaUIIndex < skillBlocks.Length)
+        //{
+        //    //クールタイムを更新
+        //    float currentCoolTime = player.GetSkillCoolTime(5);
+        //    float maxCoolTime = playerArcana.GetCoolTime();
 
-            UpdateBlockUI(arcanaUIIndex, currentCoolTime, maxCoolTime);
-        }
+        //    UpdateBlockUI(arcanaUIIndex, currentCoolTime, maxCoolTime);
+        //}
     }
 
     /// <summary>
@@ -157,9 +157,9 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
     /// <summary>
     /// フレーム変更
     /// </summary>
-    public void SkillFrameChange(NetworkPlayer player)
+    public void SkillFrameChange(PlayerRoot player)
     {
-        int index = player.GetSkillNo();
+        int index = player.SelectedSkillIndex.Value;
         if (index >= 0 && index < skillFrame.Length)
         {
             //すべての枠消す
@@ -174,9 +174,9 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
     /// <summary>
     /// 枠の色変更
     /// </summary>
-    public void FrameColorChange(NetworkPlayer player)
+    public void FrameColorChange(PlayerRoot player)
     {
-        int pIndex = player.GetNetworkId();
+        int pIndex = player.PlayerIndex.Value;
         Color color;
         switch (pIndex)
         {

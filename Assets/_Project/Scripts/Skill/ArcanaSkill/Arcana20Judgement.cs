@@ -4,10 +4,10 @@ using UnityEngine;
 public class Arcana20JudgementFront : ArcanaLogic
 {
     //当たると現在体力が３０％減る
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         GameObject hpB = Object.Instantiate(sourceArcana.effectPrefab);
-        hpB.GetComponent<HpBullet>().InitializeBullet(player.GetNetworkId(), player.transform.position);
+        hpB.GetComponent<HpBullet>().InitializeBullet(player.PlayerIndex.Value, player.transform.position);
     }
 }
 
@@ -17,11 +17,11 @@ public class Arcana20JudgementBack : ArcanaLogic
     public float length = 15f;  //範囲
     Vector2 pos = new Vector2(0, 7.5f);
     public float spawnInterval = 0.03f; //銃弾を出す間隔
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         player.StartCoroutine(OnUpdate(player, sourceArcana));
     }
-    public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
+    public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
         float elapsed = 0f;
 
@@ -37,7 +37,7 @@ public class Arcana20JudgementBack : ArcanaLogic
             Bullet magic = obj.GetComponent<Bullet>();
             if (magic != null)
                 //初期化
-                magic.InitializeBullet(player.GetNetworkId(), spawnPos);
+                magic.InitializeBullet(player.PlayerIndex.Value, spawnPos);
 
             //次の弾までの待機時間
             yield return new WaitForSeconds(spawnInterval);

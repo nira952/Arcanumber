@@ -1,4 +1,6 @@
+using R3;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
@@ -6,7 +8,7 @@ using UnityEngine;
 /// </summary>
 public abstract class MagicObject : MonoBehaviour
 {
-    protected int haveCharaNo = -1; // -1で未初期化を表す
+    protected int haveAttackerIndex = -1; // -1で未初期化を表す
     protected float dmg;          //ダメージ
     protected float keepTime;     //持続時間
     protected Animator animator;  //アニメーター
@@ -22,9 +24,22 @@ public abstract class MagicObject : MonoBehaviour
     protected bool isPenetrate = false;
     protected int reflectCount = 0;
 
-    protected virtual void CommonInitialize(int charaNo, float damage)
+    // 破棄されたことを通知するためのSubject
+    protected Subject<Unit> onDestroyed = new Subject<Unit>();
+    public Observable<Unit> OnDestroyed => onDestroyed;
+    /// <summary>
+    /// NetworkBehaviour 以外からでもサーバー上かどうかを判定するヘルパー
+    /// </summary>
+    protected bool IsServer()
     {
-        haveCharaNo = charaNo;
+        // ネットワークが非アクティブ（オフライン/テスト時）は true、マルチ時は IsServer を参照
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.isActiveAndEnabled) return true;
+        return NetworkManager.Singleton.IsServer;
+    }
+
+    protected virtual void CommonInitialize(int attackerIndex, float damage)
+    {
+        haveAttackerIndex = attackerIndex;
         dmg = damage;
         animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
         NetWorkAudioManager.Instance.PlayGlobal(se);
@@ -42,7 +57,7 @@ public abstract class MagicObject : MonoBehaviour
 
         AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
         if (stateInfo.normalizedTime >= 1.0f && !animator.IsInTransition(0))
-            Destroy(gameObject);
+            onDestroyed.OnNext(Unit.Default);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -53,19 +68,22 @@ public abstract class MagicObject : MonoBehaviour
 
     private void HandleHit(Collider2D collision)
     {
+        if (!IsServer()) return;  // サーバー上でのみ処理
+
         // 1. プレイヤー判定（子オブジェクトのコライダーも考慮）
-        NetworkPlayer targetPlayer = collision.GetComponentInParent<NetworkPlayer>();
+        PlayerRoot targetPlayer = collision.GetComponentInParent<PlayerRoot>();
         if (targetPlayer != null)
         {
-            int targetId = targetPlayer.GetNetworkId();
+            int targetIndex = targetPlayer.PlayerIndex.Value;
 
             // 自分自身への当たりの除外 & 重複ヒット防止
-            if (targetId == -1 || hitList.Contains(targetId) || targetId == haveCharaNo) return;
+            if (targetIndex == -1 || hitList.Contains(targetIndex) || targetIndex == haveAttackerIndex) return;
 
-            hitList.Add(targetId);
+            hitList.Add(targetIndex);
             OnHit(targetPlayer);
             AtkHeal();
 
+            // 貫通しない場合は破棄
             if (isPenetrate) return;
             if (reflectCount > 0)
             {
@@ -74,16 +92,16 @@ public abstract class MagicObject : MonoBehaviour
             }
 
             if (useAnimationEndEvent) isHitAndWaitingDestroy = true;
-            else Destroy(gameObject);
+            else onDestroyed.OnNext(Unit.Default);  // 破棄通知
             return;
         }
 
         //ミニオン判定
         FragileMinion targetMinion = collision.GetComponentInParent<FragileMinion>();
-        if (targetMinion != null && targetMinion.GetwnerPlayerNo() != haveCharaNo)
+        if (targetMinion != null && targetMinion.GetwnerPlayerNo() != haveAttackerIndex)
         {
-            targetMinion.TakeDamage();
-            if (!isPenetrate) Destroy(gameObject);
+            targetMinion.ApplyDamage();
+            if (!isPenetrate) onDestroyed.OnNext(Unit.Default);
             return;
         }
 
@@ -97,7 +115,7 @@ public abstract class MagicObject : MonoBehaviour
             else if (!isPenetrate)
             {
                 if (useAnimationEndEvent) isHitAndWaitingDestroy = true;
-                else Destroy(gameObject);
+                else onDestroyed.OnNext(Unit.Default);
             }
         }
     }
@@ -126,21 +144,21 @@ public abstract class MagicObject : MonoBehaviour
         transform.right = reflectDir;
     }
 
-    protected virtual void OnHit(NetworkPlayer target)
+    protected virtual void OnHit(PlayerRoot target)
     {
-        NetworkPlayer player = PlayerUtility.FindPlayerByNo(haveCharaNo);
         //ダメージを与える
-        PlayerUtility.FinalDamage(target, player, dmg);
-        // エフェクトをつける
+        PlayerUtility.FinalDamage(target.PlayerIndex.Value, haveAttackerIndex, dmg);
+        // エフェクトがある場合、付与する
         if (effect != null)
-            target.SetHaveEffect(effect.Clone());
+            target.AddEffect(effect.Clone());
     }
 
 
     protected void AtkHeal()
     {
-        NetworkPlayer player = PlayerUtility.FindPlayerByNo(haveCharaNo);
-        if (player != null && PlayerUtility.HaveEffect(player, EffectList.AtkHeal, true))
-            PlayerUtility.FinalHeal(player, dmg * GameConfig.DEATH_BACK_VALUE);
+        PlayerRoot player = PlayerUtility.GetPlayerByIndex(haveAttackerIndex);
+        // 攻撃者がAtkHeal効果を持っている場合、ダメージの一部を回復する
+        if (player != null && player.HaveEffect(EffectList.AtkHeal, true))
+            player.ApplyHeal(dmg * player.GetEffectValue(EffectList.AtkHeal));
     }
 }

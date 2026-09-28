@@ -7,7 +7,7 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerInputMediator
     private PlayerRoot root;
 
     private PlayerInputController inputController;
-    private NetworkPlayer player;
+    private PlayerRoot player;
 
     public bool CanProcessInput
     {
@@ -47,7 +47,7 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerInputMediator
     private void Awake()
     {
         root = GetComponent<PlayerRoot>();
-        player = GetComponent<NetworkPlayer>();
+        player = GetComponent<PlayerRoot>();
 
     }
 

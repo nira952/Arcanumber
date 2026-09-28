@@ -5,18 +5,18 @@ using System.Collections.Generic;
 public class WallSwap : MonoBehaviour
 {
     //クールダウン中かどうかを管理する辞書
-    private static Dictionary<NetworkPlayer, bool> isCoolingDown = new Dictionary<NetworkPlayer, bool>();
+    private static Dictionary<PlayerRoot, bool> isCoolingDown = new Dictionary<PlayerRoot, bool>();
     private float coolTime = 0.5f; //クールダウン時間
     private void OnCollisionEnter2D(Collision2D collision)
     {
         //プレイヤーを探す
-        NetworkPlayer player = collision.gameObject.GetComponent<NetworkPlayer>();
+        PlayerRoot player = collision.gameObject.GetComponent<PlayerRoot>();
         if (player == null) return;
 
         //クールダウン中なら処理を中断
         if (isCoolingDown.ContainsKey(player) && isCoolingDown[player]) return;
 
-        if (PlayerUtility.HaveEffect(player, EffectList.WallSwap, true))
+        if (player.HaveEffect(EffectList.WallSwap, true))
         {
             //ワープ処理
             player.transform.position = new Vector3(
@@ -27,7 +27,7 @@ public class WallSwap : MonoBehaviour
     }
 
     //クールダウン処理
-    private IEnumerator WarpCooldown(NetworkPlayer player)
+    private IEnumerator WarpCooldown(PlayerRoot player)
     {
         isCoolingDown[player] = true;
         //0.5秒間はワープを無効化する

@@ -7,7 +7,7 @@
 //{
 //    [Header("プレイヤーの管理")]
 //    //のちに配列にする
-//    public NetworkPlayer player;
+//    public PlayerRoot player;
 
 //    //[SerializeField] private EffectRegistry effectRegistry;
 
@@ -24,7 +24,7 @@
 //    void Initialize()
 //    {
 //        player.Initialize(true);
-//        //BattleUIManager.Instance.Initialize(player, player.GetNetworkId());
+//        //BattleUIManager.Instance.Initialize(player, player.PlayerIndex.Value);
 //        //ダメージエフェクト（アクション）の登録
 //        player.GetArcana().ExecuteArcanaEffect(ASkillCategory.DamageEffect, player);
 //    }

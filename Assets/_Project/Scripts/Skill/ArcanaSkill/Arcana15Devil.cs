@@ -10,7 +10,7 @@ using UnityEngine;
 public class Arcana15DevilFront : ArcanaLogic
 {
     //通常攻撃にデバフがつく
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
 
     }
@@ -22,12 +22,12 @@ public class Arcana15DevilFront : ArcanaLogic
 public class Arcana15DevilBack : ArcanaLogic
 {
     //デバフ・バフをすべて解除し、その数だけ攻撃力を上げる
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         //デバフ、バフの数を数える
-        int efeNum = player.GetHaveEffect().Count;
+        int efeNum = player.GetAllEffectCount();
         //すべて消す
-        player.GetHaveEffect().Clear();
+        player.ClearAllEffects();
         //数だけ攻撃力を上げる
         player.GetPlayerStatus().SetAtk(
             player.GetPlayerStatus().GetAtk() + player.GetPlayerStatus().GetAtk() * efeNum * sourceArcana.GetKeepValue());

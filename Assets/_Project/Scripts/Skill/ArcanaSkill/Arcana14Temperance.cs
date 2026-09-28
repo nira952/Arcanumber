@@ -11,12 +11,12 @@ using UnityEngine;
 public class Arcana14TemperanceFront : ArcanaLogic
 {
     //自分のスキルのクールタイムを減らす
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         Effect e = EffectRegistry.Get(EffectList.CoolTimeReduction, true);
         EffectAbility ea = new EffectAbility(e, false, -1f, sourceArcana.GetKeepValue());
         //自分にかける
-        player.SetHaveEffect(ea.Clone());
+        player.AddEffect(ea.Clone());
     }
 }
 
@@ -26,11 +26,11 @@ public class Arcana14TemperanceFront : ArcanaLogic
 public class Arcana14TemperanceBack : ArcanaLogic
 {
     //相手のスキルのクールタイムを増やす
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         Effect e = EffectRegistry.Get(EffectList.CoolTimeReduction, false);
         EffectAbility ea = new EffectAbility(e, false, -1f, sourceArcana.GetKeepValue());
         //自分以外にかける
-        PlayerUtility.ApplyEffectToOthers(player, ea);
+        PlayerUtility.ApplyEffectToOtherPlayers(player, ea);
     }
 }

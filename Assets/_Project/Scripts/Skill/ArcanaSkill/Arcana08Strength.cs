@@ -10,7 +10,7 @@ using UnityEngine;
 public class Arcana08StrengthFront : ArcanaLogic
 {
     //攻撃力が上がる
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         float newAttack = player.GetPlayerStatus().GetAtk() * sourceArcana.GetKeepValue();
         player.GetPlayerStatus().SetAtk(newAttack);
@@ -23,15 +23,16 @@ public class Arcana08StrengthFront : ArcanaLogic
 public class Arcana08StrengthBack : ArcanaLogic
 {
     //等価交換
-    private NetworkPlayer _owner;
+    private PlayerRoot _owner;
     private Arcana sArcana;
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         _owner = player;
         sArcana = sourceArcana;
-        NetworkPlayer.OnTakeDamageEvent += OnDamageReceived;
+        
+        // TODO : 保留
     }
-    private void OnDamageReceived(NetworkPlayer target, float damage)
+    private void OnDamageReceived(PlayerRoot target, float damage)
     {
         //自分自身へのダメージでなければ無視
         if (target != _owner) return;
@@ -50,7 +51,7 @@ public class Arcana08StrengthBack : ArcanaLogic
                 break;
             case 2:
                 status.SetSpeed(status.GetSpeed() + sArcana.GetKeepValue() * damage);
-                _owner.GetPlayerController().SetMoveSpeed(status.GetSpeed());
+                _owner.SetMoveSpeed(status.GetSpeed());
                 break;
         }
     }

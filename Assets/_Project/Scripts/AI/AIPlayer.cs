@@ -16,7 +16,7 @@ public class AIPlayer : MonoBehaviour
     //[SerializeField] private LayerMask groundLayer;
     //[SerializeField] private Transform groundCheck;
 
-    //NetworkPlayer enemy;
+    //PlayerRoot enemy;
 
     //private bool isAIPlayer = false;
 
@@ -41,7 +41,7 @@ public class AIPlayer : MonoBehaviour
 
     //void Start()
     //{
-    //    if (TryGetComponent(out NetworkPlayer netPlayer))
+    //    if (TryGetComponent(out PlayerRoot netPlayer))
     //        enemy = netPlayer;
 
     //    //最初の状態をセット

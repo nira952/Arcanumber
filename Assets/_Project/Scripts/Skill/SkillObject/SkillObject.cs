@@ -1,3 +1,4 @@
+using R3;
 using UnityEngine;
 
 /// <summary>
@@ -18,13 +19,17 @@ public class SkillObject : MagicObject
     private bool isReturning = false;
     private Transform ownerTransform;
 
-    public void Initialize(int charaNo, Skill skill, Vector2 targetPos)
+    public void Initialize(int attackerIndex, Skill skill, Vector2 targetPos)
     {
-        NetworkPlayer player = PlayerUtility.FindPlayerByNo(charaNo);
-        float finalDmg = PlayerUtility.GetFinalAtk(player, skill);
+        PlayerRoot player = PlayerUtility.GetPlayerByIndex(attackerIndex);
 
+        // スキルの攻撃力をプレイヤーの攻撃力に基づいて計算
+        float finalDmg = player.GetCurrentAttackPower() * skill.GetAtk();
+
+        // プレイヤーが存在する場合はプレイヤーの位置を、存在しない場合はスキルオブジェクトの位置を使用
         Vector2 spawnPos = player != null ? (Vector2)player.transform.position : (Vector2)transform.position;
 
+        // スキルの挙動タイプとパラメータを取得
         behaviorType = skill.GetBehaviorType();
         keepTime = skill.GetKeepTime();
         moveSpeed = skill.GetMoveSpeed();
@@ -34,7 +39,7 @@ public class SkillObject : MagicObject
         effect = skill.GetEffect();
         se = skill.GetSe();
 
-        CommonInitialize(charaNo, finalDmg);
+        CommonInitialize(attackerIndex, finalDmg);
 
         //挙動タイプに応じた初期化・配置
         SkillBehaviorSelectType(behaviorType, spawnPos, targetPos);
@@ -138,7 +143,7 @@ public class SkillObject : MagicObject
         boomerangTimer = 0f;
         isReturning = false;
 
-        NetworkPlayer player = PlayerUtility.FindPlayerByNo(haveCharaNo);
+        PlayerRoot player = PlayerUtility.GetPlayerByIndex(haveAttackerIndex);
         if (player != null) ownerTransform = player.transform;
 
         Vector2 direction = (targetPos - spawnPos).normalized;
@@ -205,7 +210,7 @@ public class SkillObject : MagicObject
             // 手元に戻ったら消滅
             if (Vector2.Distance(transform.position, ownerTransform.position) < 0.5f)
             {
-                Destroy(gameObject);
+                onDestroyed.OnNext(Unit.Default);
             }
         }
     }

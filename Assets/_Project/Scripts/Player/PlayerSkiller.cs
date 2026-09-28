@@ -1,13 +1,10 @@
 using R3;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
 /// プレイヤーのスキル用コンポーネント
 /// </summary>
-public class NetworkPlayer : MonoBehaviour
+public class PlayerSkiller : MonoBehaviour
 {
     // --- 参照用 ---
 
@@ -20,10 +17,8 @@ public class NetworkPlayer : MonoBehaviour
     private float attackCoolTimeDuration = 0.5f; //通常攻撃のクールタイムの時間
 
     private Skill[] skillList = new Skill[GameConfig.SKILL_HOPPER_MAX];
-    public ReactiveProperty<int> SelectedSkillIndex { get; } = new(0);
 
     // --- イベント ---
-    public static event Action<NetworkPlayer, float> OnTakeDamageEvent;
 
     public void Initialize(PlayerRoot playerRoot, AimCursor aimCursor, Skill[] skillList)
     {
@@ -45,7 +40,7 @@ public class NetworkPlayer : MonoBehaviour
     public void SkillSelect(int direction)
     {
         // 変更方向から次のスキル番号を計算
-        int newSkillNo = SelectedSkillIndex.Value + direction;
+        int newSkillNo = playerRoot.SelectedSkillIndex.Value + direction;
 
         // スキル番号が範囲外になった場合の処理
         if (newSkillNo < 0) newSkillNo = GameConfig.SKILL_HOPPER_MAX;
@@ -62,7 +57,7 @@ public class NetworkPlayer : MonoBehaviour
             newSkillNo = (direction > 0) ? 0 : GameConfig.SKILL_HOPPER_MAX - 1;
 
         // スキル番号を更新
-        SelectedSkillIndex.Value = newSkillNo;
+        playerRoot.SelectedSkillIndex.Value = newSkillNo;
 
         // エイム変更
         if (newSkillNo != GameConfig.SKILL_HOPPER_MAX)
@@ -81,7 +76,7 @@ public class NetworkPlayer : MonoBehaviour
     public void SkillUse(Arcana arcana, Skill activeSkill)
     {
         // 現在選択されているスキル番号を取得
-        int currentNo = SelectedSkillIndex.Value;
+        int currentNo = playerRoot.SelectedSkillIndex.Value;
 
         // 選択中のスキルがクールタイム中であれば、処理を中断
         if (!IsActionReady(currentNo)) { return; }
@@ -91,7 +86,7 @@ public class NetworkPlayer : MonoBehaviour
         if (currentNo == GameConfig.SKILL_HOPPER_MAX)
         {
             // 発動型のアルカナスキルを実行
-            arcana?.ExecuteArcanaEffect(ASkillCategory.Command, this);
+            arcana?.ExecuteArcanaEffect(ASkillCategory.Command, playerRoot);
 
             // アルカナスキルのクールタイムを開始
             StartActionCoolTime(GameConfig.SKILL_ARCANA, arcana.GetCoolTime());
@@ -105,7 +100,7 @@ public class NetworkPlayer : MonoBehaviour
             }
 
             // SkillManagerへスキル発動を依頼
-            SkillManager.Instance.RequestSkill(playerRoot, SelectedSkillIndex.Value);
+            SkillManager.Instance.RequestSkill(playerRoot);
 
             // 通常スキルのクールタイムを開始
             StartActionCoolTime(currentNo, activeSkill.GetCoolTime());
@@ -113,31 +108,13 @@ public class NetworkPlayer : MonoBehaviour
         }
 
         // スキル使用時に発動するアルカナを実行
-        arcana?.ExecuteArcanaEffect(ASkillCategory.SkillEffect, this);
+        arcana?.ExecuteArcanaEffect(ASkillCategory.SkillEffect, playerRoot);
     }
 
 
     /**
      * --------- ゲッター ---------
      */
-    public int GetNetworkId()
-    {
-        //playerRoot や NetworkObject が null の場合は safe に -1 を返す
-        if (playerRoot == null)
-            return -1;
-
-        return playerRoot.PlayerIndex.Value; //または NetworkObject.OwnerClientId など
-    }
-    public float GetNowHP() { return playerRoot.CurrentHealth.Value; }
-    public int GetNowJump() { return playerRoot.Nowjump.Value; }
-    public Arcana GetArcana() { return playerRoot.GetArcana(); }
-    public Skill[] GetSkill() { return skillList; }
-    public int GetSkillNo() { return SelectedSkillIndex.Value; }
-    public Skill GetNoSkill() { return skillList[SelectedSkillIndex.Value]; }
-    public PlayerStatus GetPlayerStatus() { return playerRoot.GetPlayerStatus(); }
-    public List<EffectAbility> GetHaveEffect() { return playerRoot.ActiveEffects.ToList(); }
-
-    public PlayerRoot GetPlayerController() { return playerRoot; }
 
     public float GetSkillCoolTime(int index)
     {
@@ -174,15 +151,6 @@ public class NetworkPlayer : MonoBehaviour
      * --------- セッター ---------
      */
 
-    public void SetHaveEffect(EffectAbility effect)
-    {
-        playerRoot.ActiveEffects.Add(effect);
-    }
-
-    /// <summary>
-    /// ジャンプのリセット
-    /// </summary>
-    public void JumpReset() { playerRoot.Nowjump.Value = 0; }
 
     /// <summary>
     /// クールタイムの管理
@@ -225,7 +193,7 @@ public class NetworkPlayer : MonoBehaviour
                 if (currentCoolTimes[i] < 0f) currentCoolTimes[i] = 0f;
             }
         }
-        PlayerUIManager.Instance.UpdateSkillCoolTimeUI(this);
+        PlayerUIManager.Instance.UpdateSkillCoolTimeUI(playerRoot);
     }
 
 
@@ -235,27 +203,7 @@ public class NetworkPlayer : MonoBehaviour
     public void ChangeColor()
     {
         SpriteRenderer renderer = playerRoot.GetMagic();
-        renderer.color = playerRoot.GetPlayerStatus().GetCharaColor(GetNetworkId());
+        renderer.color = playerRoot.GetPlayerStatus().GetCharaColor(playerRoot.PlayerIndex.Value);
     }
 
-    /// <summary>
-    /// ダメージ処理
-    /// </summary>
-    public void TakeDamage(float damage)
-    {
-        Arcana arcana = playerRoot.GetArcana();
-
-        // TODO : 最終的にPlayerRootに吸収
-
-        if (playerRoot.CurrentHealth.Value <= 0)
-        {
-            // 死亡時にアルカナスキルの発動
-            arcana.ExecuteArcanaEffect(ASkillCategory.DeathEffect, this);
-        }
-        //ダメージアルカナスキルの発動
-        if (arcana.GetASkillCategory() == ASkillCategory.DamageEffect)
-        {
-            OnTakeDamageEvent?.Invoke(this, damage);
-        }
-    }
 }

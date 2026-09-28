@@ -84,14 +84,14 @@
 //        }
 
 //        // --- クライアントからの命令をサーバーへ届ける窓口 ---
-//        public void RequestTakeDamage(int damage)
+//        public void RequestApplyDamage(int damage)
 //        {
 //            if (IsServer) player.ApplyDamage(damage);
-//            else TakeDamageServerRpc(damage);
+//            else ApplyDamageServerRpc(damage);
 //        }
 
 //        [ServerRpc]
-//        private void TakeDamageServerRpc(int damage) => player.ApplyDamage(damage);
+//        private void ApplyDamageServerRpc(int damage) => player.ApplyDamage(damage);
 
 
 //        public void RequestActivateSkill()

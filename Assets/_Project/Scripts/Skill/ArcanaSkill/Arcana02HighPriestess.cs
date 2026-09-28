@@ -12,8 +12,8 @@ public class Arcana02HighPriestessFront : ArcanaLogic
 {
     //だんだん攻撃力が上がる
     public const float timeInterval = 5f;
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
-    public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
+    public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
         while (true)
         {
@@ -31,13 +31,13 @@ public class Arcana02HighPriestessBack : ArcanaLogic
     //だんだん攻撃力が下がる
     public const float normalAtkValue = 10f;
     public const float timeInterval = 5f;
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         //最初に攻撃力を上げる
         player.GetPlayerStatus().SetAtk(normalAtkValue);
         player.StartCoroutine(OnUpdate(player, sourceArcana));
     }
-    public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
+    public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
         //時間経過で攻撃力を下げる
         while (true)

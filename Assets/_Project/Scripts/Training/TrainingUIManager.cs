@@ -108,7 +108,7 @@
 //    /// </summary>
 //    void MyHaveSkillImage()
 //    {
-//        Skill[] skills = PlayerUtility.FindPlayerByNo(0).GetSkill();
+//        Skill[] skills = PlayerUtility.GetOtherPlayer(0).GetSkill();
 
 //        for (int i = 0; i < myHaveSImg.Length; i++)
 //        {
@@ -163,7 +163,7 @@
 //    void ChangeArcana(Arcana arcana)
 //    {
 //        //設定したアルカナを入れる
-//        PlayerUtility.FindPlayerByNo(0).SetArcana(arcana);
+//        PlayerUtility.GetOtherPlayer(0).SetArcana(arcana);
 //        //持っているアルカナを変更
 //        GetHaveArcanaText();
 //        //ここもUI変更の処理を書く
@@ -185,7 +185,7 @@
 //    /// </summary>
 //    void ChangeSkill(Skill skill)
 //    {
-//        PlayerUtility.FindPlayerByNo(0).SetSkill(skill, slotNum);
+//        PlayerUtility.GetOtherPlayer(0).SetSkill(skill, slotNum);
 //        //ここでUI変更の処理を書く
 //        myHaveSImg[slotNum].sprite = skill.GetSprite();
 //    }
@@ -211,7 +211,7 @@
 //    /// </summary>
 //    public void PlayerHPDamage()
 //    {
-//        PlayerUtility.FindPlayerByNo(0).TakeDamage(10);
+//        PlayerUtility.GetOtherPlayer(0).ApplyDamage(10);
 //    }
 
 //    /// <summary>
@@ -219,7 +219,7 @@
 //    /// </summary>
 //    public void EnemyHeal(int i)
 //    {
-//        PlayerUtility.FinalHeal(PlayerUtility.FindPlayerByNo(i), 10);
+//        PlayerUtility.FinalHeal(PlayerUtility.GetOtherPlayer(i), 10);
 //    }
 
 //    /// <summary>
@@ -227,7 +227,7 @@
 //    /// </summary>
 //    public void ResetGame()
 //    {
-//        foreach (NetworkPlayer p in TrainingManager.Instance.GetNetworkPlayers())
+//        foreach (PlayerRoot p in TrainingManager.Instance.GetPlayerRoots())
 //        {
 //            p.Heal(10000);
 //        }
@@ -240,7 +240,7 @@
 //    /// </summary>
 //    public void AIPlayerMove()
 //    {
-//        AIPlayer aiPlayer = PlayerUtility.FindPlayerByNo(1).GetComponent<AIPlayer>();
+//        AIPlayer aiPlayer = PlayerUtility.GetOtherPlayer(1).GetComponent<AIPlayer>();
 //        aiPlayer.SetIsAIPlayer(!aiPlayer.GetIsAIPlayer());
 //    }
 
@@ -251,7 +251,7 @@
 //    {
 //        //現在持っているアルカナの名前を入れる
 //        haveArcanaText.text
-//            = $"{PlayerUtility.FindPlayerByNo(0).GetArcana().GetArcanaName}" +
-//            $"（{(PlayerUtility.FindPlayerByNo(0).GetArcana().GetIsFront() ? "正" : "逆")}位置）";
+//            = $"{PlayerUtility.GetOtherPlayer(0).GetArcana().GetArcanaName}" +
+//            $"（{(PlayerUtility.GetOtherPlayer(0).GetArcana().GetIsFront() ? "正" : "逆")}位置）";
 //    }
 //}

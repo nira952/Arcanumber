@@ -10,13 +10,13 @@ public class NormalSlash : MagicObject
     }
 
     // プレイヤーに当たったときに呼ばれる（MagicObject側で重複ヒット防止済み）
-    protected override void OnHit(NetworkPlayer target)
+    protected override void OnHit(PlayerRoot target)
     {
-        NetworkPlayer player = PlayerUtility.FindPlayerByNo(haveCharaNo);
+        PlayerRoot player = PlayerUtility.GetPlayerByIndex(haveAttackerIndex);
         if (player == null) return;
 
         //ダメージを与える（エフェクト付与はなし）
-        PlayerUtility.FinalDamage(target, player, dmg);
+        PlayerUtility.FinalDamage(target.PlayerIndex.Value, haveAttackerIndex, dmg);
         Debug.Log("当たったよ");
     }
 

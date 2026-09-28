@@ -11,7 +11,7 @@ using UnityEngine;
 public class Arcana18MoonFront : ArcanaLogic
 {
     //ブリンクをする
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         if (player == null) return;
 
@@ -19,7 +19,7 @@ public class Arcana18MoonFront : ArcanaLogic
     }
 
     //コルーチン本体
-    public override IEnumerator OnUpdate(NetworkPlayer player, Arcana sourceArcana)
+    public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
         Transform playerTransform = player.transform;
 
@@ -67,7 +67,7 @@ public class Arcana18MoonFront : ArcanaLogic
 public class Arcana18MoonBack : ArcanaLogic
 {
     //分身を出す
-    public override void Execute(NetworkPlayer player, Arcana sourceArcana)
+    public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         for(int i = 0; i < sourceArcana.GetKeepValue(); i++)
         {
@@ -76,11 +76,13 @@ public class Arcana18MoonBack : ArcanaLogic
 
             clone.tag = "Player";
 
-            if (i == 0)
-                ai.SetIsHumanLike(true);
+            // TODO : 要改修
 
-            ai.SetIsAIPlayer(true);
-            Object.Destroy(clone, 15f);
+            //if (i == 0)
+            //    ai.SetIsHumanLike(true);
+
+            //ai.SetIsAIPlayer(true);
+            //Object.Destroy(clone, 15f);
         }
     }
 
