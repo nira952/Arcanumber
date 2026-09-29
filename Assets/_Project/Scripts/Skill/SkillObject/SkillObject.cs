@@ -36,15 +36,16 @@ public class SkillObject : MagicObject
         isPenetrate = skill.GetIsPenetrate();
         reflectCount = skill.GetReflectCount();
         useAnimationEndEvent = skill.GetEffectAnimation() != null;
+        useAnimationEndEvent = !(keepTime > 0f);
         effect = skill.GetEffect();
         se = skill.GetSe();
+        isKeepDmg = skill.GetBehaviorType() == SkillBehaviorType.Area;
 
         CommonInitialize(attackerIndex, finalDmg);
 
         //挙動タイプに応じた初期化・配置
         SkillBehaviorSelectType(behaviorType, spawnPos, targetPos);
 
-        if (keepTime > 0) Destroy(gameObject, keepTime);
     }
 
     /// <summary>
@@ -177,6 +178,9 @@ public class SkillObject : MagicObject
         transform.position += transform.right * moveSpeed * Time.deltaTime;
     }
 
+    /// <summary>
+    /// ホーミング処理
+    /// </summary>
     private void UpdateHoming()
     {
         if (targetEnemy == null) return;
@@ -185,33 +189,30 @@ public class SkillObject : MagicObject
         float targetAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
         float currentAngle = transform.eulerAngles.z;
-        float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, 300f * Time.deltaTime);
+        float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, GameConfig.HOOMING_TURN_SPEED * Time.deltaTime);
         transform.rotation = Quaternion.Euler(0, 0, newAngle);
     }
 
+    /// <summary>
+    /// ブーメラン処理
+    /// </summary>
     private void UpdateBoomerang()
     {
         boomerangTimer += Time.deltaTime;
 
-        if (!isReturning && boomerangTimer > 0.8f)
-        {
+        //一定時間経過後にブーメランを手元に戻す
+        if (!isReturning && boomerangTimer > GameConfig.BOOMERANG_TURN_TIME)
             isReturning = true;
-        }
 
         if (isReturning && ownerTransform != null)
         {
             Vector2 dir = (ownerTransform.position - transform.position).normalized;
             float targetAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, targetAngle);
 
-            float currentAngle = transform.eulerAngles.z;
-            float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, 400f * Time.deltaTime);
-            transform.rotation = Quaternion.Euler(0, 0, newAngle);
-
-            // 手元に戻ったら消滅
-            if (Vector2.Distance(transform.position, ownerTransform.position) < 0.5f)
-            {
+            //手元に戻ったら消滅
+            if (Vector2.Distance(transform.position, ownerTransform.position) < GameConfig.BOOMERANG_DESTROY_RANGE)
                 onDestroyed.OnNext(Unit.Default);
-            }
         }
     }
 }

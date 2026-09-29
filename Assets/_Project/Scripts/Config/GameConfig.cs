@@ -15,6 +15,12 @@ public static class GameConfig
     public const int SKILL_ARCANA = 5;
     public const int COOLTIME_HOPPER_MAX = 6;
 
+    //スキルの定数設定
+    public const float HOOMING_TURN_SPEED = 300.0f; //ホーミングの回転速度
+    public const float BOOMERANG_TURN_TIME = 0.7f; //ブーメランの戻る時間
+    public const float BOOMERANG_DESTROY_RANGE = 0.5f; //ブーメランの消える範囲
+    public const float DAMAGE_INTERVAL = 0.5f; //ダメージの間隔
+
     /*スキルUIの定数*/
     //スキルUIのパネルのフェード時間
     public const float FADE_DURATION = 1.0f;
