@@ -27,6 +27,7 @@ public abstract class MagicObject : MonoBehaviour
     // 破棄されたことを通知するためのSubject
     protected Subject<Unit> onDestroyed = new Subject<Unit>();
     public Observable<Unit> OnDestroyed => onDestroyed;
+
     /// <summary>
     /// NetworkBehaviour 以外からでもサーバー上かどうかを判定するヘルパー
     /// </summary>
@@ -66,6 +67,36 @@ public abstract class MagicObject : MonoBehaviour
     {
         if (isKeepDmg || isHitAndWaitingDestroy) return;
         HandleHit(collision);
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (!IsServer()) return; //サーバー上でのみ処理
+
+        //持続ダメージフラグが立っている場合のみ有効にする
+        if (!isKeepDmg) return;
+
+        PlayerRoot targetPlayer = collision.GetComponentInParent<PlayerRoot>();
+        if (targetPlayer != null)
+        {
+            int targetIndex = targetPlayer.PlayerIndex.Value;
+            if (targetIndex == -1 || targetIndex == haveAttackerIndex) return;
+
+            //ターゲットごとのタイマー初期化
+            if (!stayTimers.ContainsKey(targetIndex))
+                stayTimers[targetIndex] = 0;
+
+            stayTimers[targetIndex] += Time.deltaTime;
+
+            //一定間隔を超えたら持続ダメージを適用
+            if (stayTimers[targetIndex] >= GameConfig.DAMAGE_INTERVAL)
+            {
+                stayTimers[targetIndex] = 0f; //タイマーリセット
+
+                OnHit(targetPlayer);
+                AtkHeal();
+            }
+        }
     }
 
     private void HandleHit(Collider2D collision)
