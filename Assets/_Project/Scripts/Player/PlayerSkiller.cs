@@ -165,7 +165,10 @@ public class PlayerSkiller : MonoBehaviour
             }
         }
 
-        playerUIManager.UpdateSkillCoolTimeUI(currentCoolTimes, maxCoolTimes);
+        if (playerUIManager != null)
+        {
+            playerUIManager.UpdateSkillCoolTimeUI(currentCoolTimes, maxCoolTimes);
+        }
     }
 
     /// <summary>

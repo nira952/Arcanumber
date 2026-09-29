@@ -10,6 +10,7 @@ public class DebugPlayerPreview : MonoBehaviour
 
     [SerializeField] private string previewCurrentSkill;
 
+    [SerializeField] private string previewCurrentArcana;
     [SerializeField] private int previewPlayerIndex;
     [SerializeField] private float previewCurrentHealth;
 
@@ -30,6 +31,8 @@ public class DebugPlayerPreview : MonoBehaviour
 
     private void Start()
     {
+        previewCurrentArcana = !string.IsNullOrEmpty(root.GetArcana()?.GetArcanaName) ? root.GetArcana().GetArcanaName : "•s–¾";
+
         root.PlayerIndex.Subscribe(v => previewPlayerIndex = v).AddTo(this);
         root.CurrentHealth.Subscribe(v => previewCurrentHealth = v).AddTo(this);
         root.IsDown.Subscribe(v => previewIsDown = v).AddTo(this);

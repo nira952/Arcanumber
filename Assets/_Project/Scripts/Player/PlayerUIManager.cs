@@ -89,7 +89,7 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
         if (current > 0f)
         {
             float elapsed = max - current; //経過した時間
-            skillTimeIcons[index].fillAmount = elapsed / max; //0から1に向かって増えていく
+            skillTimeIcons[index + 1].fillAmount = elapsed / max; //0から1に向かって増えていく
 
             string formattedTime = current >= 10f
                 ? $"{Mathf.CeilToInt(current):F0}"
@@ -98,13 +98,13 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
             Debug.Log($"[PlayerUIManager] Formatted time: {formattedTime}");
 
             //残り秒数をテキストに表示（9秒以下になると小数点が出てくる）
-            skillTimeTexts[index].text = formattedTime;
+            skillTimeTexts[index + 1].text = formattedTime;
 
             // 0.1より小さくなったら0にする
             if (current <= 0.1f)
             {
-                skillTimeIcons[index].fillAmount = 1f;
-                skillTimeTexts[index].text = "";
+                skillTimeIcons[index + 1].fillAmount = 1f;
+                skillTimeTexts[index + 1].text = "";
             }
 
         }

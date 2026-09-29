@@ -149,6 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d6161be6ca8f9540b4e3cf01e0b2ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  previewCurrentSkill: 
   previewPlayerIndex: 0
   previewCurrentHealth: 0
   previewIsDown: 0
@@ -241,6 +242,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68b30e7d888bc2d4c917e6956e3baf49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentCoolTimes:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  maxCoolTimes:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
 --- !u!114 &4464349389711191528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -564,6 +579,7 @@ MonoBehaviour:
   showDebugRay: 1
   groundedColor: {r: 0, g: 1, b: 0, a: 1}
   airColor: {r: 1, g: 0, b: 0, a: 1}
+  visualColider: {fileID: 1677832461980426859}
 --- !u!1 &3747513959555356234
 GameObject:
   m_ObjectHideFlags: 0

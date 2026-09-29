@@ -35,7 +35,7 @@ public class PlayerRoot : MonoBehaviour
     public bool CanControl => 
         !IsDown.Value && (GameManager.Instance == null || GameManager.Instance.StateRx.CurrentValue == GameState.Playing);
 
-    public void Initialize()
+    public void OwnerInitialize()
     {
         //　ArcanaとスキルをPlayerDataManagerから取得
         skillList = PlayerDataManager.Instance.GetMySkills();
@@ -71,6 +71,7 @@ public class PlayerRoot : MonoBehaviour
 
         // コンポーネントの初期化
         movement.Initialize(this);
+        rayInput.Initialize();
         playerAttack.Initialized(this);
         playerAnimator.Initialize(PlayerIndex.Value);
         playerSkill.Initialize(this, playerUIManager, skillList);
@@ -169,8 +170,12 @@ public class PlayerRoot : MonoBehaviour
         // ジャンプ禁止状態ならジャンプ不可
         if (HaveEffect(EffectList.NoJump, true)) { return; }
 
+        bool isGrounded = rayInput.IsGrounded(movement.GetRigidbody());
+
+        Debug.Log(isGrounded);
+
         // 地面に接地している場合のみジャンプ可能
-        if (rayInput.IsGrounded(movement.GetRigidbody()))
+        if (isGrounded)
         {
             movement.JumpActive();
         }
@@ -199,7 +204,7 @@ public class PlayerRoot : MonoBehaviour
         if (HaveEffect( EffectList.Silence, false)) { return; }
 
         // 選択中のスキルがクールタイム中であれば、処理を中断
-        if (!playerSkill.IsActionReady(SelectedSkillIndex.Value + 1)) { return; }
+        if (!playerSkill.IsActionReady(SelectedSkillIndex.Value)) { return; }
 
         playerSkill.SkillUse(CurrentArcana,CurrentSkill,SelectedSkillIndex.Value);
 

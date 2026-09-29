@@ -7,10 +7,15 @@ public class PlayerMovement : MonoBehaviour
     private PlayerRoot root;
     private float currentInputDirection;
 
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
+
     public void Initialize(PlayerRoot playerRoot)
     {
         root = playerRoot;
-        rb = GetComponent<Rigidbody2D>();
+
 
         // 強制的に Dynamic にする
         rb.bodyType = RigidbodyType2D.Dynamic;
@@ -63,6 +68,8 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public void StopMovement()
     {
+        if (rb == null || root == null) return;
+
         rb.linearVelocity = Vector2.zero; // 移動を停止
     }
 
