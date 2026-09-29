@@ -33,7 +33,6 @@ public class DebugPlayerPreview : MonoBehaviour
         root.PlayerIndex.Subscribe(v => previewPlayerIndex = v).AddTo(this);
         root.CurrentHealth.Subscribe(v => previewCurrentHealth = v).AddTo(this);
         root.IsDown.Subscribe(v => previewIsDown = v).AddTo(this);
-        root.IsJump.Subscribe(v => previewIsJump = v).AddTo(this);
         root.ActiveEffects.ObserveAdd().Subscribe(v => previewActiveEffects.Add(v.Value)).AddTo(this);
     }
 

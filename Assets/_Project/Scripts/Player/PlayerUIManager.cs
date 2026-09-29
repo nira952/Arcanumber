@@ -69,7 +69,13 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
     /// </summary>
     public void UpdateSkillCoolTimeUI(float[] currentSkillCT, float[] maxSkillCT)
     {
-        for (int i = 0; i < currentSkillCT.Length; i++)
+        int count = Mathf.Min(
+            currentSkillCT.Length,
+            maxSkillCT.Length,
+            skillTimeIcons.Length,
+            skillTimeTexts.Length);
+
+        for (int i = 0; i < count; i++)
         {
             UpdateBlockUI(i, currentSkillCT[i], maxSkillCT[i]);
         }
@@ -78,24 +84,31 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
     /// <summary>
     /// 指定されたスロットの補助メソッド
     /// </summary>
-    private void UpdateBlockUI(int uiIndex, float current, float max)
+    private void UpdateBlockUI(int index, float current, float max)
     {
-        if (current > 0f && max > 0f)
+        if (current > 0f)
         {
             float elapsed = max - current; //経過した時間
-            skillTimeIcons[uiIndex].fillAmount = elapsed / max; //0から1に向かって増えていく
+            skillTimeIcons[index].fillAmount = elapsed / max; //0から1に向かって増えていく
+
+            string formattedTime = current >= 10f
+                ? $"{Mathf.CeilToInt(current):F0}"
+                : $"{current:F1}";
+
+            Debug.Log($"[PlayerUIManager] Formatted time: {formattedTime}");
 
             //残り秒数をテキストに表示（9秒以下になると小数点が出てくる）
-            skillTimeTexts[uiIndex].text = current >= 10f
-                            ? $"{Mathf.CeilToInt(current):F0}"
-                            : $"{current:F1}";
+            skillTimeTexts[index].text = formattedTime;
+
+            // 0.1より小さくなったら0にする
+            if (current <= 0.1f)
+            {
+                skillTimeIcons[index].fillAmount = 1f;
+                skillTimeTexts[index].text = "";
+            }
+
         }
-        else
-        {
-            //満タンの状態
-            skillTimeIcons[uiIndex].fillAmount = 1f;
-            skillTimeTexts[uiIndex].text = "";
-        }
+
     }
 
 

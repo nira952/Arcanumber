@@ -28,7 +28,6 @@ public class PlayerRoot : MonoBehaviour
     public ReactiveProperty<int> PlayerIndex { get; } = new(-1);
     public ReactiveProperty<float> CurrentHealth { get; } = new(100);
     public ReactiveProperty<bool> IsDown { get; } = new(false);
-    public ReactiveProperty<bool> IsJump { get; } = new(false);
     public ObservableList<EffectAbility> ActiveEffects { get; } = new();
     public ReactiveProperty<int> SelectedSkillIndex { get; } = new(0);
 
@@ -80,7 +79,7 @@ public class PlayerRoot : MonoBehaviour
     }
 
 
-    public void Update()
+    private void Update()
     {
         // 操作できない場合は移動を停止して処理を終了
         if (!CanControl) { movement.StopMovement(); return; }
@@ -94,7 +93,6 @@ public class PlayerRoot : MonoBehaviour
         movement.UpdateMovement();
 
         // ジャンプ状態の更新
-        IsJump.Value = rayInput.IsGrounded(movement.GetRigidbody());
 
 
         // 状態異常の更新処理
@@ -171,7 +169,11 @@ public class PlayerRoot : MonoBehaviour
         // ジャンプ禁止状態ならジャンプ不可
         if (HaveEffect(EffectList.NoJump, true)) { return; }
 
-        movement.JumpActive();
+        // 地面に接地している場合のみジャンプ可能
+        if (rayInput.IsGrounded(movement.GetRigidbody()))
+        {
+            movement.JumpActive();
+        }
     }
 
     /// <summary> スキル選択実行メソッド </summary>
@@ -197,7 +199,7 @@ public class PlayerRoot : MonoBehaviour
         if (HaveEffect( EffectList.Silence, false)) { return; }
 
         // 選択中のスキルがクールタイム中であれば、処理を中断
-        if (!playerSkill.IsActionReady(SelectedSkillIndex.Value)) { return; }
+        if (!playerSkill.IsActionReady(SelectedSkillIndex.Value + 1)) { return; }
 
         playerSkill.SkillUse(CurrentArcana,CurrentSkill,SelectedSkillIndex.Value);
 
