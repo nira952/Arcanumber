@@ -22,4 +22,12 @@ public enum SeName {
     Alert,
     Spear,
     Summon,
+    Fire,
+    Water,
+    Shotgun,
+    Grass,
+    Dark,
+    Sniper,
+    Knife,
+    Dice,
 }

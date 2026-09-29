@@ -96,6 +96,8 @@ public class Skill : ScriptableObject
     public SeName GetSe() { return se; }
     public EffectAbility GetEffect() {  return effect; }
     public SkillBehaviorType GetBehaviorType() { return skillBehavior; }
+    public int GetBulletCount() { return bulletCount; }
+    public float GetSpreadAngle() { return spreadAngle; } 
 
 }
 

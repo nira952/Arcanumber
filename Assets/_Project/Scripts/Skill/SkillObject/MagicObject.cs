@@ -15,6 +15,7 @@ public abstract class MagicObject : MonoBehaviour
     protected EffectAbility effect;    //付与するエフェクト
     protected SeName se;          //再生するSE
 
+    private BoxCollider2D areaCollider; //持続ダメージ用のエリアコライダー
     protected List<int> hitList = new List<int>();
     private Dictionary<int, float> stayTimers = new Dictionary<int, float>();
 
@@ -48,9 +49,17 @@ public abstract class MagicObject : MonoBehaviour
         NetWorkAudioManager.Instance.PlayGlobal(se);
     }
 
+    protected virtual void Awake()
+    {
+        //範囲判定用コライダーをあらかじめ取得しておく
+        areaCollider = GetComponent<BoxCollider2D>() ?? GetComponentInChildren<BoxCollider2D>();
+    }
+
     protected virtual void Update()
     {
         if (useAnimationEndEvent && !isKeepDmg) CheckAnimationEnd();
+        // 持続ダメージの処理はサーバー上でのみ行う
+        if (IsServer() && isKeepDmg) ProcessAreaDamage();
     }
 
     private void CheckAnimationEnd()
@@ -69,36 +78,57 @@ public abstract class MagicObject : MonoBehaviour
         HandleHit(collision);
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private void ProcessAreaDamage()
     {
-        if (!IsServer()) return; //サーバー上でのみ処理
+        if (areaCollider == null) return;
 
-        //持続ダメージフラグが立っている場合のみ有効にする
-        if (!isKeepDmg) return;
+        //自分のコライダーの範囲内に重なっているすべてのColliderを検出する
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.useTriggers = true; //トリガーコライダーも含める
+        List<Collider2D> results = new List<Collider2D>();
+        Physics2D.OverlapCollider(areaCollider, filter, results);
 
-        PlayerRoot targetPlayer = collision.GetComponentInParent<PlayerRoot>();
-        if (targetPlayer != null)
+        //現在エリア内にいるプレイヤーのインデックスを一時的に記録するセット
+        HashSet<int> currentFramePlayers = new HashSet<int>();
+
+        foreach (var col in results)
         {
-            int targetIndex = targetPlayer.PlayerIndex.Value;
-            if (targetIndex == -1 || targetIndex == haveAttackerIndex) return;
-
-            //ターゲットごとのタイマー初期化
-            if (!stayTimers.ContainsKey(targetIndex))
-                stayTimers[targetIndex] = 0;
-
-            stayTimers[targetIndex] += Time.deltaTime;
-
-            //一定間隔を超えたら持続ダメージを適用
-            if (stayTimers[targetIndex] >= GameConfig.DAMAGE_INTERVAL)
+            PlayerRoot targetPlayer = col.GetComponentInParent<PlayerRoot>();
+            if (targetPlayer != null)
             {
-                stayTimers[targetIndex] = 0f; //タイマーリセット
+                int targetIndex = targetPlayer.PlayerIndex.Value;
+                //自分自身や未初期化は除外
+                if (targetIndex == -1 || targetIndex == haveAttackerIndex) continue;
 
-                OnHit(targetPlayer);
-                AtkHeal();
+                currentFramePlayers.Add(targetIndex);
+
+                //ターゲットごとのタイマー初期化
+                if (!stayTimers.ContainsKey(targetIndex))
+                    stayTimers[targetIndex] = 0f;
+
+                stayTimers[targetIndex] += Time.deltaTime;
+
+                //一定間隔を超えたら持続ダメージを適用
+                if (stayTimers[targetIndex] >= GameConfig.DAMAGE_INTERVAL)
+                {
+                    stayTimers[targetIndex] = 0f; //タイマーリセット
+
+                    OnHit(targetPlayer);
+                    AtkHeal();
+                }
             }
         }
-    }
 
+        //エリア外に出たプレイヤーのタイマーを削除
+        List<int> keysToRemove = new List<int>();
+        foreach (var kvp in stayTimers)
+        {
+            if (!currentFramePlayers.Contains(kvp.Key))
+                keysToRemove.Add(kvp.Key);
+        }
+        foreach (var key in keysToRemove)
+            stayTimers.Remove(key);
+    }
     private void HandleHit(Collider2D collision)
     {
         if (!IsServer()) return;  // サーバー上でのみ処理

@@ -75,7 +75,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 1a2ecc8246f77c44d93bd6228b9d9db9, type: 3}
     volume: 1
   - name: Shadow
-    clip: {fileID: 8300000, guid: 90007d1ee1c68b14d8e7c008927d15ef, type: 3}
+    clip: {fileID: 8300000, guid: 8b52159003cd2054692f887d29a16bc0, type: 3}
     volume: 1
   - name: Poison
     clip: {fileID: 8300000, guid: d4f20bfbbdfa23f45ae040ee452fe9d5, type: 3}
@@ -112,4 +112,28 @@ MonoBehaviour:
     volume: 1
   - name: Summon
     clip: {fileID: 8300000, guid: 86b164665853b5e448b3583df2b2498a, type: 3}
+    volume: 1
+  - name: Fire
+    clip: {fileID: 8300000, guid: 077f871a7d9904143b2c43e958ba4f30, type: 3}
+    volume: 1
+  - name: Water
+    clip: {fileID: 8300000, guid: c0c2cd8381230164480f400d30860fb0, type: 3}
+    volume: 1
+  - name: Shotgun
+    clip: {fileID: 8300000, guid: 64ca2784cedf15d40aeddc4a54101273, type: 3}
+    volume: 1
+  - name: Grass
+    clip: {fileID: 8300000, guid: 679bad7d19bb2cf42b5b1cf8987a13a7, type: 3}
+    volume: 1
+  - name: Dark
+    clip: {fileID: 8300000, guid: 679bad7d19bb2cf42b5b1cf8987a13a7, type: 3}
+    volume: 1
+  - name: Sniper
+    clip: {fileID: 8300000, guid: ee4fb1c8ee8e42a46832ea46d3c57672, type: 3}
+    volume: 1
+  - name: Knife
+    clip: {fileID: 8300000, guid: a77a7cb7e3a3e06488ae33ac939b90d2, type: 3}
+    volume: 1
+  - name: Dice
+    clip: {fileID: 8300000, guid: 13a6126e1a976e04a9a64e04d293c624, type: 3}
     volume: 1

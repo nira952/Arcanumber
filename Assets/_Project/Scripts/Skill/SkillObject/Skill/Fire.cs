@@ -37,8 +37,13 @@ public class Fire : SkillObject
 
         if (hit.collider != null)
         {
-            //地面に当たった位置にオブジェクトを移動させる
-            transform.position = hit.point;
+            float offset = 0f;
+            if (boxCollider != null)
+                // コライダーの高さ（size.y）の半分を計算に使う
+                offset = (boxCollider.size.y * transform.localScale.y) * 0.5f;
+
+            // 地面に当たった位置（hit.point）に、コライダーの半分の高さを足して上に浮かせる
+            transform.position = new Vector3(hit.point.x, hit.point.y + offset, transform.position.z);
 
             //着弾したので、SpriteとBoxColliderを有効化する
             if (spriteRenderer != null) spriteRenderer.enabled = true;
