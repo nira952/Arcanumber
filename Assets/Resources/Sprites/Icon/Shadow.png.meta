@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 953106749e4afe8429acf15664d3162f
+guid: c42a6c3b386efae4d9a48160d557691b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1817807953502509072
-    second: shock-ball_0
+      213: -5743308798500137762
+    second: space_orbital_sphere_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: shock-ball_0
+      name: space_orbital_sphere_0
       rect:
         serializedVersion: 2
-        x: 1
-        y: 1
-        width: 62
-        height: 62
+        x: 0
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0f76a952c49d5c6e0800000000000000
-      internalID: -1817807953502509072
+      spriteID: ed4160eb31bab40b0800000000000000
+      internalID: -5743308798500137762
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      shock-ball_0: -1817807953502509072
+      space_orbital_sphere_0: -5743308798500137762
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
