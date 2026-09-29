@@ -1,3 +1,4 @@
+using R3;
 using UnityEngine;
 
 public class TranpSkill : SkillObject
@@ -56,7 +57,7 @@ public class TranpSkill : SkillObject
     {
         if (syncedDmg < 0)
         {
-            Destroy(gameObject);
+            onDestroyed.OnNext(Unit.Default);
             return;
         }
 
@@ -66,7 +67,7 @@ public class TranpSkill : SkillObject
         Transform parentTransform = player.GetAimCursor().GetEfeUpperPos().transform;
 
         //インスタンス化
-        GameObject card = Instantiate(cardObj, parentTransform);
+        GameObject card = SkillManager.Instance.SpawnObject(cardObj, parentTransform);
 
         //SpriteRendererを取得
         SpriteRenderer sr = card.GetComponent<SpriteRenderer>();
@@ -74,7 +75,13 @@ public class TranpSkill : SkillObject
             sr.sprite = cardSprites[syncedDmg - 1];
         
         //カードを消す
-　      Destroy(card, 1.0f);
+　      SkillManager.Instance.DestroyObject(card, 1.0f);
+    }
+
+    protected override void OnHit(PlayerRoot target)
+    {
+        //ダメージを与える
+        PlayerUtility.FinalDamage(target.PlayerIndex.Value, haveAttackerIndex, syncedDmg);
     }
 
 }

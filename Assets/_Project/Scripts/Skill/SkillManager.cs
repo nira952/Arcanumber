@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using R3;
+using System.Linq;
 
 /// <summary>
 /// スキルの生成と管理を行うクラス
@@ -158,43 +159,81 @@ public class SkillManager : NetworkBehaviour
             return;
         }
 
-        // 1. サーバー（またはオフライン）側でオブジェクトを Instantiate 生成
-        GameObject skillObj = Instantiate(skill.GetEffectAnimation(), playerRoot.transform.position, Quaternion.identity);
+        int bulletCount = skill.GetBulletCount();
+        if (bulletCount <= 0) bulletCount = 1;  // 0個以下の場合は1個に補正
 
-        // 2. サイズ変更効果の適用
-        float sizeMultiplier = playerRoot.GetEffectValue(EffectList.SizeChange);
-        if (sizeMultiplier > 0f)
+        float totalSpreadAngle = skill.GetSpreadAngle(); // 例: 60度（上下に広げる全体の角度）
+        bool isRandomAngle = totalSpreadAngle < 0f;     // マイナスならランダム判定にする場合
+        float absAngle = Mathf.Abs(totalSpreadAngle);
+
+        for (int i = 0; i < bulletCount; i++)
         {
-            skillObj.transform.localScale *= sizeMultiplier;
-        }
+            //--- 角度の計算 ---
+            float currentAngle = 0f;
 
-        // 3. スキルコンポーネントの初期化
-        if (skillObj.TryGetComponent(out SkillObject magic))
-        {
-            magic.Initialize(playerRoot.PlayerIndex.Value, skill, pos);
-
-            magic.OnDestroyed
-                .Subscribe(_ =>
+            if (bulletCount <= 1)
+                currentAngle = 0f; //0個または1個の場合は正面（0度）
+            else
+            {
+                if (isRandomAngle)
                 {
-                    if (skillObj != null) Destroy(skillObj);
-                })
-                .AddTo(skillObj);
-
-            float keepTime = skill.GetKeepTime();
-
-            // もしkeepTimeが0以下の場合は、消さない
-            if (keepTime > 0f)
-            {
-                Destroy(skillObj, keepTime);
+                    //マイナス指定：指定された範囲（absAngle）の中でランダムに散らす
+                    //例: -60度なら -30度 〜 +30度 の間でランダム
+                    currentAngle = Random.Range(-absAngle * 0.5f, absAngle * 0.5f);
+                }
+                else
+                {
+                    //プラス指定：決められた範囲（absAngle）の中で上下に等間隔で配置する
+                    //i = 0 のとき一番下、i = max-1 のとき一番上になるように綺麗に割り振る
+                    float halfAngle = absAngle * 0.5f;
+                    if (bulletCount == 1)
+                        currentAngle = 0f;
+                    else
+                    {
+                        //端から端までを均等割り
+                        float step = absAngle / (bulletCount - 1);
+                        currentAngle = -halfAngle + (step * i);
+                    }
+                }
             }
-        }
 
-        // 4. オンライン時のネットワークスポーン同期
-        if (!isLocalMode && IsServer)
-        {
-            if (skillObj.TryGetComponent(out NetworkObject networkObject))
+            //プレイヤーの向き（または基準の向き）をベースに、計算した角度を加算した回転を作る
+            //※ playerRoot の向きを基準にする場合（右向き・左向きなどを考慮）
+            Quaternion baseRotation = playerRoot.transform.rotation;
+            Quaternion spawnRotation = baseRotation * Quaternion.Euler(0, 0, currentAngle);
+
+            //サーバー（またはオフライン）側でオブジェクトを Instantiate 生成
+            GameObject skillObj = Instantiate(skill.GetEffectAnimation(), playerRoot.transform.position, spawnRotation);
+
+            //サイズ変更効果の適用
+            float sizeMultiplier = playerRoot.GetEffectValue(EffectList.SizeChange);
+            if (sizeMultiplier > 0f)
+                skillObj.transform.localScale *= sizeMultiplier;
+
+            //スキルコンポーネントの初期化
+            if (skillObj.TryGetComponent(out SkillObject magic))
             {
-                networkObject.Spawn();
+                magic.Initialize(playerRoot.PlayerIndex.Value, skill, pos);
+
+                magic.OnDestroyed
+                    .Subscribe(_ =>
+                    {
+                        if (skillObj != null) Destroy(skillObj);
+                    })
+                    .AddTo(skillObj);
+
+                float keepTime = skill.GetKeepTime();
+
+                //もしkeepTimeが0以下の場合は、消さない
+                if (keepTime > 0f)
+                    Destroy(skillObj, keepTime);
+            }
+
+            // 4. オンライン時のネットワークスポーン同期
+            if (!isLocalMode && IsServer)
+            {
+                if (skillObj.TryGetComponent(out NetworkObject networkObject))
+                    networkObject.Spawn();
             }
         }
     }
@@ -284,5 +323,41 @@ public class SkillManager : NetworkBehaviour
 
         // 各クライアントの画面上で独立して破棄される（ネットワーク通信不要）
         Destroy(animObj, destroyTime);
+    }
+
+    /// <summary>
+    /// オブジェクトを生成するメソッド
+    /// </summary>
+    public GameObject SpawnObject(GameObject obj, Transform part)
+    {
+        if (IsServer)
+            return SpawnObjectRequest(obj, part);
+        return null;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private GameObject SpawnObjectRequest(GameObject obj, Transform part)
+    {
+        GameObject gameObject = Instantiate(obj, part);
+        if (gameObject.TryGetComponent(out NetworkObject networkObject))
+        {
+            networkObject.Spawn();
+        }
+        return gameObject;
+    }
+
+    /// <summary>
+    /// オブジェクトを削除するメソッド
+    /// </summary>
+    public void DestroyObject(GameObject obj, float time)
+    {
+        if (IsServer)
+            DestroyObjectRequest(obj, time);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DestroyObjectRequest(GameObject obj, float time)
+    {
+        Destroy(obj, time);
     }
 }
