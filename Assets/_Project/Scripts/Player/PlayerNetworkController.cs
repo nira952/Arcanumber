@@ -106,7 +106,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
         }
 
         // プレイヤーの初期化を実行
-        root.Initialize();
+        root.OwnerInitialize();
     }
 
 

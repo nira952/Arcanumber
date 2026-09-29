@@ -18,7 +18,7 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerInputMediator
         inputBinder.Initialize(this);
 
         // プレイヤーの初期化を実行
-        root.Initialize();
+        root.OwnerInitialize();
     }
 
 

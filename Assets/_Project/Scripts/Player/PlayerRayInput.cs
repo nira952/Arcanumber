@@ -13,6 +13,17 @@ public class PlayerRayInput : MonoBehaviour
     [SerializeField] private bool showDebugRay = true;
     [SerializeField] private Color groundedColor = Color.green;
     [SerializeField] private Color airColor = Color.red;
+    [SerializeField] private Collider2D visualColider;
+
+
+
+
+    public void Initialize()
+    {
+        // 自分の所有するColliderを非表示にする
+        visualColider.enabled = false;
+    }
+
 
     public bool IsGrounded(Rigidbody2D rb)
     {

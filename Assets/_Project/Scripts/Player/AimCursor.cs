@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 /// <summary>
 /// スキルの標準設定
 /// </summary>
-public class AimCursor : NetworkBehaviour
+public class AimCursor : MonoBehaviour
 {
     [SerializeField] private GameObject aimCursor;  //標準の位置
     [SerializeField] private Transform normalPos;   //プレイヤーの位置（中心）
@@ -27,9 +27,10 @@ public class AimCursor : NetworkBehaviour
     private const float SCREEN_MARGIN_MAX = 0.95f;  //画面の端から95%の位置
     private const float ZERO_DIVISION_EPSILON = 0.001f; //ゼロ除算の対策用の値
 
-    private void Start()
+    private void Awake()
     {
-        if (!IsOwner) gameObject.SetActive(false);
+        // 初期状態では標準を非表示にする
+        gameObject.SetActive(false);
     }
 
     /// <summary>

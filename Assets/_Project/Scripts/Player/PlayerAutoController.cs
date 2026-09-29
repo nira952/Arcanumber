@@ -11,17 +11,9 @@ public class PlayerAutoController : MonoBehaviour, IPlayerInputMediator
         // --- コンポーネントの取得 ---
         root = GetComponent<PlayerRoot>();
 
-        // --- 入力バインダーの初期化 ---
-
-        // プレイヤーの初期化を実行
-        root.Initialize();
-
         root.gameObject.tag = "Enemy";
 
     }
-
-
-    // 入力をパススルーでRootに渡す
 
     public void OnAttackTriggered()
     {
