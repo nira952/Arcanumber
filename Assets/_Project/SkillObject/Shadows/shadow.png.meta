@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: 953106749e4afe8429acf15664d3162f
+guid: 9d0e8b49a5ea4fe4dbbae223e92b095e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1817807953502509072
-    second: shock-ball_0
+      213: -4756028443593143600
+    second: shadow_0
+  - first:
+      213: -1524956852876221711
+    second: shadow_1
+  - first:
+      213: 5351476090715925925
+    second: shadow_2
+  - first:
+      213: 4983692595894577325
+    second: shadow_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +109,89 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: shock-ball_0
+      name: shadow_0
       rect:
         serializedVersion: 2
-        x: 1
-        y: 1
-        width: 62
-        height: 62
+        x: 8
+        y: 0
+        width: 27
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0f76a952c49d5c6e0800000000000000
-      internalID: -1817807953502509072
+      spriteID: 0da0afd34513ffdb0800000000000000
+      internalID: -4756028443593143600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: shadow_1
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 0
+        width: 28
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f2e38662d346dae0800000000000000
+      internalID: -1524956852876221711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: shadow_2
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 0
+        width: 25
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ad6e13b623444a40800000000000000
+      internalID: 5351476090715925925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: shadow_3
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 0
+        width: 26
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da86a00e202a92540800000000000000
+      internalID: 4983692595894577325
       vertices: []
       indices: 
       edges: []
@@ -125,7 +200,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: bf764ddf319a5ab47867ffe81a064442
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +210,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      shock-ball_0: -1817807953502509072
+      shadow_0: -4756028443593143600
+      shadow_1: -1524956852876221711
+      shadow_2: 5351476090715925925
+      shadow_3: 4983692595894577325
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
