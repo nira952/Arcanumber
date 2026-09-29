@@ -1,4 +1,5 @@
 using DG.Tweening;
+using NPOI.SS.Formula.Functions;
 using ObservableCollections;
 using R3;
 using System;
@@ -67,89 +68,62 @@ public class GameUIManager :MonoBehaviour
         // タイマーの初期表示を空にする
         if (timerText != null) { timerText.text = ""; }
 
+        // エフェクトを全て非表示に
+        foreach (var block in playerEffectBlocks)
+        {
+            block.HideAll();
+        }
+
         // タイマーの残り時間を購読し、UIのタイマー表示を更新する
         timeManager.RemainingTime.Subscribe(time =>
         {
             UpdateTimerDisplay((int)time);
         }).AddTo(this);
 
+
+        // 一度すべてのプレイヤーのステータスを非表示にしておく
+        for (int i = 0; i < statusObjects.Length; i++)
+        {
+            if (statusObjects[i] != null)
+            {
+                statusObjects[i].SetActive(false);
+            }
+        }
+
         List<PlayerRoot> playerList = PlayerUtility.GetAllPlayer();
 
         // プレイヤーリストの更新を購読し、UIを更新する
         foreach (var root in playerList)
         {
-            BindSinglePlayer(root);
-            // FIX: プレイヤーのステータス表示をバインドする処理を追加
-            BindPlayerStatus(root.PlayerIndex.Value, root.ActiveEffects);
+            if (root == null) { continue; }
+            if (root.PlayerIndex.Value < 0) { continue; }
+
 
             // プレイヤーの名前とHPスライダーの初期設定
-            if (root.PlayerIndex.Value >= 0)
-            {
-                SetPlayerName(root.PlayerIndex.Value, root.name);
-                SetHealthSliderMaxValue(root.PlayerIndex.Value, 100);
-            }
+            string playerName = PlayerDataManager.Instance.GetPlayerNameByIndex(root.PlayerIndex.Value);
 
-            // プレイヤーのHP変化を購読し、UIのHPスライダーを更新する
+            Debug.Log($"[GameUIManager] PlayerIndex: {root.PlayerIndex.Value}, Name: {playerName}");
+
+
+            SetPlayerName(root.PlayerIndex.Value, playerName);
+            SetHealthSliderMaxValue(root.PlayerIndex.Value, 100);
+
+            // 2. HP変化時の処理
             root.CurrentHealth.Subscribe(hp =>
             {
-                if (root.PlayerIndex.Value >= 0)
-                {
-                    UpdateHealth(root.PlayerIndex.Value, hp);
-                }
+                UpdateHealth(root.PlayerIndex.Value, hp);
+                
             }).AddTo(playerSubscriptions);
+
 
             // プレイヤーのアクティブ効果の変更を購読し、UIのステータス表示を更新する
             root.ActiveEffects.ObserveChanged()
                 .Subscribe(_ =>
                 {
-                    if (root.PlayerIndex.Value >= 0)
-                    {
-                        UpdateActiveEffects(root.PlayerIndex.Value, root.ActiveEffects.ToList());
-                    }
+                    UpdateActiveEffects(root.PlayerIndex.Value, root.ActiveEffects.ToList());
                 }).AddTo(playerSubscriptions);
-
-            // プレイヤーのインデックスが確定した時の処理（有効なインデックス >= 0 になった時）
-            root.PlayerIndex
-                .Where(index => index >= 0)
-                .Take(1)
-                .Subscribe(index =>
-                {
-                    SetPlayerName(index, root.name);
-                    SetHealthSliderMaxValue(index, 100);
-                })
-                .AddTo(playerSubscriptions);
         }
 
-    }
-
-
-    // 単体プレイヤーのバインディング
-    private void BindSinglePlayer(PlayerRoot root)
-    {
-        if (root == null) return;
-
-        // 1. Index確定時の処理（有効なIndex >= 0 になった時）
-        root.PlayerIndex
-            .Where(index => index >= 0)
-            .Take(1)
-            .Subscribe(index =>
-            {
-                string playerName = root.name;
-                SetPlayerName(index, playerName);
-                SetHealthSliderMaxValue(index, 100);
-            })
-            .AddTo(playerSubscriptions);
-
-        // 2. HP変化時の処理
-        root.CurrentHealth
-            .Subscribe(hp =>
-            {
-                if (root.PlayerIndex.Value >= 0)
-                {
-                    UpdateHealth(root.PlayerIndex.Value, hp);
-                }
-            })
-            .AddTo(playerSubscriptions);
     }
 
 
@@ -192,17 +166,6 @@ public class GameUIManager :MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// タイマーの表示を更新する
-    /// </summary>
-    private void UpdateTimer(string time)
-    {
-        if (timerText != null)
-        {
-            timerText.text = time;
-        }
-    }
-
     public void UpdateGameStateText(string text)
     {
         if (gameStateText != null)
@@ -228,7 +191,7 @@ public class GameUIManager :MonoBehaviour
     }
 
     // UIの表示フォーマット更新 (mm:ss)
-    public void UpdateTimerDisplay(int totalSeconds)
+    private void UpdateTimerDisplay(int totalSeconds)
     {
         if (timerText == null) return;
 
@@ -238,26 +201,8 @@ public class GameUIManager :MonoBehaviour
     }
 
 
-    /// <summary>
-    /// プレイヤーのステータス表示を指定インデックスにバインドし、アクティブ効果の変更を監視して表示を更新します。
-    /// </summary>
-    ///
-    /// <param name="playerIndex">対象プレイヤーのインデックス。配列の範囲外の場合は処理を行いません。</param>
-    /// <param name="activeEffects">現在適用されている効果のコレクション。変更を監視して表示を更新します。</param>
-    public void BindPlayerStatus(int playerIndex,ObservableList<EffectAbility> activeEffects)
-    {
-        if (playerIndex < 0 || playerIndex >= playerEffectBlocks.Length)
-            return;
 
-        UpdateActiveEffects(playerIndex, activeEffects.ToList());
-
-        activeEffects.ObserveChanged()
-        .Subscribe(_ =>
-        {
-            UpdateActiveEffects(playerIndex, activeEffects.ToList());
-        })
-        .AddTo(this);
-    }
+    // バフ・デバフの表示をプレイヤーごとにバインドする処理
     /// <summary>
     /// エフェクト表示の更新処理
     /// </summary>

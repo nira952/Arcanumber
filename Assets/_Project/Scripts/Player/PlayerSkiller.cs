@@ -1,4 +1,3 @@
-using R3;
 using UnityEngine;
 
 /// <summary>
@@ -7,27 +6,51 @@ using UnityEngine;
 public class PlayerSkiller : MonoBehaviour
 {
     // --- 参照用 ---
-
     private PlayerRoot playerRoot;
-    private AimCursor aimCursor;
+
+    private PlayerUIManager playerUIManager;
 
     // --- クールタイム管理 ---
 
-    private float[] currentCoolTimes = new float[GameConfig.COOLTIME_HOPPER_MAX];
+    [SerializeField] private float[] currentCoolTimes = new float[GameConfig.COOLTIME_HOPPER_MAX];
     private float attackCoolTimeDuration = 0.5f; //通常攻撃のクールタイムの時間
 
-    private Skill[] skillList = new Skill[GameConfig.SKILL_HOPPER_MAX];
+    [SerializeField] private float[] maxCoolTimes = new float[GameConfig.COOLTIME_HOPPER_MAX];
 
     // --- イベント ---
 
-    public void Initialize(PlayerRoot playerRoot, AimCursor aimCursor, Skill[] skillList)
+    public void Initialize(PlayerRoot playerRoot, PlayerUIManager playerUIManager, Skill[] skillList)
     {
         this.playerRoot = playerRoot;
-        this.aimCursor = aimCursor;
-        this.skillList = skillList;
+        this.playerUIManager = playerUIManager;
+
+        foreach (var skill in skillList)
+        {
+            // スキルが存在するかデバッグログを流す
+            if (skill != null)
+            {
+                Debug.Log($"Skill {skill.GetSkillName()} is loaded.");
+            }
+            else
+            {
+                Debug.LogWarning("A skill slot is empty.");
+            }
+        }
 
         //クールタイムリセット
         for (int i = 0; i < currentCoolTimes.Length; i++) { currentCoolTimes[i] = 0f; }
+
+        //最大クールタイムを初期化
+        for (int i = 0; i < maxCoolTimes.Length; i++)
+        {
+            if (i == 0) // 通常攻撃
+                maxCoolTimes[i] = attackCoolTimeDuration;
+            else if (i < skillList.Length && skillList[i] != null)
+                maxCoolTimes[i] = skillList[i].GetCoolTime();
+            else if (i == GameConfig.SKILL_ARCANA) // アルカナスキル
+                maxCoolTimes[i] = playerRoot.GetArcana().GetCoolTime();
+        }
+
 
         ChangeColor();
     }
@@ -36,11 +59,10 @@ public class PlayerSkiller : MonoBehaviour
     /// <summary>
     /// スキル選択用メソッド
     /// </summary>
-    /// <param name="direction"></param>
-    public void SkillSelect(int direction)
+    public int SkillSelect(int nowSkillIndex, int direction)
     {
         // 変更方向から次のスキル番号を計算
-        int newSkillNo = playerRoot.SelectedSkillIndex.Value + direction;
+        int newSkillNo = nowSkillIndex + direction;
 
         // スキル番号が範囲外になった場合の処理
         if (newSkillNo < 0) newSkillNo = GameConfig.SKILL_HOPPER_MAX;
@@ -49,41 +71,25 @@ public class PlayerSkiller : MonoBehaviour
         // 現在のアルカナスキルを取得
         Arcana currentArcana = playerRoot.GetArcana();
 
-        // アルカナスキルスロットが選択されている場合、アルカナスキルがコマンドスキルでない場合は通常スキルに戻す
+        // アルカナスキルスロットが選択されている場合、アルカナスキルが選択可能スキルでない場合は通常スキルに戻す
         bool isArcanaSlot = (newSkillNo == GameConfig.SKILL_HOPPER_MAX);
         bool isCommandArcana = currentArcana != null && currentArcana.GetASkillCategory() == ASkillCategory.Command;
 
+        // アルカナスキルスロットが選択されているが、コマンドアルカナスキルがない場合は、通常スキルに戻す
         if (isArcanaSlot && !isCommandArcana)
             newSkillNo = (direction > 0) ? 0 : GameConfig.SKILL_HOPPER_MAX - 1;
 
-        // スキル番号を更新
-        playerRoot.SelectedSkillIndex.Value = newSkillNo;
-
-        // エイム変更
-        if (newSkillNo != GameConfig.SKILL_HOPPER_MAX)
-        {
-            var aimSelect = GetCurrentSkill()?.GetAimSelect();
-            if (aimSelect != null) aimCursor.SelectAim((AimSelect)aimSelect);
-        }
-
         // UI更新
-        //PlayerUIManager.Instance.SkillFrameChange(this);
+        return newSkillNo;
     }
 
     /// <summary>
     /// 実際にスキルを使用する
     /// </summary>
-    public void SkillUse(Arcana arcana, Skill activeSkill)
+    public void SkillUse(Arcana arcana, Skill activeSkill,int index)
     {
-        // 現在選択されているスキル番号を取得
-        int currentNo = playerRoot.SelectedSkillIndex.Value;
-
-        // 選択中のスキルがクールタイム中であれば、処理を中断
-        if (!IsActionReady(currentNo)) { return; }
-
-
         // 選択中のスキルがアルカナスキルの場合、アルカナスキルを発動
-        if (currentNo == GameConfig.SKILL_HOPPER_MAX)
+        if (index == GameConfig.SKILL_HOPPER_MAX)
         {
             // 発動型のアルカナスキルを実行
             arcana?.ExecuteArcanaEffect(ASkillCategory.Command, playerRoot);
@@ -95,7 +101,7 @@ public class PlayerSkiller : MonoBehaviour
         {
             if (activeSkill == null)
             {
-                Debug.LogWarning($"Skill is null for skill number {currentNo}. Cannot execute skill.");
+                Debug.LogWarning($"Skill is null for skill number {index}. Cannot execute skill.");
                 return;
             }
 
@@ -103,47 +109,12 @@ public class PlayerSkiller : MonoBehaviour
             SkillManager.Instance.RequestSkill(playerRoot);
 
             // 通常スキルのクールタイムを開始
-            StartActionCoolTime(currentNo, activeSkill.GetCoolTime());
+            StartActionCoolTime(index, activeSkill.GetCoolTime());
 
         }
 
         // スキル使用時に発動するアルカナを実行
         arcana?.ExecuteArcanaEffect(ASkillCategory.SkillEffect, playerRoot);
-    }
-
-
-    /**
-     * --------- ゲッター ---------
-     */
-
-    public float GetSkillCoolTime(int index)
-    {
-        if (index >= 0 && index < currentCoolTimes.Length)
-            return currentCoolTimes[index];
-        return 0f; // 範囲外の場合は0を返す
-    }
-    public float GetAttackCoolTimeDuration() => attackCoolTimeDuration;
-
-
-    /// <summary>
-    /// 現在選択されているスキルを取得する
-    /// </summary>
-    /// <returns></returns>
-    public Skill GetCurrentSkill() { return playerRoot.GetCurrentSkill(); }
-
-    /// <summary>
-    /// 選択されているスキル番号からクールタイムのインデックスを取得する
-    /// </summary>
-    /// <param name="skillNo"> スキル番号 </param>
-    public float GetCoolTimeIndex(int skillNo)
-    {
-        // スキル番号が有効な範囲内であることを確認
-        if (skillNo >= 0 && skillNo < skillList.Length)
-        {
-            // 現在選択されているスキルのクールタイムを返す
-            return GetCurrentSkill().GetCoolTime();
-        }
-        return -1; // 無効なインデックスを返す
     }
 
 
@@ -193,16 +164,16 @@ public class PlayerSkiller : MonoBehaviour
                 if (currentCoolTimes[i] < 0f) currentCoolTimes[i] = 0f;
             }
         }
-        PlayerUIManager.Instance.UpdateSkillCoolTimeUI(playerRoot);
-    }
 
+        playerUIManager.UpdateSkillCoolTimeUI(currentCoolTimes, maxCoolTimes);
+    }
 
     /// <summary>
     /// 予備動作の色変更
     /// </summary>
     public void ChangeColor()
     {
-        SpriteRenderer renderer = playerRoot.GetMagic();
+        SpriteRenderer renderer = playerRoot.GetMagicStart();
         renderer.color = playerRoot.GetPlayerStatus().GetCharaColor(playerRoot.PlayerIndex.Value);
     }
 

@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
-using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
 public enum GameState
@@ -62,6 +61,8 @@ public class GameManager : NetworkBehaviour
 
         // ローカルモードかどうかを判定
         isLocalMode = PlayerDataManager.Instance.IsLocalMode;
+
+        Debug.Log($"[GameManager] Awake called. isLocalMode: {isLocalMode}");
     }
 
 
@@ -77,6 +78,8 @@ public class GameManager : NetworkBehaviour
 
         // プレイヤーのダウン状態を監視する購読を設定
         SettingPlayerObservable();
+
+        gameUIManager.Initialize(this, timeManager);
 
         // ゲーム開始シーケンスを非同期で開始
         StartGameSequenceAsync().Forget();
@@ -139,7 +142,7 @@ public class GameManager : NetworkBehaviour
         timeManager.onTimeUp.Subscribe(_ => HandleTimeUp()).AddTo(this);
 
         // ゲーム開始シーケンスを非同期で開始
-        StartGameSequenceAsync().Forget();
+        StartGameSequenceClientRpc();
     }
 
 
@@ -178,10 +181,20 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    // ゲーム開始sequenceをRPCに通知するClientRpc
+    [ClientRpc]
+    private void StartGameSequenceClientRpc()
+    {
+        StartGameSequenceAsync().Forget();
+    }
+
     // ゲーム開始シーケンスを非同期で実行するメソッド
     private async UniTaskVoid StartGameSequenceAsync()
     {
         // TODO : 要改修
+
+        CurtainManager.Instance.FullOpenAsync(GetType().Name).Forget();
+
 
         ChangeGameState(GameState.Ready);
 
@@ -198,6 +211,8 @@ public class GameManager : NetworkBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: this.GetCancellationTokenOnDestroy());
         HideGameStateTextInternal();
     }   
+
+
 
     private void HandleTimeUp()
     {

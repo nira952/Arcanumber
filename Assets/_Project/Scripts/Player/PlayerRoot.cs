@@ -14,37 +14,43 @@ public class PlayerRoot : MonoBehaviour
     [Header("Skill & Arcana")]
     private Arcana CurrentArcana;
     private Skill CurrentSkill;
-
-    private List<Skill> skills = new List<Skill>();
+    private Skill[] skillList = new Skill[GameConfig.SKILL_HOPPER_MAX];
 
     [Header("Components")]
     [SerializeField] private PlayerMovement movement;
     [SerializeField] private PlayerRayInput rayInput;
     [SerializeField] private PlayerAttack playerAttack;
-    [SerializeField] private PlayerActionController actionController;
     [SerializeField] private PlayerAnimator playerAnimator;
-    [SerializeField] private AimCursor aim;
+    [SerializeField] private AimCursor aimCursor;
     [SerializeField] private PlayerSkiller playerSkill;
 
     // --- プレイヤー情報・入力状態 (省略せずにそのまま使用) ---
     public ReactiveProperty<int> PlayerIndex { get; } = new(-1);
     public ReactiveProperty<float> CurrentHealth { get; } = new(100);
-    public ReactiveProperty<int> Nowjump { get; } = new(0);
     public ReactiveProperty<bool> IsDown { get; } = new(false);
-    public ReactiveProperty<bool> IsMove { get; } = new(true);
     public ReactiveProperty<bool> IsJump { get; } = new(false);
     public ObservableList<EffectAbility> ActiveEffects { get; } = new();
     public ReactiveProperty<int> SelectedSkillIndex { get; } = new(0);
 
-
-    public bool CanControl => !IsDown.Value && (GameManager.Instance == null || GameManager.Instance.NetWorkGameState.Value == GameState.Playing);
+    /// <summary> 入力を受け付けて制御できるかどうかを示します </summary>
+    public bool CanControl => 
+        !IsDown.Value && (GameManager.Instance == null || GameManager.Instance.StateRx.CurrentValue == GameState.Playing);
 
     public void Initialize()
     {
         //　ArcanaとスキルをPlayerDataManagerから取得
-        Skill[] skillList = PlayerDataManager.Instance.GetMySkills();
-        CurrentSkill = skillList[0];
+        skillList = PlayerDataManager.Instance.GetMySkills();
         CurrentArcana = PlayerDataManager.Instance.GetMyArcana();
+        SelectedSkillIndex.Subscribe(index =>
+        {
+            if (index < 0 || index >= skillList.Length)
+            {
+                return;
+            }
+            CurrentSkill = skillList[index];
+        });
+
+        SelectedSkillIndex.Value = 1;
 
         // ArcanaがNULLだったら愚者（逆）を入れる
         if (CurrentArcana == null)
@@ -62,12 +68,15 @@ public class PlayerRoot : MonoBehaviour
         // ステータスを新品に入れ替える
         status = new PlayerStatus();
 
+        PlayerUIManager playerUIManager = PlayerUIManager.Instance;
+
         // コンポーネントの初期化
         movement.Initialize(this);
-        actionController.Initialize();
         playerAttack.Initialized(this);
         playerAnimator.Initialize(PlayerIndex.Value);
-        playerSkill.Initialize(this, aim, skillList);
+        playerSkill.Initialize(this, playerUIManager, skillList);
+        aimCursor.Initialize();
+        playerUIManager.Initialize(this);
     }
 
 
@@ -75,8 +84,6 @@ public class PlayerRoot : MonoBehaviour
     {
         // 操作できない場合は移動を停止して処理を終了
         if (!CanControl) { movement.StopMovement(); return; }
-
-        if (IsDown.Value) { movement.StopMovement(); return; }
 
         if(HaveEffect(EffectList.Stun, true)) { movement.StopMovement(); return; }
 
@@ -115,7 +122,7 @@ public class PlayerRoot : MonoBehaviour
     public void LateUpdate()
     {
         if (!CanControl) return;
-        actionController.LateUpdateAim();
+        aimCursor.AimUpdate();
     }
 
     // --- ActionHandlerから統合したメソッド群 ---
@@ -141,8 +148,6 @@ public class PlayerRoot : MonoBehaviour
     /// <summary> 移動実行メソッド </summary>
     public void ExecuteMove(float rawInput)
     {
-        if (!IsMove.Value) return;
-
         // 移動方向の反転処理
         bool isChangeMove = HaveEffect(EffectList.Reverse, true);
 
@@ -172,7 +177,17 @@ public class PlayerRoot : MonoBehaviour
     /// <summary> スキル選択実行メソッド </summary>
     public void ExecuteSkillSelect(int direction)
     {
-        playerSkill.SkillSelect(direction);
+        int newSkillNo = playerSkill.SkillSelect(SelectedSkillIndex.Value, direction);
+
+        // 選択スキル番号を更新
+        SelectedSkillIndex.Value = newSkillNo;
+
+        // エイム方法の切り替え
+        if (newSkillNo != GameConfig.SKILL_HOPPER_MAX)
+        {
+            var aimSelect = CurrentSkill?.GetAimSelect();
+            if (aimSelect != null) aimCursor.SelectAim((AimSelect)aimSelect);
+        }
     }
 
     // / <summary> スキル使用実行メソッド </summary>
@@ -181,7 +196,10 @@ public class PlayerRoot : MonoBehaviour
         // サイレンス状態ならスキル使用不可
         if (HaveEffect( EffectList.Silence, false)) { return; }
 
-        playerSkill.SkillUse(CurrentArcana,CurrentSkill);
+        // 選択中のスキルがクールタイム中であれば、処理を中断
+        if (!playerSkill.IsActionReady(SelectedSkillIndex.Value)) { return; }
+
+        playerSkill.SkillUse(CurrentArcana,CurrentSkill,SelectedSkillIndex.Value);
 
         // アニメーション再生
         playerAnimator.PlayMagicAnimation();
@@ -199,7 +217,6 @@ public class PlayerRoot : MonoBehaviour
         if (CurrentHealth.Value <= 0)
         {
             IsDown.Value = true;
-            IsMove.Value = false; // 死亡時は移動不可にするなど
         }
     }
 
@@ -228,51 +245,6 @@ public class PlayerRoot : MonoBehaviour
                                                  e.GetEffect().GetIsUp() == isUp);
     }
 
-    public float GetMoveSpeed() => status.GetSpeed();
-    public float GetJumpForce() => jumpForce;
-
-    // 現在の攻撃力を取得するメソッド
-    public float GetCurrentAttackPower()
-    {
-        float baseAttackPower = status.GetAtk();
-        float attackPowerMultiplier = GetEffectValue(EffectList.ATK); // 攻撃力上昇の効果を取得
-        return Mathf.Max(0.1f, baseAttackPower * attackPowerMultiplier);
-    }
-
-    // 現在の防御力を取得するメソッド
-    public float GetCurrentDefense()
-    {
-        float baseDefense = status.GetDef();
-        float defenseMultiplier = GetEffectValue(EffectList.DEF); // 防御力上昇の効果を取得
-        return Mathf.Max(0.1f, baseDefense * defenseMultiplier);
-    }
-
-    public PlayerActionController GetActionController() => actionController;
-    public AimCursor GetAimCursor() { return aim; }
-
-    public List<EffectAbility> GetEffectList() { return ActiveEffects.ToList(); }
-
-    // リスト内に特定のエフェクトが存在するかを確認するメソッド
-    public bool HasEffect(EffectList effect)
-    {
-        return ActiveEffects.Any(e => e?.GetEffect() != null && e.GetEffect().GetEffectList() == effect);
-    }
-
-    public int GetAllEffectCount()
-    {
-        return ActiveEffects.Count;
-    }
-
-    public void ClearAllEffects()
-    {
-        ActiveEffects.Clear();
-    }
-
-    public SpriteRenderer GetMagic() { return magicStart; }
-    public PlayerStatus GetPlayerStatus() => status;
-    public Arcana GetArcana() { return CurrentArcana; }
-    public Skill GetCurrentSkill() { return CurrentSkill; }
-    public List<Skill> GetSkill() { return skills; }
     /// <summary>
     /// 指定したプレイヤーが持つ特定の効果の値を取得する。
     /// </summary>
@@ -297,6 +269,40 @@ public class PlayerRoot : MonoBehaviour
     }
 
 
+    public float GetMoveSpeed() => status.GetSpeed();
+    public float GetJumpForce() => jumpForce;
+
+    // 現在の攻撃力を取得するメソッド
+    public float GetCurrentAttackPower()
+    {
+        float baseAttackPower = status.GetAtk();
+        float attackPowerMultiplier = GetEffectValue(EffectList.ATK); // 攻撃力上昇の効果を取得
+        return Mathf.Max(0.1f, baseAttackPower * attackPowerMultiplier);
+    }
+
+    // 現在の防御力を取得するメソッド
+    public float GetCurrentDefense()
+    {
+        float baseDefense = status.GetDef();
+        float defenseMultiplier = GetEffectValue(EffectList.DEF); // 防御力上昇の効果を取得
+        return Mathf.Max(0.1f, baseDefense * defenseMultiplier);
+    }
+    public AimCursor GetAimCursor() { return aimCursor; }
+
+
+    // 全ての効果の数を取得するメソッド
+    public int GetAllEffectCount() { return ActiveEffects.Count;}
+
+    // すべての効果をクリアするメソッド
+    public void ClearAllEffects() { ActiveEffects.Clear(); }
+
+    public SpriteRenderer GetMagicStart() { return magicStart; }
+    public PlayerStatus GetPlayerStatus() => status;
+    public Arcana GetArcana() { return CurrentArcana; }
+    public Skill GetCurrentSkill() { return CurrentSkill; }
+    public Skill[] GetSkill() { return skillList; }
+
+
     /**
  * --------- セッター ---------
  */
@@ -304,8 +310,15 @@ public class PlayerRoot : MonoBehaviour
 
     public void SetSkills(Skill[] skills)
     {
-        this.skills.Clear();
-        this.skills.AddRange(skills);
+        // スキルリストをクリアして新しいスキルを追加
+        for (int i = 0; i < skillList.Length; i++)
+        {
+            // 古いスキルを削除
+            skillList[i] = null;
+
+            // 新しいスキルを設定
+            skillList[i] = skills.Length > i ? skills[i] : null;
+        }
     }
 
     public void SetArcana(Arcana arcana)

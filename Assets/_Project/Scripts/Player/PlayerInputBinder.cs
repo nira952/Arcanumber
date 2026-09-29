@@ -1,12 +1,13 @@
 using R3;
 using UnityEngine;
-using UnityEngine.LowLevel;
 
 /// <summary>
 /// プレイヤー入力を購読し、現在のIPlayerInputMediatorへ変換して転送するスクリプト
 /// </summary>
 public class PlayerInputBinder : MonoBehaviour
 {
+
+    [SerializeField] private PlayerRoot playerRoot;
     [SerializeField] private PlayerInputController inputController;
 
     // 現在アクティブなMediator（Network, Offlineなど）を保持
@@ -19,7 +20,13 @@ public class PlayerInputBinder : MonoBehaviour
         {
             inputController = GetComponent<PlayerInputController>();
 
-            Debug.LogError("PlayerInputControllerがアタッチされていません。");
+            Debug.LogWarning("PlayerInputControllerがアタッチされていません。");
+        }
+
+        if (playerRoot == null)
+        {
+            playerRoot = GetComponent<PlayerRoot>();
+            Debug.LogWarning("PlayerRootがアタッチされていません。");
         }
     }
 
@@ -68,7 +75,9 @@ public class PlayerInputBinder : MonoBehaviour
             if (!netController.IsSpawned || !netController.IsOwner) return false;
         }
 
-        // 2. PlayerRoot 側のゲームルール判定（ダウン中・ポーズ中など）をチェック
+        // 2. プレイヤーが操作可能状態でない場合は入力を受け付けない
+        if (!playerRoot.CanControl) return false;
+
         return true;
     }
 }

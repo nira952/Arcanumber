@@ -44,12 +44,10 @@ public class SkillManager : NetworkBehaviour
         // オフライン時、またはすでにサーバー上で動作している場合は直接実行
         if (isLocalMode || IsServer)
         {
-            var skills = player.GetSkill();
-            if (skills != null && skillIndex >= 0 && skillIndex < skills.Count)
-            {
-                Skill skill = skills[skillIndex];
-                StartCoroutine(SkillSpawnDelayCoroutine(player, skill, aimPos));
-            }
+            Skill skill = player.GetCurrentSkill();
+
+            StartCoroutine(SkillSpawnDelayCoroutine(player, skill, aimPos));
+
         }
         else
         {
@@ -67,7 +65,7 @@ public class SkillManager : NetworkBehaviour
 
         // 2. インデックスの範囲チェックを行ってから Skill を取得
         var skills = player.GetSkill();
-        if (skills == null || skillIndex < 0 || skillIndex >= skills.Count) return;
+        if (skills == null || skillIndex < 0 || skillIndex >= skills.Length) return;
 
         Skill skill = skills[skillIndex];
         if (skill != null)
@@ -108,9 +106,9 @@ public class SkillManager : NetworkBehaviour
     /// </summary>
     private GameObject MagicStartSpawn(PlayerRoot player, Skill skill, Vector2 pos, float delayTime)
     {
-        if (skill.GetAimSelect() == AimSelect.LookOn && player.GetMagic() != null)
+        if (skill.GetAimSelect() == AimSelect.LookOn && player.GetMagicStart() != null)
         {
-            GameObject mStart = Instantiate(player.GetMagic().gameObject, pos, Quaternion.identity);
+            GameObject mStart = Instantiate(player.GetMagicStart().gameObject, pos, Quaternion.identity);
 
             // ネットワークオブジェクトの場合は全クライアントに同期スポーンする
             if (!isLocalMode && IsServer)
@@ -154,7 +152,11 @@ public class SkillManager : NetworkBehaviour
     /// </summary>
     private void SkillObjectSpawn(PlayerRoot playerRoot, Skill skill, Vector2 pos)
     {
-        if (skill.GetEffectAnimation() == null) return;
+        if (skill.GetEffectAnimation() == null)
+        {
+            Debug.LogWarning("エフェクトが見つかりません。");
+            return;
+        }
 
         // 1. サーバー（またはオフライン）側でオブジェクトを Instantiate 生成
         GameObject skillObj = Instantiate(skill.GetEffectAnimation(), playerRoot.transform.position, Quaternion.identity);
@@ -179,7 +181,12 @@ public class SkillManager : NetworkBehaviour
                 .AddTo(skillObj);
 
             float keepTime = skill.GetKeepTime();
-            Destroy(skillObj, keepTime);
+
+            // もしkeepTimeが0以下の場合は、消さない
+            if (keepTime > 0f)
+            {
+                Destroy(skillObj, keepTime);
+            }
         }
 
         // 4. オンライン時のネットワークスポーン同期

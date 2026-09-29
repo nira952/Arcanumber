@@ -1,11 +1,11 @@
-using System.Linq;
+using R3;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
-{
-
+{ 
     [Header("スキル関係")]
     [SerializeField] private GameObject[] skillBlocks = new GameObject[6];
     [SerializeField] private Image[] skillIcons = new Image[6];
@@ -13,121 +13,66 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
     [SerializeField] private TextMeshProUGUI[] skillTimeTexts = new TextMeshProUGUI[6];
     [SerializeField] private GameObject[] skillFrame = new GameObject[5];
 
+    // 各キャラクター用の色を設定する変数 (1:青, 2:赤, 3:緑, 4:黄)
+    private Color[] playerColors = new Color[4] { Color.blue, Color.red, Color.green, Color.yellow };
 
-    /// <summary>
-    /// 初期化
-    /// </summary>
-    public void Initialize(PlayerRoot[] player, int playerId)
+    public void Initialize(PlayerRoot player)
     {
-        SkillUIInitialize(player[playerId]);
-        FrameColorChange(player[playerId]);
-    }
-    public void Initialize(PlayerDataManager player)
-    {
-        SkillUIInitialize(player);
-        FrameColorChange(player);
-    }
+        Skill[] skills = player.GetSkill();
+        Arcana arcana = player.GetArcana();
+        int plIndex = player.PlayerIndex.Value;
 
+        Debug.Log($"[PlayerUIManager] Player index: {plIndex}");
+        SkillUIInitialize(skills, arcana);
+        FrameColorChange(plIndex);
+
+        // スキル選択のUI反映
+        player.SelectedSkillIndex.Subscribe(index => SkillFrameChange(index)).AddTo(this);
+    }
 
     /// <summary>
     /// スキルUIの初期化
     /// </summary>
-    void SkillUIInitialize(PlayerRoot player)
+    void SkillUIInitialize(Skill[] skills,Arcana arcana)
     {
-        ////クールタイムを元に戻す
-        //for (int i = 0; i < skillBlocks.Length; i++)
-        //{
-        //    if (i < player.GetSkill().Count())
-        //    {
-        //        skillTimeIcons[i].fillAmount = 1f;
-        //        skillTimeTexts[i].text = "";
-        //    }
-        //}
-
-        ////スキルのスプライトを変更
-        //Skill[] pSkills = player.GetSkill();
-        //for (int i = 0; i < pSkills.Length; i++)
-        //{
-        //    skillIcons[i + 1].sprite = pSkills[i].GetSprite();
-        //    skillTimeIcons[i + 1].sprite = pSkills[i].GetSprite();
-        //}
-        //SkillFrameChange(player);
-    }
-    void SkillUIInitialize(PlayerDataManager playerDataManager)
-    {
-        if (playerDataManager == null) return;
-
-        Skill[] mySkills = playerDataManager.GetMySkills();
-        if (mySkills == null) return;
-
-        // クールタイムを元に戻す
-        for (int i = 0; i < skillBlocks.Length; i++)
+        //クールタイムを元に戻す
+        for (int i = 0; i < skills.Length; i++)
         {
-            if (i < mySkills.Length)
-            {
-                if (i < skillTimeIcons.Length && skillTimeIcons[i] != null)
-                    skillTimeIcons[i].fillAmount = 1f;
-                if (i < skillTimeTexts.Length && skillTimeTexts[i] != null)
-                    skillTimeTexts[i].text = "";
-            }
+            skillTimeIcons[i].fillAmount = 1f;
+            skillTimeTexts[i].text = "";  
         }
 
         // スキルのスプライトを変更
-        for (int i = 0; i < mySkills.Length; i++)
+        for (int i = 0; i < skills.Length; i++)
         {
-            if (mySkills[i] != null)
+            if (skills[i] == null || skills[i].GetSprite() == null)
             {
-                int uiIndex = i + 1; // 0番通常攻撃などのオフセットに合わせて調整
-                if (uiIndex < skillIcons.Length && skillIcons[uiIndex] != null)
-                {
-                    skillIcons[uiIndex].sprite = mySkills[i].GetSprite();
-                }
-                if (uiIndex < skillTimeIcons.Length && skillTimeIcons[uiIndex] != null)
-                {
-                    skillTimeIcons[uiIndex].sprite = mySkills[i].GetSprite();
-                }
+                Debug.LogError($"[PlayerUIManager] Skill at index {i} is null or has no sprite.");
+                continue;
             }
-        }
-    }
 
+            Debug.Log($"[PlayerUIManager] Skill sprite: {skills[i].GetSprite().name}");
+
+            skillIcons[i + 1].sprite = skills[i].GetSprite();
+            skillTimeIcons[i + 1].sprite = skills[i].GetSprite();
+        }
+
+        // アルカナのスプライトを変更
+        //skillIcons[GameConfig.SKILL_ARCANA].sprite = arcana();
+
+
+        // スキル選択のUI反映
+        SkillFrameChange(1);
+    }
     /// <summary>
     /// スキルとアルカナのクールタイム状態をUIにリアルタイム反映する
     /// </summary>
-    public void UpdateSkillCoolTimeUI(PlayerRoot player)
+    public void UpdateSkillCoolTimeUI(float[] currentSkillCT, float[] maxSkillCT)
     {
-        ////通常攻撃のクールタイム更新
-        //float currentAttack = player.GetSkillCoolTime(0);
-        //float maxAttack = player.GetAttackCoolTimeDuration();
-        //UpdateBlockUI(0, currentAttack, maxAttack);
-
-        ////通常スキル
-        //Skill[] skills = player.GetSkill();
-        //for (int i = 0; i < skills.Length; i++)
-        //{
-        //    //１～４までのUI更新
-        //    int uiIndex = PlayerUtility.GetCoolTimeIndex(i);
-
-        //    if (uiIndex < skillBlocks.Length && skills[i] != null)
-        //    {
-        //        float currentCoolTime = player.GetSkillCoolTime(uiIndex);
-        //        float maxCoolTime = PlayerUtility.CoolTimeValue(player, skills[i].GetCoolTime());
-
-        //        //UIの配列番号をそのまま渡す
-        //        UpdateBlockUI(uiIndex, currentCoolTime, maxCoolTime);
-        //    }
-        //}
-
-        ////アルカナ枠のUI更新
-        //int arcanaUIIndex = 5;
-        //Arcana playerArcana = player.GetArcana();
-        //if (playerArcana != null && arcanaUIIndex < skillBlocks.Length)
-        //{
-        //    //クールタイムを更新
-        //    float currentCoolTime = player.GetSkillCoolTime(5);
-        //    float maxCoolTime = playerArcana.GetCoolTime();
-
-        //    UpdateBlockUI(arcanaUIIndex, currentCoolTime, maxCoolTime);
-        //}
+        for (int i = 0; i < currentSkillCT.Length; i++)
+        {
+            UpdateBlockUI(i, currentSkillCT[i], maxSkillCT[i]);
+        }
     }
 
     /// <summary>
@@ -157,9 +102,8 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
     /// <summary>
     /// フレーム変更
     /// </summary>
-    public void SkillFrameChange(PlayerRoot player)
+    public void SkillFrameChange(int index)
     {
-        int index = player.SelectedSkillIndex.Value;
         if (index >= 0 && index < skillFrame.Length)
         {
             //すべての枠消す
@@ -174,64 +118,18 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
     /// <summary>
     /// 枠の色変更
     /// </summary>
-    public void FrameColorChange(PlayerRoot player)
+    public void FrameColorChange(int index)
     {
-        int pIndex = player.PlayerIndex.Value;
-        Color color;
-        switch (pIndex)
-        {
-            case 0:
-                color = Color.red;
-                break;
-            case 1:
-                color = Color.blue;
-                break;
-            case 2:
-                color = Color.green;
-                break;
-            case 3:
-                color = Color.yellow;
-                break;
-            default:
-                color = Color.white;
-                break;
-        }
-        foreach (var frame in skillFrame)
-            frame.GetComponent<Image>().color = color;
-    }
-    public void FrameColorChange(PlayerDataManager playerDataManager)
-    {
-        if (playerDataManager == null) return;
 
-        // PlayerDataManager から自分のロビーインデックス（またはID）を取得する
-        int pIndex = playerDataManager.GetMyLobbyIndex();
-        Color color;
-        switch (pIndex)
+        for (int i = 0; i < skillBlocks.Length; i++)
         {
-            case 0:
-                color = Color.blue;
-                break;
-            case 1:
-                color = Color.red;
-                break;
-            case 2:
-                color = Color.green;
-                break;
-            case 3:
-                color = Color.yellow;
-                break;
-            default:
-                color = Color.white;
-                break;
-        }
-
-        foreach (var frame in skillFrame)
-        {
-            if (frame != null)
+            if (i < skillBlocks.Length && skillBlocks[i] != null)
             {
-                var img = frame.GetComponent<Image>();
-                if (img != null)
-                    img.color = color;
+                Image blockImage = skillBlocks[i].GetComponent<Image>();
+                if (blockImage != null)
+                {
+                    blockImage.color = playerColors[index];
+                }
             }
         }
     }

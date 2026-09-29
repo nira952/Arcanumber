@@ -1,98 +1,54 @@
-using R3;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerRoot))]
+[RequireComponent(typeof(PlayerInputBinder))]
 public class PlayerOfflineController : MonoBehaviour, IPlayerInputMediator
 {
     private PlayerRoot root;
+    private PlayerInputBinder inputBinder;
 
-    private PlayerInputController inputController;
-    private PlayerRoot player;
-
-    public bool CanProcessInput
+    private void Start()
     {
-        get
-        {
-            if (GameManager.Instance == null) return false;
-            // ゲーム状態がPlaying かつ ダウンしていない時のみ入力を許可
-            return GameManager.Instance.StateRx.CurrentValue == GameState.Playing && !root.IsDown.Value;
-        }
+        // --- コンポーネントの取得 ---
+        root = GetComponent<PlayerRoot>();            // メインスクリプトを取得
+        inputBinder = GetComponent<PlayerInputBinder>();     // 入力バインダーの取得
+
+
+        // バインダーに現在のコントローラーを設定し、入力イベントを購読する
+        inputBinder.Initialize(this);
+
+        // プレイヤーの初期化を実行
+        root.Initialize();
     }
+
+
+    // 入力をパススルーでRootに渡す
 
     public void OnAttackTriggered()
     {
-        throw new System.NotImplementedException();
+        // 攻撃を実行する
+        root.ExecuteAttack();
+    }
+
+    // ローカルで移動入力を処理する
+    public void OnMoveTriggered(float direction)
+    {
+        root.ExecuteMove(direction); // 移動のアクションを呼び出す
     }
 
     public void OnJumpTriggered()
     {
-        throw new System.NotImplementedException();
-    }
-
-    public void OnMoveTriggered(float direction)
-    {
-        throw new System.NotImplementedException();
+        root.ExecuteJump();
     }
 
     public void OnSkillSelectTriggered(int skillIndex)
     {
-        throw new System.NotImplementedException();
+        root.ExecuteSkillSelect(skillIndex);
     }
 
     public void OnSkillUseTriggered()
     {
-        throw new System.NotImplementedException();
+        root.ExecuteSkillUse();
     }
-
-    private void Awake()
-    {
-        root = GetComponent<PlayerRoot>();
-        player = GetComponent<PlayerRoot>();
-
-    }
-
-    private void Start()
-    {
-        //// --- UIの初期化 ---
-
-        //if (GameUIManager.Instance == null)
-        //{
-        //    Debug.LogWarning("GameUIManager is not found in the scene.");
-        //    return;
-        //}
-        //GameCameraManager.Instance.RegisterTarget(this.transform); // カメラにプレイヤーを登録
-
-        //// UIManagerのインスタンスを取得
-        //GameUIManager uIManager = GameUIManager.Instance;
-
-        // プレイヤーの名前と体力バーの初期化
-        //root.PlayerIndex.Value = 0;
-
-        //root.PlayerIndex.Where(idx => idx != -1).Take(1).Subscribe(idx =>
-        //{
-        //    string playerName = PlayerDataManager.Instance.GetPlayerNameByIndex(idx);
-
-        //    uIManager.SetPlayerName(idx, playerName);
-        //    uIManager.SetHealthSliderMaxValue(idx, 100);
-        //}).AddTo(this);
-
-        //root.CurrentHealth.Subscribe(hp =>
-        //{
-        //    if (root.PlayerIndex.Value != -1)
-        //    {
-        //        uIManager.UpdateHealth(root.PlayerIndex.Value, hp);
-        //    }
-        //}).AddTo(this);
-
-        //if (PlayerUIManager.Instance != null && PlayerDataManager.Instance != null)
-        //{
-        //    PlayerUIManager.Instance.Initialize(PlayerDataManager.Instance);
-        //}
-
-        //inputController = GetComponent<PlayerInputController>();
-
-        //root.Initialize(this, inputController);
-    }
-
 
 }

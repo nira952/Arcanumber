@@ -33,6 +33,8 @@ public abstract class MagicObject : MonoBehaviour
     protected bool IsServer()
     {
         // ネットワークが非アクティブ（オフライン/テスト時）は true、マルチ時は IsServer を参照
+        if (PlayerDataManager.Instance != null && PlayerDataManager.Instance.IsLocalMode) return true;
+
         if (NetworkManager.Singleton == null || !NetworkManager.Singleton.isActiveAndEnabled) return true;
         return NetworkManager.Singleton.IsServer;
     }
@@ -74,6 +76,9 @@ public abstract class MagicObject : MonoBehaviour
         PlayerRoot targetPlayer = collision.GetComponentInParent<PlayerRoot>();
         if (targetPlayer != null)
         {
+            Debug.Log($"MagicObject hit Player: {targetPlayer.PlayerIndex.Value} by Attacker: {haveAttackerIndex}");
+
+            // 2. ターゲットのインデックスを取得
             int targetIndex = targetPlayer.PlayerIndex.Value;
 
             // 自分自身への当たりの除外 & 重複ヒット防止

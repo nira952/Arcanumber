@@ -19,18 +19,12 @@ public class PlayerSpawner : NetworkBehaviour
             isLocalMode = PlayerDataManager.Instance.IsLocalMode;
         }
 
-        // デバッグモード（オフライン）の場合、OnNetworkSpawn が呼ばれないため Start で直接生成する
-        if (isLocalMode)
-        {
-            Debug.Log("[PlayerSpawner] オフラインモードでプレイヤーを単体生成します。");
-            SpawnAllPlayersOffline();
-        }
     }
 
     /// <summary>
     /// 現在接続されているすべてのクライアントのプレイヤーを一括生成・登録する (サーバー専用)
     /// </summary>
-    public List<PlayerRoot> SpawnAllPlayersOnline()
+    public void SpawnAllPlayersOnline()
     {
         // 接続されているクライアントの ID を取得
         var connectedClientIds = NetworkManager.Singleton.ConnectedClientsIds;
@@ -38,8 +32,6 @@ public class PlayerSpawner : NetworkBehaviour
         Debug.Log($"[PlayerSpawner] 全プレイヤーの一括生成を開始します。現在の接続人数: {connectedClientIds.Count}人");
 
         PlayerUtility.SetIsServer(true); // サーバーとしてのフラグを設定
-
-        List<PlayerRoot> spawnedPlayers = new List<PlayerRoot>();
 
         int index = 0; // 0～3のインデックスを順番に割り当てる
 
@@ -85,33 +77,29 @@ public class PlayerSpawner : NetworkBehaviour
                 Debug.LogError($"[PlayerSpawner] プレイヤーオブジェクトに NetworkObject コンポーネントが見つかりません。ClientId: {clientId}, PlayerName: {playerName}");
             }
 
-            spawnedPlayers.Add(spawnedPlayer);
-
             index++;
         }
-
-        return spawnedPlayers;
     }
 
     /// <summary>
     /// オフライン（単体テスト等）用にプレイヤーを生成・初期化する
     /// </summary>
-    public List<PlayerRoot> SpawnAllPlayersOffline()
+    public void SpawnAllPlayersOffline()
     {
         PlayerUtility.SetIsServer(true); // サーバーとしてのフラグを設定
-
-        List<PlayerRoot> spawnedPlayers = new List<PlayerRoot>();
 
         int playerIndex = 0;
 
         Transform spawnPoint = GetSpawnPoint(playerIndex);
         PlayerRoot spawnedPlayer = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
 
+        spawnedPlayer.PlayerIndex.Value = playerIndex; // プレイヤーのインデックスを設定
+
         PlayerUtility.RegisterPlayer(spawnedPlayer);
 
         PlayerOfflineController controller = spawnedPlayer.gameObject.AddComponent<PlayerOfflineController>();
 
-        spawnedPlayers.Add(spawnedPlayer);
+        GameCameraManager.Instance.RegisterTarget(spawnedPlayer.transform);
 
         Debug.Log("[PlayerSpawner] PlayerOfflineController をアタッチし、オフライン生成を完了しました。");
 
@@ -122,13 +110,15 @@ public class PlayerSpawner : NetworkBehaviour
         Transform enemySpawnPoint = GetSpawnPoint(enemyIndex);
         PlayerRoot spawnedEnemy = Instantiate(playerPrefab, enemySpawnPoint.position, enemySpawnPoint.rotation);
 
+        spawnedEnemy.PlayerIndex.Value = enemyIndex; // 敵プレイヤーのインデックスを設定
+
+        PlayerUtility.RegisterPlayer(spawnedEnemy);
+
         PlayerAutoController enemyController = spawnedEnemy.gameObject.AddComponent<PlayerAutoController>();
 
+        GameCameraManager.Instance.RegisterTarget(spawnedEnemy.transform);
+
         Debug.Log("[PlayerSpawner] PlayerAutoController をアタッチし、オフライン敵生成を完了しました。");
-
-        spawnedPlayers.Add(spawnedEnemy);
-
-        return spawnedPlayers;
     }
 
     /// <summary>
