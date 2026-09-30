@@ -66,16 +66,10 @@ public class TranpSkill : SkillObject
         if (player == null) return;
         Transform parentTransform = player.GetAimCursor().GetEfeUpperPos().transform;
 
-        //インスタンス化
-        GameObject card = SkillManager.Instance.SpawnObject(cardObj, parentTransform);
+        SpriteRenderer sr = cardObj.GetComponent<SpriteRenderer>();
 
-        //SpriteRendererを取得
-        SpriteRenderer sr = card.GetComponent<SpriteRenderer>();
-        if (sr != null && syncedDmg > 0 && syncedDmg < cardSprites.Length + 1)
-            sr.sprite = cardSprites[syncedDmg - 1];
-        
-        //カードを消す
-　      SkillManager.Instance.DestroyObject(card, 1.0f);
+        //カードのスプライトを更新
+        SkillManager.Instance.SpawnChangeAndDestroy(cardObj, parentTransform, (syncedDmg > 0) ? cardSprites[syncedDmg - 1] : sr.sprite, 1.0f);
     }
 
     protected override void OnHit(PlayerRoot target)
@@ -83,5 +77,7 @@ public class TranpSkill : SkillObject
         //ダメージを与える
         PlayerUtility.FinalDamage(target.PlayerIndex.Value, haveAttackerIndex, syncedDmg);
     }
+
+
 
 }

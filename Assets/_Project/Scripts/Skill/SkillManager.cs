@@ -326,38 +326,29 @@ public class SkillManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// オブジェクトを生成するメソッド
+    /// スプライトが有効な場合のみオブジェクトを生成し、スプライトを変更し、指定秒数後に削除するメソッド
     /// </summary>
-    public GameObject SpawnObject(GameObject obj, Transform part)
+    public void SpawnChangeAndDestroy(GameObject obj, Transform part, Sprite sprite, float destroyTime)
     {
-        if (IsServer)
-            return SpawnObjectRequest(obj, part);
-        return null;
-    }
 
-    [ServerRpc(RequireOwnership = false)]
-    private GameObject SpawnObjectRequest(GameObject obj, Transform part)
-    {
+        // 生成
         GameObject gameObject = Instantiate(obj, part);
         if (gameObject.TryGetComponent(out NetworkObject networkObject))
         {
             networkObject.Spawn();
         }
-        return gameObject;
-    }
 
-    /// <summary>
-    /// オブジェクトを削除するメソッド
-    /// </summary>
-    public void DestroyObject(GameObject obj, float time)
-    {
-        if (IsServer)
-            DestroyObjectRequest(obj, time);
-    }
+        // スプライト変更
+        if (gameObject.TryGetComponent(out SpriteRenderer spriteRenderer))
+        {
+            spriteRenderer.sprite = sprite;
+        }
 
-    [ServerRpc(RequireOwnership = false)]
-    private void DestroyObjectRequest(GameObject obj, float time)
-    {
-        Destroy(obj, time);
+        // もしスプライトが null なら処理を飛ばす（生成しない）
+        if (sprite == null)
+            return;
+
+        // 指定秒数後に削除
+        Destroy(gameObject, destroyTime);
     }
 }
