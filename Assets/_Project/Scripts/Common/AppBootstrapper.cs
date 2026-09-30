@@ -34,8 +34,6 @@ public static class AppBootstrapper
 
         // 2. 意図した順番で初期化を実行
 
-        dataManager.DebugSettings();
-
         loadManager.Initialize();
 
 

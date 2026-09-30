@@ -95,7 +95,7 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
                 ? $"{Mathf.CeilToInt(current):F0}"
                 : $"{current:F1}";
 
-            Debug.Log($"[PlayerUIManager] Formatted time: {formattedTime}");
+            //Debug.Log($"[PlayerUIManager] Formatted time: {formattedTime}");
 
             //残り秒数をテキストに表示（9秒以下になると小数点が出てくる）
             skillTimeTexts[index + 1].text = formattedTime;

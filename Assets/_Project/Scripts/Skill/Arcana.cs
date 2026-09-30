@@ -44,7 +44,7 @@ public class Arcana : ScriptableObject
 
         //ロジック更新
         this.arcanaLogic = CreateInstanceFromName(Get(9));
-        if (arcanaLogic != null)
+        if (arcanaLogic == null)
             this.aCategory = ASkillCategory.DamageEffect;
     }
 
