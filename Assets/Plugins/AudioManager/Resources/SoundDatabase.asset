@@ -137,3 +137,39 @@ MonoBehaviour:
   - name: Dice
     clip: {fileID: 8300000, guid: 13a6126e1a976e04a9a64e04d293c624, type: 3}
     volume: 1
+  - name: FlipHorizontally
+    clip: {fileID: 8300000, guid: a83f7ccfc644b2b4ba34bad5e4c2f24f, type: 3}
+    volume: 1
+  - name: Charm
+    clip: {fileID: 8300000, guid: 487ff2809d241694a9656672333911e2, type: 3}
+    volume: 1
+  - name: Blackout
+    clip: {fileID: 8300000, guid: 148a289ff87d80f41a31cb53aca70229, type: 3}
+    volume: 1
+  - name: EquivalentExchange
+    clip: {fileID: 8300000, guid: d7e89821046c1014cb8ff3bbc2815a15, type: 3}
+    volume: 1
+  - name: Steel
+    clip: {fileID: 8300000, guid: a7cbcb6ddd68cb9498e309d964f3e4a2, type: 3}
+    volume: 1
+  - name: Trap
+    clip: {fileID: 8300000, guid: 3bf4cef09d6f6174c96db5b80b12f464, type: 3}
+    volume: 1
+  - name: Teleport
+    clip: {fileID: 8300000, guid: 64c6b1f824581d14ba2904eb3ca22664, type: 3}
+    volume: 1
+  - name: Dimension
+    clip: {fileID: 8300000, guid: f0f3a15406605c443aeebf71ebb3c69d, type: 3}
+    volume: 1
+  - name: AllAtack
+    clip: {fileID: 8300000, guid: ca98d66e8a9360d4fa888e8bc6bbace1, type: 3}
+    volume: 1
+  - name: Counter
+    clip: {fileID: 8300000, guid: deb636a15f04ae4458feedac5715a0dd, type: 3}
+    volume: 1
+  - name: FlipCamera
+    clip: {fileID: 8300000, guid: eff3ee14fa018ef4fa727fce539fadb7, type: 3}
+    volume: 1
+  - name: Correct
+    clip: {fileID: 8300000, guid: 891b66c0237589c47b8e01c16ec6005b, type: 3}
+    volume: 1
