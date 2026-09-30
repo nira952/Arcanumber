@@ -8855,29 +8855,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b991e6f822290374e93c2c14f44cb08d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  normalAttackBlock: {fileID: 2064075821}
+  normalAttackIcon: {fileID: 718341306}
+  normalAttackTimeIcon: {fileID: 1837073973}
+  normalAttackText: {fileID: 404948384}
   skillBlocks:
-  - {fileID: 2064075821}
   - {fileID: 1779921429}
   - {fileID: 547917520}
   - {fileID: 1742464025}
   - {fileID: 787836786}
   - {fileID: 1248071118}
   skillIcons:
-  - {fileID: 718341306}
   - {fileID: 417064532}
   - {fileID: 812047375}
   - {fileID: 837383912}
   - {fileID: 1570544656}
   - {fileID: 2126491923}
   skillTimeIcons:
-  - {fileID: 1837073973}
   - {fileID: 2095134994}
   - {fileID: 136649278}
   - {fileID: 878842345}
   - {fileID: 939326788}
   - {fileID: 1214971603}
   skillTimeTexts:
-  - {fileID: 404948384}
   - {fileID: 2053178599}
   - {fileID: 1921060046}
   - {fileID: 220696739}
@@ -34324,7 +34324,7 @@ Transform:
   m_GameObject: {fileID: 4452598822952201906}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.1700001, z: -10}
+  m_LocalPosition: {x: 0.00000478116, y: -0.23949003, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

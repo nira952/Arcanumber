@@ -5,13 +5,21 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
-{ 
+{
+    [Header("通常攻撃関係")]
+
+    [SerializeField] private GameObject normalAttackBlock;
+    [SerializeField] private Image normalAttackIcon;
+    [SerializeField] private Image normalAttackTimeIcon;
+    [SerializeField] private TextMeshProUGUI normalAttackText;
+
+
     [Header("スキル関係")]
-    [SerializeField] private GameObject[] skillBlocks = new GameObject[6];
-    [SerializeField] private Image[] skillIcons = new Image[6];
-    [SerializeField] private Image[] skillTimeIcons = new Image[6];
-    [SerializeField] private TextMeshProUGUI[] skillTimeTexts = new TextMeshProUGUI[6];
-    [SerializeField] private GameObject[] skillFrame = new GameObject[5];
+    [SerializeField] private GameObject[] skillBlocks = new GameObject[GameConfig.COOLTIME_HOPPER_MAX];
+    [SerializeField] private Image[] skillIcons = new Image[GameConfig.COOLTIME_HOPPER_MAX];
+    [SerializeField] private Image[] skillTimeIcons = new Image[GameConfig.COOLTIME_HOPPER_MAX];
+    [SerializeField] private TextMeshProUGUI[] skillTimeTexts = new TextMeshProUGUI[GameConfig.COOLTIME_HOPPER_MAX];
+    [SerializeField] private GameObject[] skillFrame = new GameObject[GameConfig.COOLTIME_HOPPER_MAX];
 
     // 各キャラクター用の色を設定する変数 (1:青, 2:赤, 3:緑, 4:黄)
     private Color[] playerColors = new Color[4] { Color.blue, Color.red, Color.green, Color.yellow };
@@ -69,13 +77,7 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
     /// </summary>
     public void UpdateSkillCoolTimeUI(float[] currentSkillCT, float[] maxSkillCT)
     {
-        int count = Mathf.Min(
-            currentSkillCT.Length,
-            maxSkillCT.Length,
-            skillTimeIcons.Length,
-            skillTimeTexts.Length);
-
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < currentSkillCT.Length; i++)
         {
             UpdateBlockUI(i, currentSkillCT[i], maxSkillCT[i]);
         }
@@ -89,22 +91,20 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
         if (current > 0f)
         {
             float elapsed = max - current; //経過した時間
-            skillTimeIcons[index + 1].fillAmount = elapsed / max; //0から1に向かって増えていく
+            skillTimeIcons[index].fillAmount = elapsed / max; //0から1に向かって増えていく
 
             string formattedTime = current >= 10f
                 ? $"{Mathf.CeilToInt(current):F0}"
                 : $"{current:F1}";
 
-            //Debug.Log($"[PlayerUIManager] Formatted time: {formattedTime}");
-
             //残り秒数をテキストに表示（9秒以下になると小数点が出てくる）
-            skillTimeTexts[index + 1].text = formattedTime;
+            skillTimeTexts[index].text = formattedTime;
 
             // 0.1より小さくなったら0にする
             if (current <= 0.1f)
             {
-                skillTimeIcons[index + 1].fillAmount = 1f;
-                skillTimeTexts[index + 1].text = "";
+                skillTimeIcons[index].fillAmount = 1f;
+                skillTimeTexts[index].text = "";
             }
 
         }

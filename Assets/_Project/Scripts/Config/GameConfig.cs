@@ -12,8 +12,8 @@ public static class GameConfig
 
     //スキルホッパー
     public const int SKILL_HOPPER_MAX = 4;
-    public const int SKILL_ARCANA = 5;
-    public const int COOLTIME_HOPPER_MAX = 6;
+    public const int SKILL_ARCANA = 4;
+    public const int COOLTIME_HOPPER_MAX = 5;
 
     //スキルの定数設定
     public const float HOOMING_TURN_SPEED = 300.0f; //ホーミングの回転速度
