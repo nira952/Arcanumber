@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 1629990974785484421}
   - component: {fileID: 660621822768799849}
   - component: {fileID: 8611568700007025110}
-  - component: {fileID: -3748407961498149692}
   - component: {fileID: 8928674866428473458}
+  - component: {fileID: 2976793279269957149}
   m_Layer: 0
   m_Name: Ice
   m_TagString: Untagged
@@ -198,26 +198,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.34174472, y: 0.33004844}
   m_EdgeRadius: 0
---- !u!114 &-3748407961498149692
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8098692409450760036}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  NetworkAnimatorExpanded: 0
-  AuthorityMode: 0
-  m_Animator: {fileID: 3100544831795113580}
-  TransitionStateInfoList: []
-  AnimatorParameterEntries:
-    ParameterEntries: []
-  AnimatorParametersExpanded: 0
 --- !u!114 &8928674866428473458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -236,3 +216,23 @@ MonoBehaviour:
   alphaThreshold: 0.01
   drawOutside: 0
   enableInstancing: 0
+--- !u!114 &2976793279269957149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8098692409450760036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cb57d68727d4044784836c71d32da3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 0
+  m_Animator: {fileID: 3100544831795113580}
+  TransitionStateInfoList: []
+  AnimatorParameterEntries:
+    ParameterEntries: []
+  AnimatorParametersExpanded: 0
