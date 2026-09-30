@@ -235,6 +235,8 @@ public class GameUIManager : MonoBehaviour
     /// </summary>
     private void UpdateActiveEffects(int playerIndex, List<EffectAbility> effects)
     {
+        Debug.Log($"[GameUIManager] エフェクトを更新: {playerIndex}");
+
         var targetBlock = playerEffectBlocks[playerIndex];
 
         // 1. まず用意されているイメージ枠を全て非表示にする
