@@ -160,11 +160,15 @@ public class SkillManager : NetworkBehaviour
         }
 
         int bulletCount = skill.GetBulletCount();
-        if (bulletCount <= 0) bulletCount = 1;  // 0個以下の場合は1個に補正
+        if (bulletCount <= 0) bulletCount = 1;  //0個以下の場合は1個に
 
-        float totalSpreadAngle = skill.GetSpreadAngle(); // 例: 60度（上下に広げる全体の角度）
-        bool isRandomAngle = totalSpreadAngle < 0f;     // マイナスならランダム判定にする場合
+        float totalSpreadAngle = skill.GetSpreadAngle(); //例: 60度（上下に広げる全体の角度）
+        bool isRandomAngle = totalSpreadAngle < 0f;     //マイナスならランダム判定
         float absAngle = Mathf.Abs(totalSpreadAngle);
+
+        //プレイヤーからマウス（AIM）の位置への方向を計算し、基準の角度（baseAngle）を求める
+        Vector2 aimDirection = (pos - (Vector2)playerRoot.transform.position).normalized;
+        float baseAngle = aimDirection != Vector2.zero ? Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg : 0f;
 
         for (int i = 0; i < bulletCount; i++)
         {
@@ -176,11 +180,8 @@ public class SkillManager : NetworkBehaviour
             else
             {
                 if (isRandomAngle)
-                {
                     //マイナス指定：指定された範囲（absAngle）の中でランダムに散らす
-                    //例: -60度なら -30度 〜 +30度 の間でランダム
                     currentAngle = Random.Range(-absAngle * 0.5f, absAngle * 0.5f);
-                }
                 else
                 {
                     //プラス指定：決められた範囲（absAngle）の中で上下に等間隔で配置する
@@ -197,10 +198,16 @@ public class SkillManager : NetworkBehaviour
                 }
             }
 
-            //プレイヤーの向き（または基準の向き）をベースに、計算した角度を加算した回転を作る
-            //※ playerRoot の向きを基準にする場合（右向き・左向きなどを考慮）
-            Quaternion baseRotation = playerRoot.transform.rotation;
-            Quaternion spawnRotation = baseRotation * Quaternion.Euler(0, 0, currentAngle);
+            //プレイヤーの向きではなく、「マウスの方向（baseAngle）」をベースにオフセット角（currentAngle）を加算する
+            Quaternion spawnRotation = Quaternion.Euler(0, 0, baseAngle + currentAngle);
+
+            Vector2 spawnPos = playerRoot.transform.position;
+            if (isRandomAngle)
+            {
+                // 半径 0.4f 以内のランダムな位置にズラす（数値はお好みで調整してください）
+                Vector2 randomOffset = Random.insideUnitCircle * 0.4f;
+                spawnPos += randomOffset;
+            }
 
             //サーバー（またはオフライン）側でオブジェクトを Instantiate 生成
             GameObject skillObj = Instantiate(skill.GetEffectAnimation(), playerRoot.transform.position, spawnRotation);
@@ -229,7 +236,7 @@ public class SkillManager : NetworkBehaviour
                     Destroy(skillObj, keepTime);
             }
 
-            // 4. オンライン時のネットワークスポーン同期
+            //オンライン時のネットワークスポーン同期
             if (!isLocalMode && IsServer)
             {
                 if (skillObj.TryGetComponent(out NetworkObject networkObject))

@@ -87,13 +87,6 @@ public class SkillObject : MagicObject
     {
         isMoving = (moveSpeed > 0);
         transform.position = spawnPos;
-
-        Vector2 direction = (targetPos - spawnPos).normalized;
-        if (direction != Vector2.zero)
-        {
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
-        }
     }
 
     private void SetupStationary(Vector2 targetPos)

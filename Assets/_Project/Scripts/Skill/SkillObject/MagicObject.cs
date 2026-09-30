@@ -149,11 +149,11 @@ public abstract class MagicObject : MonoBehaviour
             OnHit(targetPlayer);
             AtkHeal();
 
-            // 貫通しない場合は破棄
+            //貫通しない場合は破棄
             if (isPenetrate) return;
             if (reflectCount > 0)
             {
-                HandleReflect(collision);
+                onDestroyed.OnNext(Unit.Default);
                 return;
             }
 
