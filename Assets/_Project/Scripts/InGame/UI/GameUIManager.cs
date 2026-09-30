@@ -108,6 +108,8 @@ public class GameUIManager :MonoBehaviour
             SetPlayerName(root.PlayerIndex.Value, playerName);
             SetHealthSliderMaxValue(root.PlayerIndex.Value, 100);
 
+            UpdateHealth(root.PlayerIndex.Value, root.CurrentHealth.Value);
+
             // 2. HP変化時の処理
             root.CurrentHealth.Subscribe(hp =>
             {
