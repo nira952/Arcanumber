@@ -18,37 +18,75 @@ public class Arcana18MoonFront : ArcanaLogic
         player.StartCoroutine(OnUpdate(player, sourceArcana));
     }
 
-    //コルーチン本体
     public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
         Transform playerTransform = player.transform;
 
-        // 1. パラメータの取得
-        // KeepValue を「移動距離」、あるいは別の列を「移動時間」にするなど調整可能です
-        float distance = sourceArcana.GetKeepValue(); // 例: 10f (進む距離)
+        //パラメータの取得
+        float distance = sourceArcana.GetKeepValue();
         if (distance <= 0f) distance = 8f;
 
-        float duration = 0.2f; // 高速移動にかかる時間（秒）- 短いほど一瞬（高速）になる
+        float duration = 0.2f; //高速移動にかかる時間
         float elapsed = 0f;
 
         Vector3 startPos = playerTransform.position;
-        Vector3 direction = playerTransform.forward;
+
+        //Visualオブジェクトから向いている方向を取得する
+        float facingDir = 1f;
+        Transform visualTransform = playerTransform.Find("Visual");
+
+        if (visualTransform != null)
+            facingDir = visualTransform.localScale.x >= 0f ? -1f : 1f;
+        else
+            facingDir = playerTransform.localScale.x >= 0f ? -1f : 1f;
+
+        Vector3 direction = new Vector3(facingDir, 0f, 0f);
         Vector3 targetPos = startPos + (direction * distance);
 
-        // エフェクト再生（開始時）
+        //エフェクト再生
         PlayArcanaVisuals(player, sourceArcana, playerTransform);
 
-        // CharacterControllerがあれば一時的にオフにする（すり抜けや位置干渉を防ぐため）
+        //PlayerRoot（親）にアタッチされている BoxCollider2D を取得する
+        BoxCollider2D boxCol = player.GetComponent<BoxCollider2D>();
+
+        //BoxCastAll を使って自分自身を除外しつつ壁を検知する
+        if (boxCol != null)
+        {
+            Vector2 origin = boxCol.bounds.center;
+            Vector2 size = boxCol.size;
+            float angle = playerTransform.eulerAngles.z;
+
+            //進行方向にあるすべてのコライダーを取得
+            RaycastHit2D[] hits = Physics2D.BoxCastAll(origin, size, angle, direction, distance);
+
+            foreach (var hit in hits)
+            {
+                if (hit.collider != null)
+                {
+                    //自分自身のコライダーや子オブジェクトはスキップ
+                    if (hit.collider.transform.IsChildOf(playerTransform)) continue;
+
+                    //ヒットしたのが Wall または Ground の場合
+                    if (hit.collider.CompareTag("Wall") || hit.collider.CompareTag("Ground"))
+                    {
+                        //一番手前にある壁までの安全な距離を計算し、目標地点をそこに上書きしてループを抜ける
+                        float safeDistance = Mathf.Max(0f, hit.distance - 0.05f);
+                        targetPos = startPos + (direction * safeDistance);
+                        break;
+                    }
+                }
+            }
+        }
+
         CharacterController cc = player.GetComponent<CharacterController>();
         if (cc != null) cc.enabled = false;
 
-        // 指定した時間（duration）かけて滑らかに高速移動させる
+        //計算された安全な targetPos まで滑らかに移動させる
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
 
-            // イージング（最初は速く、後半減速する等）をつけたい場合は Mathf.SmoothStep なども使えます
             playerTransform.position = Vector3.Lerp(startPos, targetPos, t);
 
             yield return null;
