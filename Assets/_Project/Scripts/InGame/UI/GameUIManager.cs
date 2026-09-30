@@ -1,5 +1,4 @@
 using DG.Tweening;
-using NPOI.SS.Formula.Functions;
 using ObservableCollections;
 using R3;
 using System;
@@ -9,7 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameUIManager :MonoBehaviour
+public class GameUIManager : MonoBehaviour
 {
     [Serializable]
     private class PlayerEffectBlock
@@ -47,87 +46,112 @@ public class GameUIManager :MonoBehaviour
 
     private readonly CompositeDisposable playerSubscriptions = new();
 
-    public void Initialize(GameManager gameManager,TimeManager timeManager)
+    public void Initialize(GameManager gameManager, TimeManager timeManager)
     {
-        // --- ストリームを購読してUIを更新する処理 ---
-
-        // ゲーム状態の変更を購読し、UI更新とログ出力を行う
-        gameManager.StateRx.Subscribe(state =>
+        // --- 1. CompositeDisposable の初期化（nullチェック） ---
+        if (playerSubscriptions == null)
         {
-            switch (state)
-            {
-                case GameState.Playing:
-                    UpdateGameStateText("Start!");
-                    break;
-                case GameState.Finish:
-                    UpdateGameStateText("Finish");
-                    break;
-            }
-        }).AddTo(this);
+            Debug.LogError("[GameUIManager] playerSubscriptions が null です！");
+            return;
+        }
+        else
+        {
+            playerSubscriptions.Clear(); // 既存の購読をクリア
+        }
 
-        // タイマーの初期表示を空にする
+
+        // --- 2. GameManager の Subscribe (StateRxのnullチェック) ---
+        if (gameManager != null && gameManager.StateRx != null)
+        {
+            gameManager.StateRx.Subscribe(state =>
+            {
+                switch (state)
+                {
+                    case GameState.Playing:
+                        UpdateGameStateText("Start!");
+                        break;
+                    case GameState.Finish:
+                        UpdateGameStateText("Finish");
+                        break;
+                }
+            }).AddTo(this);
+        }
+        else
+        {
+            Debug.LogError("[GameUIManager] gameManager または StateRx が null です！");
+        }
+
+        // タイマーの初期表示
         if (timerText != null) { timerText.text = ""; }
 
-        // エフェクトを全て非表示に
-        foreach (var block in playerEffectBlocks)
+        // --- 3. playerEffectBlocks の null チェック ---
+        if (playerEffectBlocks != null)
         {
-            block.HideAll();
-        }
-
-        // タイマーの残り時間を購読し、UIのタイマー表示を更新する
-        timeManager.RemainingTime.Subscribe(time =>
-        {
-            UpdateTimerDisplay((int)time);
-        }).AddTo(this);
-
-
-        // 一度すべてのプレイヤーのステータスを非表示にしておく
-        for (int i = 0; i < statusObjects.Length; i++)
-        {
-            if (statusObjects[i] != null)
+            foreach (var block in playerEffectBlocks)
             {
-                statusObjects[i].SetActive(false);
+                if (block != null) block.HideAll();
             }
         }
 
-        List<PlayerRoot> playerList = PlayerUtility.GetAllPlayer();
-
-        // プレイヤーリストの更新を購読し、UIを更新する
-        foreach (var root in playerList)
+        // --- 4. TimeManager の Subscribe ---
+        if (timeManager != null && timeManager.RemainingTime != null)
         {
-            if (root == null) { continue; }
-            if (root.PlayerIndex.Value < 0) { continue; }
-
-
-            // プレイヤーの名前とHPスライダーの初期設定
-            string playerName = PlayerDataManager.Instance.GetPlayerNameByIndex(root.PlayerIndex.Value);
-
-            Debug.Log($"[GameUIManager] PlayerIndex: {root.PlayerIndex.Value}, Name: {playerName}");
-
-
-            SetPlayerName(root.PlayerIndex.Value, playerName);
-            SetHealthSliderMaxValue(root.PlayerIndex.Value, 100);
-
-            UpdateHealth(root.PlayerIndex.Value, root.CurrentHealth.Value);
-
-            // 2. HP変化時の処理
-            root.CurrentHealth.Subscribe(hp =>
+            timeManager.RemainingTime.Subscribe(time =>
             {
-                UpdateHealth(root.PlayerIndex.Value, hp);
-                
-            }).AddTo(playerSubscriptions);
-
-
-            // プレイヤーのアクティブ効果の変更を購読し、UIのステータス表示を更新する
-            root.ActiveEffects.ObserveChanged()
-                .Subscribe(_ =>
-                {
-                    UpdateActiveEffects(root.PlayerIndex.Value, root.ActiveEffects.ToList());
-                }).AddTo(playerSubscriptions);
+                UpdateTimerDisplay((int)time);
+            }).AddTo(this);
         }
 
-    }
+        // ステータスオブジェクトの非表示
+        if (statusObjects != null)
+        {
+            for (int i = 0; i < statusObjects.Length; i++)
+            {
+                if (statusObjects[i] != null) statusObjects[i].SetActive(false);
+            }
+        }
 
+        // --- 5. プレイヤーリストの処理 ---
+        List<PlayerRoot> playerList = PlayerUtility.GetAllPlayer();
+        if (playerList == null) return;
+
+        foreach (var root in playerList)
+        {
+            if (root == null || root.PlayerIndex.Value < 0) continue;
+
+            int pIndex = root.PlayerIndex.Value;
+
+            // PlayerDataManager の null チェック
+            string playerName = "Player";
+            if (PlayerDataManager.Instance != null)
+            {
+                playerName = PlayerDataManager.Instance.GetPlayerNameByIndex(pIndex);
+            }
+
+            Debug.Log($"[GameUIManager] PlayerIndex: {pIndex}, Name: {playerName}");
+
+            SetPlayerName(pIndex, playerName);
+            SetHealthSliderMaxValue(pIndex, 100);
+            UpdateHealth(pIndex, root.CurrentHealth.Value);
+
+
+            root.CurrentHealth.Subscribe(hp =>
+            {
+                UpdateHealth(pIndex, hp);
+            }).AddTo(playerSubscriptions);
+            
+
+            // アクティブ効果の変更購読
+            if (root.ActiveEffects != null)
+            {
+                root.ActiveEffects.ObserveChanged()
+                    .Subscribe(_ =>
+                    {
+                        UpdateActiveEffects(pIndex, root.ActiveEffects.ToList());
+                    }).AddTo(playerSubscriptions);
+            }
+        }
+    }
 
 
     /// <summary>
@@ -164,7 +188,8 @@ public class GameUIManager :MonoBehaviour
         healthSliders[playerIndex].value = health;
         if (hpText != null && playerIndex < hpText.Length)
         {
-            hpText[playerIndex].text = health.ToString();
+            // 小数点以下を切り捨てて整数表示にする
+            hpText[playerIndex].text = health.ToString("F0");
         }
     }
 

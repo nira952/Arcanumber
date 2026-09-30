@@ -48,9 +48,6 @@ public class PlayerSpawner : NetworkBehaviour
 
             spawnedPlayer.gameObject.name = "Player" + index;
 
-            // プレイヤーをサーバーリストに登録
-            PlayerUtility.RegisterPlayer(spawnedPlayer);
-
             // カメラにプレイヤーを登録
             GameCameraManager.Instance.RegisterTarget(spawnedPlayer.transform);
 
@@ -95,8 +92,6 @@ public class PlayerSpawner : NetworkBehaviour
 
         spawnedPlayer.PlayerIndex.Value = playerIndex; // プレイヤーのインデックスを設定
 
-        PlayerUtility.RegisterPlayer(spawnedPlayer);
-
         PlayerOfflineController controller = spawnedPlayer.gameObject.AddComponent<PlayerOfflineController>();
 
         GameCameraManager.Instance.RegisterTarget(spawnedPlayer.transform);
@@ -111,8 +106,6 @@ public class PlayerSpawner : NetworkBehaviour
         PlayerRoot spawnedEnemy = Instantiate(playerPrefab, enemySpawnPoint.position, enemySpawnPoint.rotation);
 
         spawnedEnemy.PlayerIndex.Value = enemyIndex; // 敵プレイヤーのインデックスを設定
-
-        PlayerUtility.RegisterPlayer(spawnedEnemy);
 
         PlayerAutoController enemyController = spawnedEnemy.gameObject.AddComponent<PlayerAutoController>();
 
