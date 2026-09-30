@@ -6,16 +6,14 @@ public class Arcana20JudgementFront : ArcanaLogic
     //当たると現在体力が３０％減る
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        GameObject hpB = Object.Instantiate(sourceArcana.effectPrefab);
-        hpB.GetComponent<HpBullet>().InitializeBullet(player.PlayerIndex.Value, player.transform.position);
+        SkillManager.Instance.SpawnRpcObject(player.PlayerIndex.Value);
     }
 }
 
 public class Arcana20JudgementBack : ArcanaLogic
 {
     //銃弾の雨が降る
-    public float length = 15f;  //範囲
-    Vector2 pos = new Vector2(0, 7.5f);
+
     public float spawnInterval = 0.03f; //銃弾を出す間隔
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
@@ -27,17 +25,7 @@ public class Arcana20JudgementBack : ArcanaLogic
 
         while (elapsed < sourceArcana.GetKeepValue())
         {
-            //範囲内でランダムなX
-            float randomX = Random.Range(-length / 2f, length / 2f);
-            //生成位置（高さは固定7.5f）
-            Vector3 spawnPos = new Vector3(pos.x + randomX, pos.y, 0);
-
-            //生成（回転は必要に応じて調整）
-            GameObject obj = Object.Instantiate(sourceArcana.effectPrefab, spawnPos, Quaternion.Euler(0, 0, -90));
-            Bullet magic = obj.GetComponent<Bullet>();
-            if (magic != null)
-                //初期化
-                magic.InitializeBullet(player.PlayerIndex.Value, spawnPos);
+            SkillManager.Instance.SpawnRpcObject(player.PlayerIndex.Value);
 
             //次の弾までの待機時間
             yield return new WaitForSeconds(spawnInterval);

@@ -1,10 +1,13 @@
-using UnityEngine;
-
 /// <summary>
 /// トラップスキルのクラス
 /// </summary>
-public class TrapObject : MagicObject
+public class TrapObject : MagicObject, IRpcObjectInterface
 {
+    public void RpcInitialize(int playerIndex)
+    {
+        
+    }
+
     protected override void OnHit(PlayerRoot target)
     {
         base.OnHit(target);

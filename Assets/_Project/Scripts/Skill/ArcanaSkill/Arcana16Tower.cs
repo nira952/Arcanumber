@@ -13,10 +13,7 @@ public class Arcana16TowerFront : ArcanaLogic
     //永続するタレットがおける
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        GameObject turret = Object.Instantiate(sourceArcana.effectPrefab);
-        turret.transform.position = player.transform.position;
-        Turret t = turret.GetComponent<Turret>();
-        t.SetHaveNo(player.PlayerIndex.Value);
+        SkillManager.Instance.SpawnRpcObject(player.PlayerIndex.Value);
     }
 }
 

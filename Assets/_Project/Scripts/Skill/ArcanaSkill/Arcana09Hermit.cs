@@ -30,9 +30,9 @@ public class Arcana09HermitBack : ArcanaLogic
     {
         while (true)
         {
-            GameObject trap = GameObject.Instantiate(
-                sourceArcana.GetEffectPrefab());
-            trap.transform.position = player.transform.position;
+            // トラップを設置するロジックをここに記述
+            SkillManager.Instance.SpawnRpcObject(player.PlayerIndex.Value);
+
             yield return new WaitForSeconds(sourceArcana.GetKeepValue());
         }
     }

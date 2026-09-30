@@ -61,8 +61,8 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
 
             Debug.Log($"[PlayerUIManager] Skill sprite: {skills[i].GetSprite().name}");
 
-            skillIcons[i + 1].sprite = skills[i].GetSprite();
-            skillTimeIcons[i + 1].sprite = skills[i].GetSprite();
+            skillIcons[i].sprite = skills[i].GetSprite();
+            skillTimeIcons[i].sprite = skills[i].GetSprite();
         }
 
         // アルカナのスプライトを変更

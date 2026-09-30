@@ -38,17 +38,10 @@ public class PlayerDataManager : NetworkBehaviour
 
     public void DebugSettings()
     {
-        // 全てのスキルをデバッグ用に設定する
-        for (int i = 0; i < mySkills.Length; i++)
-        {
-            Skill skill = ScriptableObject.CreateInstance<Skill>();
 
-
-            mySkills[i] = skill;
-        }
 
         // デバッグ用のアルカナを設定する
-        Arcana arcana = ScriptableObject.CreateInstance<Arcana>();
+        Arcana arcana = AssetLoader.Instance.GetArcana(ArcanaList.Tower, true);
         myArcana = arcana;
     }
 
@@ -466,4 +459,15 @@ public class PlayerDataManager : NetworkBehaviour
             GameSceneManager.Instance.LoadNetworkScene(sceneName);
         }
     }
+
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            Debug.Log("[PlayerDataManager] F1キーが押されました。デバッグ用の設定を適用します。");
+            DebugSettings();
+        }
+    }
+
 }

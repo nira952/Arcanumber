@@ -6813,6 +6813,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  bulletPrefab: {fileID: 3931452936275764385, guid: cb526099c9f1c2747a195e3a726d03f3, type: 3}
 --- !u!114 &1394781193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34324,7 +34325,7 @@ Transform:
   m_GameObject: {fileID: 4452598822952201906}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.00000478116, y: -0.23949003, z: -10}
+  m_LocalPosition: {x: 0, y: -1.1700001, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

@@ -1,20 +1,30 @@
+using R3;
 using UnityEngine;
 
-public class Turret : MonoBehaviour
+public class Turret : MonoBehaviour, IRpcObjectInterface
 {
-    private int haveNo;
-    [SerializeField] GameObject bullet; //弾
-    [SerializeField] GameObject spwnObj;    //スポーン用
+    private bool isOwner = false;
+
+    private int attackerIndex;
     float createSpeed = 1f;
     float time = 0;
-    void Start()
+
+    private Subject<Unit> onDestroyed = new Subject<Unit>();
+    public Observable<Unit> OnDestroyed => onDestroyed;
+
+    public void RpcInitialize(int playerIndex)
     {
+        attackerIndex = playerIndex;
+
         TurretDirection();
+
+        isOwner = true;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        if (!isOwner) return;
+
         TimeCount();
     }
 
@@ -49,16 +59,8 @@ public class Turret : MonoBehaviour
     void InstanceBullet()
     {
         //弾を生成
-        GameObject b = Instantiate(bullet);
-        //場所と向きを決定
-        b.transform.position = spwnObj.transform.position;
-        b.transform.rotation = transform.rotation;
-        //クラスを取得して初期化する
-        Bullet bulletScript = b.GetComponent<Bullet>();
-        if (bulletScript != null)
-            //初期化する
-            bulletScript.InitializeBullet(haveNo, b.transform.position);
+        SkillManager.Instance.SpawnBulletObject(attackerIndex, transform.position, transform.right);
     }
 
-   public void SetHaveNo(int no) { haveNo = no; }
+
 }

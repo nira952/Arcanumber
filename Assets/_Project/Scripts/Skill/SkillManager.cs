@@ -30,6 +30,8 @@ public class SkillManager : NetworkBehaviour
     }
     #endregion
 
+    [SerializeField] private Bullet bulletPrefab; // 弾丸のプレハブ
+
     private bool isLocalMode = false;
 
     /// <summary>
@@ -332,12 +334,125 @@ public class SkillManager : NetworkBehaviour
         Destroy(animObj, destroyTime);
     }
 
+
+
+    public void SpawnRpcObject(int playerIndex)
+    {
+        if (isLocalMode || IsServer)
+        {
+            PlayerRoot player = PlayerUtility.GetPlayerByIndex(playerIndex);
+            GameObject prefab = player.GetArcana().GetEffectPrefab();
+
+            // オフラインモードまたはサーバー側で直接生成
+            RequestSpawnRpcObject(player, prefab);
+        }
+        else
+        {
+            // クライアントからの要求の場合：ServerRpc を経由してサーバー側で処理を開始する
+            RequestSpawnRpcObjectServerRpc(playerIndex);
+        }
+
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestSpawnRpcObjectServerRpc(int playerIndex)
+    {
+        // 1. 安全に PlayerRoot を取得（Nullチェック）
+        PlayerRoot player = PlayerUtility.GetPlayerByIndex(playerIndex);
+        if (player == null) return;
+
+        // ここでプレイヤーのArcanaからエフェクトプレハブを取得
+        GameObject prefab = player.GetArcana().GetEffectPrefab();
+
+        // 2. サーバー側でオブジェクトを生成し、全クライアントに同期させる
+        RequestSpawnRpcObject(player, prefab);
+    }
+
+
+    private void RequestSpawnRpcObject(PlayerRoot player,GameObject prefab)
+    {
+        // オブジェクトを生成する
+        GameObject obj = Instantiate(prefab, player.transform.position, Quaternion.identity);
+
+        // インターフェースを持つコンポーネントを取得して初期化
+        if (obj.TryGetComponent(out IRpcObjectInterface rpcInterface))
+        {
+            rpcInterface.RpcInitialize(player.PlayerIndex.Value);
+
+            rpcInterface.OnDestroyed.Subscribe(_ =>
+            {
+                if (obj != null)
+                {
+                    Destroy(obj);
+                }
+            }).AddTo(obj);
+
+        }
+
+        // ネットワークオブジェクトの場合は全クライアントに同期スポーンする
+        if (!isLocalMode && IsServer)
+        {
+            if (obj.TryGetComponent(out NetworkObject networkObject))
+            {
+                networkObject.Spawn();
+            }
+        }
+
+    }
+
+    public void SpawnBulletObject(int playerIndex,Vector2 pos,Vector2 direction)
+    {
+        if (isLocalMode || IsServer)
+        {
+            RequestSpawnBullet(playerIndex, pos, direction);
+        }
+        else
+        {
+            RequestSpawnBulletServerRpc(playerIndex, pos, direction);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestSpawnBulletServerRpc(int playerIndex, Vector2 pos, Vector2 direction)
+    {
+        // 2. サーバー側でオブジェクトを生成し、全クライアントに同期させる
+        RequestSpawnBullet(playerIndex, pos, direction);
+    }
+
+    private void RequestSpawnBullet(int index, Vector2 pos, Vector2 direction)
+    {
+        // オブジェクトを生成する
+        Bullet bullet = Instantiate(bulletPrefab, pos, Quaternion.identity);
+
+        bullet.BulletInitialize(index, pos);
+
+        // インターフェースを持つコンポーネントを取得して初期化
+        if (bullet.TryGetComponent(out IRpcObjectInterface rpcInterface))
+        {
+            rpcInterface.OnDestroyed.Subscribe(_ =>
+            {
+                if (bullet != null)
+                {
+                    Destroy(bullet.gameObject);
+                }
+            }).AddTo(bullet.gameObject);
+        }
+        // ネットワークオブジェクトの場合は全クライアントに同期スポーンする
+        if (!isLocalMode && IsServer)
+        {
+            if (bullet.gameObject.TryGetComponent(out NetworkObject networkObject))
+            {
+                networkObject.Spawn();
+            }
+        }
+    }
+
+
     /// <summary>
     /// スプライトが有効な場合のみオブジェクトを生成し、スプライトを変更し、指定秒数後に削除するメソッド
     /// </summary>
     public void SpawnChangeAndDestroy(GameObject obj, Transform part, Sprite sprite, float destroyTime)
     {
-
         // 生成
         GameObject gameObject = Instantiate(obj, part);
         if (gameObject.TryGetComponent(out NetworkObject networkObject))
