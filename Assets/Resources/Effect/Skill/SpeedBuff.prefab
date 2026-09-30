@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 559259162589612794}
   - component: {fileID: 6623657286174734007}
   - component: {fileID: -2052049130900599904}
+  - component: {fileID: -3016778572857378969}
   m_Layer: 0
   m_Name: SpeedBuff
   m_TagString: Untagged
@@ -123,3 +124,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b65aad54fde8b7947b30111e3daafe1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-3016778572857378969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 138227444262088322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cb57d68727d4044784836c71d32da3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 1
+  m_Animator: {fileID: 6623657286174734007}
+  TransitionStateInfoList: []
+  AnimatorParameterEntries:
+    ParameterEntries: []
+  AnimatorParametersExpanded: 0

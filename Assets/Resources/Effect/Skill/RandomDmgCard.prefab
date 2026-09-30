@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 153392622517983455}
   - component: {fileID: -7413263239466405839}
   - component: {fileID: 2804529938105388378}
+  - component: {fileID: -727603734273813979}
   m_Layer: 0
   m_Name: RandomDmgCard
   m_TagString: Untagged
@@ -244,3 +245,23 @@ MonoBehaviour:
   alphaThreshold: 0.01
   drawOutside: 0
   enableInstancing: 0
+--- !u!114 &-727603734273813979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8791130941898260743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cb57d68727d4044784836c71d32da3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 1
+  m_Animator: {fileID: 6802278300795905712}
+  TransitionStateInfoList: []
+  AnimatorParameterEntries:
+    ParameterEntries: []
+  AnimatorParametersExpanded: 0

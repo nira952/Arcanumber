@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 8237473635962487598}
   - component: {fileID: 3877787762214374428}
   - component: {fileID: -4625135051205862853}
+  - component: {fileID: 5029032971333087587}
   m_Layer: 0
   m_Name: Poison
   m_TagString: Untagged
@@ -215,3 +216,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1619579118a294d4d938e6f63c6adcab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5029032971333087587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2355479593251735817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cb57d68727d4044784836c71d32da3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 1
+  m_Animator: {fileID: 3295271936883593935}
+  TransitionStateInfoList: []
+  AnimatorParameterEntries:
+    ParameterEntries: []
+  AnimatorParametersExpanded: 0

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4242232894330006932}
   - component: {fileID: 3202398719310045289}
   - component: {fileID: 5528366739208935564}
+  - component: {fileID: 5434965250482256596}
   m_Layer: 0
   m_Name: Shadow
   m_TagString: Untagged
@@ -189,3 +190,23 @@ MonoBehaviour:
   alphaThreshold: 0.01
   drawOutside: 1
   enableInstancing: 0
+--- !u!114 &5434965250482256596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4460132741149261180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cb57d68727d4044784836c71d32da3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 1
+  m_Animator: {fileID: 5356745627321351481}
+  TransitionStateInfoList: []
+  AnimatorParameterEntries:
+    ParameterEntries: []
+  AnimatorParametersExpanded: 0
