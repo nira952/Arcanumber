@@ -28,8 +28,7 @@ public class Arcana01MagicianBack : ArcanaLogic
     {
         for (int i = 0; i < (int)sourceArcana.GetKeepValue(); i++)
         {
-            GameObject monster = GameObject.Instantiate(sourceArcana.GetEffectPrefab());
-            monster.transform.position = player.transform.position;
+            SkillManager.Instance.SpawnRpcObject(player.PlayerIndex.Value);
         }
     }
 }

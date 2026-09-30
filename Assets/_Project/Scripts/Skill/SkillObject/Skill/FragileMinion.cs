@@ -1,12 +1,13 @@
-using NUnit.Framework;
-using System.Collections.Generic;
+using R3;
 using UnityEngine;
 
 /// <summary>
 /// 召喚物のクラス
 /// </summary>
-public class FragileMinion : MonoBehaviour
+public class FragileMinion : MonoBehaviour, IRpcObjectInterface
 {
+    private bool isOwner = false;  //自分の召喚物かどうか
+
     private int ownerPlayerNo;   //出したプレイヤー番号
     private const int MaxHits = 2;  //体力
     private int hitCount = 0;   //攻撃された回数
@@ -22,13 +23,23 @@ public class FragileMinion : MonoBehaviour
     [SerializeField] private Animator animator;          //アニメーター
     [SerializeField] private SpriteRenderer spriteRenderer; //反転用
 
-    public void Initialize(int playerNo)
+
+    private Subject<Unit> destroyedSubject = new Subject<Unit>();
+    public Observable<Unit> OnDestroyed => destroyedSubject;
+
+    public void RpcInitialize(int playerIndex)
     {
-        ownerPlayerNo = playerNo;
+        Debug.Log($"FragileMinion: RpcInitialize called with playerIndex {playerIndex}");
+
+        ownerPlayerNo = playerIndex;
+
+        isOwner = true;
     }
 
     void Update()
     {
+        if (!isOwner) return;
+
         CountDown();
 
         target = FindTarget();
@@ -58,7 +69,7 @@ public class FragileMinion : MonoBehaviour
         lifeTime -= Time.deltaTime;
         if (lifeTime <= 0)
         {
-            Destroy(gameObject);
+            destroyedSubject.OnNext(Unit.Default);
             return;
         }
     }
@@ -68,25 +79,26 @@ public class FragileMinion : MonoBehaviour
     /// </summary>
     private Transform FindTarget()
     {
-        List<PlayerRoot> players = PlayerUtility.GetOtherPlayers(
-            PlayerUtility.GetPlayerByIndex(ownerPlayerNo));
-        Transform closest = null;
-        float minDistance = Mathf.Infinity;
+        // 0～3のランダムなプレイヤー番号を生成
+        int randomPlayerNo = Random.Range(0, 4);
 
-        foreach (PlayerRoot p in players)
+        // プレイヤー番号が自分の番号と一致する場合は再度生成
+        while (randomPlayerNo == ownerPlayerNo)
         {
-            //自分の持ち主ではないプレイヤーを探す
-            if (p.PlayerIndex.Value != ownerPlayerNo)
-            {
-                float dist = Vector3.Distance(transform.position, p.transform.position);
-                if (dist < minDistance)
-                {
-                    minDistance = dist;
-                    closest = p.transform;
-                }
-            }
+            randomPlayerNo = Random.Range(0, 4);
         }
-        return closest;
+
+        // ターゲットのプレイヤーを探す
+        PlayerRoot target = PlayerUtility.GetPlayerByIndex(randomPlayerNo);
+
+        if (target == null)
+        {
+            Debug.LogWarning($"FragileMinion: No player found with index {randomPlayerNo}");
+            return null;
+        }
+
+
+        return target.transform;
     }
 
     public void ApplyDamage()
@@ -95,7 +107,7 @@ public class FragileMinion : MonoBehaviour
 
         if (hitCount >= MaxHits)
         {
-            Destroy(gameObject);
+            destroyedSubject.OnNext(Unit.Default);
         }
     }
 
@@ -104,6 +116,8 @@ public class FragileMinion : MonoBehaviour
     /// </summary>
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!isOwner) return;
+
         TryAttack(collision);
     }
 
@@ -112,6 +126,8 @@ public class FragileMinion : MonoBehaviour
     /// </summary>
     private void OnTriggerStay2D(Collider2D collision)
     {
+        if (!isOwner) return;
+
         TryAttack(collision);
     }
 
@@ -128,7 +144,7 @@ public class FragileMinion : MonoBehaviour
         //持ち主以外のプレイヤーに当たったらダメージ
         if (targetPlayer != null && targetPlayer.PlayerIndex.Value != ownerPlayerNo)
         {
-            targetPlayer.ApplyDamage(attackDmg);
+            PlayerUtility.FinalDamage(targetPlayer.PlayerIndex.Value, ownerPlayerNo, attackDmg);
 
             //攻撃時刻を更新
             lastAttackTime = Time.time;

@@ -33,7 +33,6 @@ public class AIAttack : MonoBehaviour
         GameObject s = Instantiate(bullet);
         s.transform.position = pos.position;
         Bullet magic = s.GetComponent<Bullet>();
-        magic.InitializeBullet(aiPlayer.PlayerIndex.Value, aiPlayer.transform.position);
 
         float directionX = transform.localScale.x;
 

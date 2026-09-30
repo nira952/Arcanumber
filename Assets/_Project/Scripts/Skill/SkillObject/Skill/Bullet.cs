@@ -1,16 +1,31 @@
 using UnityEngine;
 using R3;
-public class Bullet : EnvironmentObject
+public class Bullet : EnvironmentObject, IRpcObjectInterface
 {
     private float speed = 10f;
     private float damage = 0.5f;
 
-    //スキルとして登録しないのであれば、独自の初期化メソッド名でOK
-    public void InitializeBullet(int charaNo, Vector2 pos)
+    public float length = 15f;  //範囲
+    Vector2 pos = new Vector2(0, 7.5f);
+
+
+    public void RpcInitialize(int playerIndex)
     {
-        //親の初期化を呼び出す
-        base.Initialize(charaNo, pos, damage, speed, false, 0);
+        //範囲内でランダムなX
+        float randomX = Random.Range(-length / 2f, length / 2f);
+        //生成位置（高さは固定7.5f）
+        Vector3 spawnPos = new Vector3(pos.x + randomX, pos.y, 0);
+
+        base.Initialize(playerIndex, spawnPos, damage, speed, false, 0);
+
     }
+
+    public void BulletInitialize(int playerIndex,Vector2 spawnPos)
+    {
+        base.Initialize(playerIndex, spawnPos, damage, speed, false, 0);
+
+    }
+
 
     protected override void OnHit(PlayerRoot target)
     {
