@@ -294,6 +294,9 @@ public class LobbyPresenter : IDisposable
             });
 
             processedClientIds.Add(clientId);
+
+            //NetWorkAudioManager.Instance.PlayLocal(GetBgm(index)); //曲を流す
+
             index++;
         }
 
@@ -304,6 +307,22 @@ public class LobbyPresenter : IDisposable
         // ホスト側が直接ロードするのではなく、ネットワーク経由で全クライアント（ホスト含む）に
         PlayerDataManager.Instance.RequestStartGameServerRpc(_nextSceneName);
     }
+
+    /// <summary>
+    /// 曲の決定
+    /// </summary>
+    private BgmName GetBgm(int value)
+    {
+        return value switch
+        {
+            0 => BgmName.Blue,
+            1 => BgmName.Red,
+            2 => BgmName.Green,
+            3 => BgmName.Yellow,
+            _ => throw new ArgumentOutOfRangeException(nameof(value), $"Invalid value: {value}"),
+        };
+    }
+
 
     /// <summary>
     /// 破棄されるときに呼び出されるメソッド
