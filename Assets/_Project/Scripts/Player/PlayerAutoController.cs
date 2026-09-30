@@ -13,6 +13,8 @@ public class PlayerAutoController : MonoBehaviour, IPlayerInputMediator
 
         root.gameObject.tag = "Enemy";
 
+        PlayerUtility.RegisterPlayer(root);
+
     }
 
     public void OnAttackTriggered()

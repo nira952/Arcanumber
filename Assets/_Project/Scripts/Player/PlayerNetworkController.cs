@@ -35,6 +35,8 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
         root            = GetComponent<PlayerRoot>();            // メインスクリプトを取得
         inputBinder     = GetComponent<PlayerInputBinder>();     // 入力バインダーの取得
 
+        PlayerUtility.RegisterPlayer(root);
+
         // 所有者でない場合、Inputコンポーネントを停止
         if (!IsOwner)
         {

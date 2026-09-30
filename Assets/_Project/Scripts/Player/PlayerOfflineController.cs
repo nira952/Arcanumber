@@ -12,6 +12,7 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerInputMediator
         // --- コンポーネントの取得 ---
         root = GetComponent<PlayerRoot>();            // メインスクリプトを取得
         inputBinder = GetComponent<PlayerInputBinder>();     // 入力バインダーの取得
+        PlayerUtility.RegisterPlayer(root);
 
 
         // バインダーに現在のコントローラーを設定し、入力イベントを購読する

@@ -72,6 +72,8 @@ public class TimeManager : NetworkBehaviour
 
     private void Update()
     {
+        if (!IsServer) { return; }
+
         if (!isTimerRunning) return;
 
         // タイマー更新権限の確認（ローカル または サーバーのみ）

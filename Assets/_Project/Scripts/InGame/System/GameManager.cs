@@ -129,14 +129,8 @@ public class GameManager : NetworkBehaviour
         // プレイヤーのダウン状態を監視する購読を設定
         SettingPlayerObservable();
 
-
-        // CurrentStateの変更をReactivePropertyに反映
-        NetWorkGameState.AsObservable().Subscribe(state => stateRx.Value = state).AddTo(this);
-
-        // TimeManagerとGameUIManagerの設定
+        // TimeManagerの設定
         timeManager.Initialize(this);
-
-        gameUIManager.Initialize(this, timeManager);
 
         // タイムアップ時の処理を購読
         timeManager.onTimeUp.Subscribe(_ => HandleTimeUp()).AddTo(this);
@@ -185,6 +179,13 @@ public class GameManager : NetworkBehaviour
     [ClientRpc]
     private void StartGameSequenceClientRpc()
     {
+        // Network変数の変更を購読して、stateRxに反映させる
+        NetWorkGameState.AsObservable().Subscribe(state => stateRx.Value = state).AddTo(this);
+
+        // ゲームUIManagerの初期化
+        gameUIManager.Initialize(this, timeManager);
+
+
         StartGameSequenceAsync().Forget();
     }
 
