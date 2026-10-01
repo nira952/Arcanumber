@@ -371,6 +371,12 @@ public class SkillManager : NetworkBehaviour
 
     private void RequestSpawnRpcObject(PlayerRoot player,GameObject prefab)
     {
+        if (prefab == null)
+        {
+            Debug.LogWarning("Arcanaのエフェクトプレハブが設定されていません。");
+            return;
+        }
+
         // オブジェクトを生成する
         GameObject obj = Instantiate(prefab, player.transform.position, Quaternion.identity);
 
