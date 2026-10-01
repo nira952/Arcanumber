@@ -34,7 +34,9 @@ public class AimCursor : MonoBehaviour
     private void Awake()
     {
         // 初期状態では標準を非表示にする
-        aimCursor.gameObject.SetActive(false);
+        if (aimCursor != null)
+            aimCursor.enabled = false; 
+        Debug.Log("Awakeが通りました。");
     }
 
     /// <summary>
@@ -44,25 +46,14 @@ public class AimCursor : MonoBehaviour
     {
         //システムカーソルを非表示に
         Cursor.visible = false;
-        //初期状態としてカーソルを表示する
-        if (aimCursor != null)
-            aimCursor.gameObject.SetActive(true);
-
+        //カーソルの色を変える
         aimCursor.sprite = circleSprite[playerIndex];
-        switch(playerIndex)
+        switch (playerIndex)
         {
-            case 0:
-                spriteGlow.GlowColor = Color.blue;
-                break;
-            case 1:
-                spriteGlow.GlowColor = Color.red;
-                break;
-            case 2:
-                spriteGlow.GlowColor = Color.green;
-                break;
-            case 3:
-                spriteGlow.GlowColor = Color.yellow;
-                break;
+            case 0: spriteGlow.GlowColor = Color.blue; break;
+            case 1: spriteGlow.GlowColor = Color.red; break;
+            case 2: spriteGlow.GlowColor = Color.green; break;
+            case 3: spriteGlow.GlowColor = Color.yellow; break;
         }
     }
 

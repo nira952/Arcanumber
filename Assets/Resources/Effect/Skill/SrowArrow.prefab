@@ -278,7 +278,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkAnimatorExpanded: 0
   AuthorityMode: 0
-  m_Animator: {fileID: 0}
+  m_Animator: {fileID: 5817294566909068454}
   TransitionStateInfoList: []
   AnimatorParameterEntries:
     ParameterEntries: []
