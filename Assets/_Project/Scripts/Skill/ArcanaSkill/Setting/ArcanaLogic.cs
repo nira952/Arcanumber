@@ -13,17 +13,7 @@ public abstract class ArcanaLogic
     {
         if (sourceArcana.effectPrefab != null)
         {
-            //オブジェクトを出す場所とオブジェクトの親
-            GameObject effectObj = Object.Instantiate(sourceArcana.effectPrefab, pos.position, Quaternion.identity);
-            effectObj.transform.SetParent(player.transform);
-
-            Animator animator = effectObj.GetComponentInChildren<Animator>();
-            if (animator != null)
-            {
-                //アニメーションの長さでオブジェクトを消す
-                AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-                Object.Destroy(effectObj, stateInfo.length);
-            }
+            ArcanaNetworkManager.Instance.SetData(player.PlayerIndex.Value, pos.position);
         }
     }
     /// <summary>
