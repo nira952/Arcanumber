@@ -1,3 +1,4 @@
+using SpriteGlow;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,6 +14,9 @@ public class AimCursor : MonoBehaviour
 
     [SerializeField] private GameObject magicStart;
 
+    [SerializeField] private SpriteGlowEffect spriteGlow;
+    [SerializeField] private Sprite[] circleSprite = new Sprite[4];
+
     private Vector3 _mouseWorldPos; //現在のマウスの位置
 
     private AimSelect _currentMode; //どの標準方法か
@@ -27,6 +31,7 @@ public class AimCursor : MonoBehaviour
     private const float SCREEN_MARGIN_MAX = 0.95f;  //画面の端から95%の位置
     private const float ZERO_DIVISION_EPSILON = 0.001f; //ゼロ除算の対策用の値
 
+
     private void Awake()
     {
         // 初期状態では標準を非表示にする
@@ -36,13 +41,30 @@ public class AimCursor : MonoBehaviour
     /// <summary>
     /// 初期設定
     /// </summary>
-    public void Initialize()
+    public void Initialize(int playerIndex)
     {
         //システムカーソルを非表示に
         Cursor.visible = false;
         //初期状態としてカーソルを表示する
         if (aimCursor != null)
             aimCursor.gameObject.SetActive(true);
+
+        aimCursor.sprite = circleSprite[playerIndex];
+        switch(playerIndex)
+        {
+            case 0:
+                spriteGlow.GlowColor = Color.blue;
+                break;
+            case 1:
+                spriteGlow.GlowColor = Color.red;
+                break;
+            case 2:
+                spriteGlow.GlowColor = Color.green;
+                break;
+            case 3:
+                spriteGlow.GlowColor = Color.yellow;
+                break;
+        }
     }
 
     /// <summary>

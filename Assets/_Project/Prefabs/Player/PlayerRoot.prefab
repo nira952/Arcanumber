@@ -824,6 +824,7 @@ GameObject:
   - component: {fileID: 2852961033598664836}
   - component: {fileID: 5561259072808182381}
   - component: {fileID: 7723590351540204353}
+  - component: {fileID: 3343789028923233860}
   m_Layer: 0
   m_Name: Aim
   m_TagString: Untagged
@@ -841,7 +842,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 3488746715832410720}
@@ -869,7 +870,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -889,7 +890,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
@@ -917,6 +918,30 @@ MonoBehaviour:
   normalPos: {fileID: 3488746715832410720}
   efeUpperPos: {fileID: 8841696434679722697}
   magicStart: {fileID: 7060418422167205889, guid: a300bf94befe5da44b4933f0ed53a274, type: 3}
+  spriteGlow: {fileID: 3343789028923233860}
+  circleSprite:
+  - {fileID: 2755622293263715907, guid: 9e1c87748a58dce4ea1dcf84381548f9, type: 3}
+  - {fileID: -8952743178712569332, guid: 4d7c1edbf5474704cbf50920d3e441f2, type: 3}
+  - {fileID: -4698670360043849514, guid: 429336556808c5b48a63788a10629eb6, type: 3}
+  - {fileID: 1753554848332283241, guid: 2dd62056674b3f1439c55d848990e5b8, type: 3}
+--- !u!114 &3343789028923233860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6191248840557189169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8f6d3c6e4250e84192f5b34ce9e71bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowColor: {r: 1, g: 1, b: 1, a: 1}
+  glowBrightness: 2.52
+  outlineWidth: 1
+  alphaThreshold: 0.01
+  drawOutside: 1
+  enableInstancing: 0
 --- !u!1 &6748020729873026260
 GameObject:
   m_ObjectHideFlags: 0

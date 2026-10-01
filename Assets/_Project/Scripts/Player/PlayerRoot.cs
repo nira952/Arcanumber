@@ -78,7 +78,7 @@ public class PlayerRoot : MonoBehaviour
         playerAttack.Initialized(this);
         playerAnimator.Initialize(PlayerIndex.Value);
         playerSkill.Initialize(this, playerUIManager, skillList);
-        aimCursor.Initialize();
+        aimCursor.Initialize(PlayerIndex.Value);
         playerUIManager.Initialize(this);
     }
 
