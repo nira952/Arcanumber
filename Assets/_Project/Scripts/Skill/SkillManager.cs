@@ -31,6 +31,7 @@ public class SkillManager : NetworkBehaviour
     #endregion
 
     [SerializeField] private Bullet bulletPrefab; // 弾丸のプレハブ
+    [SerializeField] private DiceCard diceCardPrefab; // ダイスカードのプレハブ
 
     private bool isLocalMode = false;
 
@@ -454,29 +455,69 @@ public class SkillManager : NetworkBehaviour
     }
 
 
-    /// <summary>
-    /// スプライトが有効な場合のみオブジェクトを生成し、スプライトを変更し、指定秒数後に削除するメソッド
-    /// </summary>
-    public void SpawnChangeAndDestroy(GameObject obj, Transform part, Sprite sprite, float destroyTime)
+
+
+    public void SpawnDiceCard(int playerIndex, int dmg)
     {
-        // 生成
-        GameObject gameObject = Instantiate(obj, part);
-        if (gameObject.TryGetComponent(out NetworkObject networkObject))
+        if (isLocalMode || IsServer)
         {
-            networkObject.Spawn();
+            PlayerRoot player = PlayerUtility.GetPlayerByIndex(playerIndex);
+
+            RequestSpawnDiceCard(player, dmg);
+        }
+        else
+        {
+            RequestSpawnDiceCardServerRpc(playerIndex, dmg);
+        }
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestSpawnDiceCardServerRpc(int playerIndex, int dmg)
+    {
+        // 1. 安全に PlayerRoot を取得（Nullチェック）
+        PlayerRoot player = PlayerUtility.GetPlayerByIndex(playerIndex);
+        if (player == null) return;
+        // 2. サーバー側でオブジェクトを生成し、全クライアントに同期させる
+        RequestSpawnDiceCard(player, dmg);
+    }
+
+
+
+    private void RequestSpawnDiceCard(PlayerRoot player, int dmg)
+    {
+        // オブジェクトを生成する
+
+        float offsetY = 3f; // プレイヤーの上に3ユニット上げる
+
+        Vector3 spawnPosition = player.transform.position + new Vector3(0, offsetY, 0);
+        DiceCard diceCard = Instantiate(diceCardPrefab, spawnPosition, Quaternion.identity);
+
+        // ダメージ値を同期する
+        diceCard.syncedDmg = dmg;
+
+        diceCard.RpcInitialize(player.PlayerIndex.Value);
+        // インターフェースを持つコンポーネントを取得して初期化
+        if (diceCard.TryGetComponent(out IRpcObjectInterface rpcInterface))
+        {
+            rpcInterface.OnDestroyed.Subscribe(_ =>
+            {
+                if (diceCard != null)
+                {
+                    Destroy(diceCard.gameObject);
+                }
+            }).AddTo(diceCard.gameObject);
         }
 
-        // スプライト変更
-        if (gameObject.TryGetComponent(out SpriteRenderer spriteRenderer))
+        Destroy(diceCard.gameObject, 1.0f); // 1秒後に自動破棄
+
+        // ネットワークオブジェクトの場合は全クライアントに同期スポーンする
+        if (!isLocalMode && IsServer)
         {
-            spriteRenderer.sprite = sprite;
+            if (diceCard.gameObject.TryGetComponent(out NetworkObject networkObject))
+            {
+                networkObject.Spawn();
+            }
         }
-
-        // もしスプライトが null なら処理を飛ばす（生成しない）
-        if (sprite == null)
-            return;
-
-        // 指定秒数後に削除
-        Destroy(gameObject, destroyTime);
     }
 }

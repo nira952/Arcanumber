@@ -5,8 +5,6 @@ public class TranpSkill : SkillObject
 {
     private int syncedDmg = 0;  //ダメージ
 
-    [SerializeField] private GameObject cardObj;
-    [SerializeField] private Sprite[] cardSprites;
 
     private void Start()
     {
@@ -66,10 +64,8 @@ public class TranpSkill : SkillObject
         if (player == null) return;
         Transform parentTransform = player.GetAimCursor().GetEfeUpperPos().transform;
 
-        SpriteRenderer sr = cardObj.GetComponent<SpriteRenderer>();
-
-        //カードのスプライトを更新
-        SkillManager.Instance.SpawnChangeAndDestroy(cardObj, parentTransform, (syncedDmg > 0) ? cardSprites[syncedDmg - 1] : sr.sprite, 1.0f);
+        //カードを生成
+        SkillManager.Instance.SpawnDiceCard(player.PlayerIndex.Value, syncedDmg);
     }
 
     protected override void OnHit(PlayerRoot target)
