@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4d3e1995156e14418b078fe55639551, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpForce: 15
+  jumpForce: 17
   magicStart: {fileID: 6065509016216946852, guid: a300bf94befe5da44b4933f0ed53a274, type: 3}
   movement: {fileID: 8291563514371388668}
   rayInput: {fileID: 2028130769534439176}
@@ -913,7 +913,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90223f341ed21f04b87341bc5227e08a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aimCursor: {fileID: 6191248840557189169}
+  aimCursor: {fileID: 5561259072808182381}
   normalPos: {fileID: 3488746715832410720}
   efeUpperPos: {fileID: 8841696434679722697}
   magicStart: {fileID: 7060418422167205889, guid: a300bf94befe5da44b4933f0ed53a274, type: 3}

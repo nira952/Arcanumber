@@ -25,6 +25,7 @@ public class PlayerRoot : MonoBehaviour
 
     // --- プレイヤー情報・入力状態 (省略せずにそのまま使用) ---
     public ReactiveProperty<int> PlayerIndex { get; } = new(-1);
+    public ReactiveProperty<string> PlayerName { get; } = new("Player");
     public ReactiveProperty<float> CurrentHealth { get; } = new(100);
     public ReactiveProperty<bool> IsDown { get; } = new(false);
     public ObservableList<EffectAbility> ActiveEffects { get; } = new();
@@ -36,6 +37,9 @@ public class PlayerRoot : MonoBehaviour
 
     public void OwnerInitialize()
     {
+        // プレイヤー名をPlayerDataManagerから取得
+        PlayerName.Value = PlayerDataManager.Instance.LocalPlayerName;
+
         //　ArcanaとスキルをPlayerDataManagerから取得
         skillList = PlayerDataManager.Instance.GetMySkills();
         CurrentArcana = PlayerDataManager.Instance.GetMyArcana();

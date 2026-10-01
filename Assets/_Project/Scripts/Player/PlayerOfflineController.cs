@@ -7,7 +7,7 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerInputMediator
     private PlayerRoot root;
     private PlayerInputBinder inputBinder;
 
-    private void Start()
+    private void Awake()
     {
         // --- コンポーネントの取得 ---
         root = GetComponent<PlayerRoot>();            // メインスクリプトを取得

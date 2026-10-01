@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class AimCursor : MonoBehaviour
 {
-    [SerializeField] private GameObject aimCursor;  //標準の位置
+    [SerializeField] private SpriteRenderer aimCursor;  //標準の位置
     [SerializeField] private Transform normalPos;   //プレイヤーの位置（中心）
     [SerializeField] private Transform efeUpperPos;    //エフェクトの位置
 
@@ -30,7 +30,7 @@ public class AimCursor : MonoBehaviour
     private void Awake()
     {
         // 初期状態では標準を非表示にする
-        gameObject.SetActive(false);
+        aimCursor.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public class AimCursor : MonoBehaviour
         Cursor.visible = false;
         //初期状態としてカーソルを表示する
         if (aimCursor != null)
-            aimCursor.SetActive(true);
+            aimCursor.gameObject.SetActive(true);
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public class AimCursor : MonoBehaviour
     /// </summary>
     public void SelectAim(AimSelect aim)
     {
-        aimCursor.SetActive(true);
+        aimCursor.enabled = true;
         _currentMode = aim;
         //パラメータの初期化
         _currentRadius = 0f;
@@ -92,7 +92,7 @@ public class AimCursor : MonoBehaviour
                 _useLerp = false;
                 break;
             case AimSelect.None:
-                aimCursor.SetActive(false);
+                aimCursor.enabled = false;
                 break;
         }
     }

@@ -6,7 +6,7 @@ public class PlayerAutoController : MonoBehaviour, IPlayerInputMediator
 {
     private PlayerRoot root;
 
-    private void Start()
+    private void Awake()
     {
         // --- コンポーネントの取得 ---
         root = GetComponent<PlayerRoot>();

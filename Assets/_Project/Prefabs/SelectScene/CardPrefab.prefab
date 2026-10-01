@@ -580,6 +580,7 @@ MonoBehaviour:
   canvasGroup: {fileID: -854254761639838333}
   flontFaces: {fileID: 2688059872972443486}
   frontImage: {fileID: 3152794013649159655}
+  frontImageFrame: {fileID: 6344554376157981321}
   backImage: {fileID: 2252507850748417099}
   BackGlowImage: {fileID: 5527140589577404334}
   flipDuration: 0.4

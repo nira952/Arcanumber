@@ -59,6 +59,7 @@ public class GameUIManager : MonoBehaviour
             playerSubscriptions.Clear(); // 既存の購読をクリア
         }
 
+        Debug.Log("[GameUIManager] Initialize called.1");
 
         // --- 2. GameManager の Subscribe (StateRxのnullチェック) ---
         if (gameManager != null && gameManager.StateRx != null)
@@ -81,6 +82,8 @@ public class GameUIManager : MonoBehaviour
             Debug.LogError("[GameUIManager] gameManager または StateRx が null です！");
         }
 
+        Debug.Log("[GameUIManager] Initialize called.2");
+
         // タイマーの初期表示
         if (timerText != null) { timerText.text = ""; }
 
@@ -101,6 +104,9 @@ public class GameUIManager : MonoBehaviour
                 UpdateTimerDisplay((int)time);
             }).AddTo(this);
         }
+
+
+        Debug.Log("[GameUIManager] Initialize called.3");
 
         // ステータスオブジェクトの非表示
         if (statusObjects != null)
@@ -130,11 +136,17 @@ public class GameUIManager : MonoBehaviour
 
             Debug.Log($"[GameUIManager] PlayerIndex: {pIndex}, Name: {playerName}");
 
+            // プレイヤー名の初期表示と購読
             SetPlayerName(pIndex, playerName);
+            root.PlayerName.Subscribe(name =>
+            {
+                SetPlayerName(pIndex, name);
+            }).AddTo(playerSubscriptions);
+
+
+            // 体力スライダーの最大値を設定し、初期値を更新
             SetHealthSliderMaxValue(pIndex, 100);
             UpdateHealth(pIndex, root.CurrentHealth.Value);
-
-
             root.CurrentHealth.Subscribe(hp =>
             {
                 UpdateHealth(pIndex, hp);

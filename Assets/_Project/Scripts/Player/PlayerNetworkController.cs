@@ -1,5 +1,6 @@
 using ObservableCollections;
 using R3;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
     private PlayerInputController inputController;
 
     private readonly NetworkVariable<int> netPlayerIndex = new(-1);
+    private readonly NetworkVariable<FixedString64Bytes> netPlayerName =new("Player"); 
     private readonly NetworkVariable<float> netCurrentHealth = new(100);
     private readonly NetworkVariable<bool> netIsDown = new(false);
     private readonly NetworkList<NetworkEffectData> netActiveEffects = new NetworkList<NetworkEffectData>();
@@ -61,6 +63,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
 
             // サーバー側で ReactiveProperty の変更を NetworkVariable に同期
             root.PlayerIndex.Subscribe(v => netPlayerIndex.Value = v).AddTo(this);
+            root.PlayerName.Subscribe(v => netPlayerName.Value = v).AddTo(this);
             root.CurrentHealth.Subscribe(v => netCurrentHealth.Value = v).AddTo(this);
             root.IsDown.Subscribe(v => netIsDown.Value = v).AddTo(this);
 
@@ -97,6 +100,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
         {
             // クライアント側で NetworkVariable の変更を ReactiveProperty に同期
             netPlayerIndex.AsObservable().Subscribe(v => root.PlayerIndex.Value = v).AddTo(this);
+            netPlayerName.AsObservable().Subscribe(v => root.PlayerName.Value = v.ToString()).AddTo(this);
             netCurrentHealth.AsObservable().Subscribe(v => root.CurrentHealth.Value = v).AddTo(this);
             netIsDown.AsObservable().Subscribe(v => root.IsDown.Value = v).AddTo(this);
 

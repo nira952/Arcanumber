@@ -30,6 +30,9 @@ public class PlayerAnimator : NetworkBehaviour
     {
         animator = GetComponent<Animator>();
         networkAnimator = GetComponent<OwnerNetworkAnimator>();
+
+        youObject.SetActive(false); // 他のプレイヤーでは無効化
+
     }
     public override void OnNetworkSpawn()
     {
@@ -59,15 +62,9 @@ public class PlayerAnimator : NetworkBehaviour
             Debug.LogWarning($"PlayerIndex ({playerIndex}) が配列の範囲外です。(配列長: {animatorControllers.Length}) デフォルトの 0 を使用します。");
             playerIndex = Mathf.Clamp(playerIndex, 0, animatorControllers.Length - 1); // 範囲内に収める
         }
-        if (IsOwner)
-        {
-            syncedPlayerIndex.Value = playerIndex;
-            youObject.SetActive(true); // 自分のプレイヤーを示すオブジェクトを有効化
-        }
-        else
-        {
-            youObject.SetActive(false); // 他のプレイヤーでは無効化
-        }
+
+        syncedPlayerIndex.Value = playerIndex;
+        youObject.SetActive(true); // 自分のプレイヤーを示すオブジェクトを有効化
 
         animator.runtimeAnimatorController = animatorControllers[playerIndex];
     }
