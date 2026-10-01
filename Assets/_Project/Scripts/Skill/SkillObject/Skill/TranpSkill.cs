@@ -15,6 +15,12 @@ public class TranpSkill : SkillObject
     {
         var player = PlayerUtility.GetPlayerByIndex(haveAttackerIndex);
 
+        if (player == null)
+        {
+            Debug.LogError("Player not found for index: " + haveAttackerIndex);
+            return;
+        }
+
         //運があるかどうか
         bool hasLuck = player.HaveEffect( EffectList.Lacky, true);
 

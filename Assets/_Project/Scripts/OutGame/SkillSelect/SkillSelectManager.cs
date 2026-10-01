@@ -30,13 +30,6 @@ public class SkillSelectManager : NetworkBehaviour
     // AssetLoaderからロードしたすべてのスキルリスト
     [SerializeField] private List<Skill> allSkills = new List<Skill>();
 
-    // 【サーバー専用】全員の準備完了数をカウントするための NetworkVariable
-    private readonly NetworkVariable<int> readyPlayerCount = new NetworkVariable<int>(
-        0,
-        NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Server
-    );
-
     private readonly CompositeDisposable _disposables = new();
 
     private void Start()

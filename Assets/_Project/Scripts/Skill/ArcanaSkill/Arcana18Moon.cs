@@ -109,18 +109,7 @@ public class Arcana18MoonBack : ArcanaLogic
     {
         for(int i = 0; i < sourceArcana.GetKeepValue(); i++)
         {
-            GameObject clone = GameObject.Instantiate(sourceArcana.GetEffectPrefab(), player.transform.position, Quaternion.identity);
-            AIPlayer ai = clone.GetComponent<AIPlayer>();
-
-            clone.tag = "Player";
-
-            // TODO : 要改修
-
-            //if (i == 0)
-            //    ai.SetIsHumanLike(true);
-
-            //ai.SetIsAIPlayer(true);
-            //Object.Destroy(clone, 15f);
+            SkillManager.Instance.SpawnRpcObject(player.PlayerIndex.Value);
         }
     }
 

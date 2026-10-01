@@ -119,7 +119,7 @@ public class LoadManager : SingletonMonoBehaviour<LoadManager>
             string rawNo = GetCellValueCalculated(row.GetCell(0), skillEvaluator);
 
             //ScriptableObjectのインスタンスを作成
-            var data = ScriptableObject.CreateInstance<Skill>();
+            var data = new Skill();
 
             //Excelの行データから値を流し込む
             data.LoadFromExcel(row, skillEvaluator);

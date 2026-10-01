@@ -51,19 +51,6 @@ public class PlayerSpawner : NetworkBehaviour
             // カメラにプレイヤーを登録
             GameCameraManager.Instance.RegisterTarget(spawnedPlayer.transform);
 
-
-            if (!IsOwner)
-            {
-                // プレイヤーのスキルとアルカナを取得
-                Skill[] skills = PlayerDataManager.Instance.GetPlayerSkillsByIndex(index);
-                Arcana arcana = PlayerDataManager.Instance.GetPlayerArcanaByIndex(index);
-
-                // 自分以外のプレイヤーオブジェクトの場合、PlayerDataManagerから取得したArcanaとSkillを設定する
-                spawnedPlayer.SetSkills(skills);
-                spawnedPlayer.SetArcana(arcana);
-
-            }
-
             if (spawnedPlayer.TryGetComponent<NetworkObject>(out var networkObj))
             {
                 // 1. スポーン処理（これは全端末へ伝播する）

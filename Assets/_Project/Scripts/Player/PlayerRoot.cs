@@ -309,7 +309,6 @@ public class PlayerRoot : MonoBehaviour
     public SpriteRenderer GetMagicStart() { return magicStart; }
     public PlayerStatus GetPlayerStatus() => status;
     public Arcana GetArcana() { return CurrentArcana; }
-    public Skill GetCurrentSkill() { return CurrentSkill; }
     public Skill[] GetSkill() { return skillList; }
 
 
@@ -318,21 +317,4 @@ public class PlayerRoot : MonoBehaviour
  */
     public void SetMoveSpeed(float speed) { status.SetSpeed(speed); }
 
-    public void SetSkills(Skill[] skills)
-    {
-        // スキルリストをクリアして新しいスキルを追加
-        for (int i = 0; i < skillList.Length; i++)
-        {
-            // 古いスキルを削除
-            skillList[i] = null;
-
-            // 新しいスキルを設定
-            skillList[i] = skills.Length > i ? skills[i] : null;
-        }
-    }
-
-    public void SetArcana(Arcana arcana)
-    {
-        CurrentArcana = arcana;
-    }
 }

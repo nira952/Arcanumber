@@ -287,14 +287,7 @@ public class PlayerDataManager : NetworkBehaviour
                 // 構造体は値型なので、一旦ローカルにコピーして取り出す
                 PlayerNetworkData data = _allPlayerData[i];
 
-                // 先ほどの int[] から、引数で渡された Skill[] の疑似データを作って構造体にセットする
-                // （PlayerNetworkData.SetSkill が型として Skill[] を要求しているため、疑似オブジェクトの配列を作ります）
-                Skill[] tempSkillArray = new Skill[selectedSkillNos.Length];
-                for (int j = 0; j < selectedSkillNos.Length; j++)
-                {
-                    // 空のSkillを作成し、内部のスキル番号だけを一致させる
-                    Skill dummySkill = ScriptableObject.CreateInstance<Skill>();
-                }
+                Debug.Log($"[PlayerDataManager] ClientId: {clientId} のスキルデータを受信しました。スキル番号: [{string.Join(", ", selectedSkillNos)}]");
 
                 data.SetSkillFromIds(selectedSkillNos);
 

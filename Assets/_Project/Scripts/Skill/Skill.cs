@@ -1,13 +1,14 @@
 using NaughtyAttributes;
 using NPOI.SS.UserModel;
+using System;
 using UnityEngine;
 
 /// <summary>
 /// スキルオブジェクトを生成するためのクラス
 /// </summary>
 
-[CreateAssetMenu(fileName = "NewSkill", menuName = "ScriptableObjects/SkillData")]
-public class Skill : ScriptableObject
+[Serializable]
+public class Skill
 {
     [Label("スキル番号")][SerializeField] int skillNo;
     [Label("スキル名")][SerializeField] string skillName;

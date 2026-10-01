@@ -1,9 +1,9 @@
+using R3;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using R3;
-using System.Linq;
 
 /// <summary>
 /// スキルの生成と管理を行うクラス
@@ -30,10 +30,36 @@ public class SkillManager : NetworkBehaviour
     }
     #endregion
 
+    [Serializable]
+    private struct PlayerSkills
+    {
+        public Skill[] skillList;
+    }
+    
+
     [SerializeField] private Bullet bulletPrefab; // 弾丸のプレハブ
     [SerializeField] private DiceCard diceCardPrefab; // ダイスカードのプレハブ
 
     private bool isLocalMode = false;
+
+    [SerializeField]
+    private List<PlayerSkills> playerSkillsList = new List<PlayerSkills>();
+
+
+    public override void OnNetworkSpawn()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            PlayerSkills playerSkills = new PlayerSkills
+            {
+                skillList = PlayerDataManager.Instance.GetPlayerSkillsByIndex(i)
+            };
+            playerSkillsList.Add(playerSkills);
+        }
+
+
+    }
+
 
     /// <summary>
     /// スキルの使用リクエストを受け付ける（外部からの入口）
@@ -48,7 +74,7 @@ public class SkillManager : NetworkBehaviour
         // オフライン時、またはすでにサーバー上で動作している場合は直接実行
         if (isLocalMode || IsServer)
         {
-            Skill skill = player.GetCurrentSkill();
+            Skill skill = playerSkillsList[player.PlayerIndex.Value].skillList[skillIndex];
 
             StartCoroutine(SkillSpawnDelayCoroutine(player, skill, aimPos));
 
@@ -68,10 +94,8 @@ public class SkillManager : NetworkBehaviour
         if (player == null) return;
 
         // 2. インデックスの範囲チェックを行ってから Skill を取得
-        var skills = player.GetSkill();
-        if (skills == null || skillIndex < 0 || skillIndex >= skills.Length) return;
 
-        Skill skill = skills[skillIndex];
+        Skill skill = playerSkillsList[player.PlayerIndex.Value].skillList[skillIndex];
         if (skill != null)
         {
             StartCoroutine(SkillSpawnDelayCoroutine(player, skill, aimPos));
@@ -184,7 +208,7 @@ public class SkillManager : NetworkBehaviour
             {
                 if (isRandomAngle)
                     //マイナス指定：指定された範囲（absAngle）の中でランダムに散らす
-                    currentAngle = Random.Range(-absAngle * 0.5f, absAngle * 0.5f);
+                    currentAngle = UnityEngine.Random.Range(-absAngle * 0.5f, absAngle * 0.5f);
                 else
                 {
                     //プラス指定：決められた範囲（absAngle）の中で上下に等間隔で配置する
@@ -208,7 +232,7 @@ public class SkillManager : NetworkBehaviour
             if (isRandomAngle)
             {
                 // 半径 0.4f 以内のランダムな位置にズラす（数値はお好みで調整してください）
-                Vector2 randomOffset = Random.insideUnitCircle * 0.4f;
+                Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * 0.4f;
                 spawnPos += randomOffset;
             }
 
