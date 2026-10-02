@@ -17,9 +17,9 @@ public class Arcana17StarFront : ArcanaLogic
     }
     public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
-        GameCameraManager.Instance.SetZoom(true, player.transform);
-        yield return new WaitForSeconds(sourceArcana.GetKeepValue());
-        GameCameraManager.Instance.SetZoom(false);
+        VisualEffectManager.Instance.ShowZoomPlayer(player.PlayerIndex.Value, sourceArcana.GetKeepValue());
+
+        yield return null;
     }
 }
 

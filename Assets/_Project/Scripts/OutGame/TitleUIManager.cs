@@ -63,6 +63,7 @@ public class TitleUIManager : MonoBehaviour
         SettingObservable();
 
         mainPanel.SetActive(true);
+        titlePanel.SetActive(true);
 
         // DOTweenでguideTextを点滅させる
         guideTween = guideText.DOFade(0f, 1f)
@@ -166,6 +167,7 @@ public class TitleUIManager : MonoBehaviour
         CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
 
     }
+
 
 
     public void CloseAllPanels()

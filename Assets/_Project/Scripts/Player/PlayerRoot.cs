@@ -203,6 +203,7 @@ public class PlayerRoot : MonoBehaviour
     /// <summary> スキル選択実行メソッド </summary>
     public void ExecuteSkillSelect(int direction)
     {
+        if (!CanControl) { return; }
         int newSkillNo = playerSkill.SkillSelect(SelectedSkillIndex.Value, direction);
 
         // 選択スキル番号を更新
