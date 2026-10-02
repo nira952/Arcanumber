@@ -36,7 +36,6 @@ public class AimCursor : MonoBehaviour
         // 初期状態では標準を非表示にする
         if (aimCursor != null)
             aimCursor.enabled = false; 
-        Debug.Log("Awakeが通りました。");
     }
 
     /// <summary>

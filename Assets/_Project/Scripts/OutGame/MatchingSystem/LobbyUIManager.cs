@@ -11,6 +11,9 @@ using UnityEngine.UI;
 /// </summary>
 public class LobbyUIManager : MonoBehaviour
 {
+
+    [SerializeField] private TitleUIManager titleUIManager;
+
     [Header("--- パネル ---")]
     [SerializeField] private GameObject mainPanel;
     [SerializeField] private GameObject roomPanel;
@@ -213,9 +216,11 @@ public class LobbyUIManager : MonoBehaviour
     {
         mainPanel.SetActive(true);
         roomPanel.SetActive(false);
-        if (lanModeToggle != null) lanModeToggle.interactable = true;
         cancelLoadingButton.interactable = true;
         leaveRoomButton.interactable = true;
+
+        joinCasualButton.interactable = true;
+        joinPrivateButton.interactable = true;
 
         foreach (var t in playerListTexts)
         {
@@ -226,7 +231,8 @@ public class LobbyUIManager : MonoBehaviour
     // --- ルーム画面 ---
     public void ShowRoomPanel()
     {
-        mainPanel.SetActive(false);
+        // タイトル画面を非表示にしてルーム画面を表示
+        titleUIManager.CloseAllPanels();
         roomPanel.SetActive(true);
     }
 

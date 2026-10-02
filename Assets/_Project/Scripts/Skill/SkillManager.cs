@@ -31,9 +31,9 @@ public class SkillManager : NetworkBehaviour
     #endregion
 
     [Serializable]
-    private struct PlayerSkills
+    private class PlayerSkills
     {
-        public Skill[] skillList;
+        public Skill[] skillList = new Skill[GameConfig.SKILL_HOPPER_MAX];
     }
     
 
@@ -56,8 +56,16 @@ public class SkillManager : NetworkBehaviour
             };
             playerSkillsList.Add(playerSkills);
         }
+    }
 
+    public void SetSkillList(int index, Skill[] skills)
+    {
+        PlayerSkills playerSkills = new PlayerSkills
+        {
+            skillList = skills
+        };
 
+        playerSkillsList.Add(playerSkills);
     }
 
 

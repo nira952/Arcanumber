@@ -18,8 +18,17 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerInputMediator
         // バインダーに現在のコントローラーを設定し、入力イベントを購読する
         inputBinder.Initialize(this);
 
+
+    }
+
+    private void Start()
+    {
+
         // プレイヤーの初期化を実行
         root.OwnerInitialize();
+
+        SkillManager.Instance.SetSkillList(root.PlayerIndex.Value, root.GetSkill());
+
     }
 
 

@@ -119,10 +119,11 @@ public class GameUIManager : MonoBehaviour
 
         // --- 5. プレイヤーリストの処理 ---
         List<PlayerRoot> playerList = PlayerUtility.GetAllPlayer();
-        if (playerList == null) return;
-
+        if (playerList == null) { return;}
         foreach (var root in playerList)
         {
+            Debug.Log($"[GameUIManager] PlayerRoot found: {root?.name}, PlayerIndex: {root?.PlayerIndex.Value}");
+
             if (root == null || root.PlayerIndex.Value < 0) continue;
 
             int pIndex = root.PlayerIndex.Value;

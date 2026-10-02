@@ -105,6 +105,9 @@ public class EffectAbility
                     owner.ApplyHeal(value); // 1秒ごとに回復
                 }
                 break;
+
+            default:
+                break;
         }
     }
 

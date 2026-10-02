@@ -72,7 +72,23 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
             // 要素が「追加」された時だけ NetworkList に Add する
             root.ActiveEffects.ObserveAdd().Subscribe(e =>
             {
+                // 1. e.Value (EffectAbility) 自体の null チェック
+                if (e.Value == null)
+                {
+                    Debug.LogError("[PlayerNetworkController] 追加された EffectAbility (e.Value) が null です。");
+                    return;
+                }
+
                 Effect effectSO = e.Value.GetEffect();
+
+                // 2. e.Value.GetEffect() で取得した effectSO の null チェック
+                if (effectSO == null)
+                {
+                    Debug.LogError($"[PlayerNetworkController] {e.Value} の GetEffect() が null を返しました。");
+                    return;
+                }
+
+                // 両方 null でないことが確認できてからデータを作成
                 netActiveEffects.Add(new NetworkEffectData
                 {
                     EffectType = effectSO.GetEffectList(),

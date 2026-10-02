@@ -305,6 +305,16 @@ public class GameManager : NetworkBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: this.GetCancellationTokenOnDestroy());
         await CurtainManager.Instance.CloseAsync("Finish!", GetType().Name, 0.1f);
 
+        // プレイヤーを全て非表示にする
+        List<PlayerRoot> players = PlayerUtility.GetAllPlayer();
+        foreach (var player in players)
+        {
+            if (player != null)
+            {
+                player.gameObject.SetActive(false);
+            }
+        }
+
         string resultMessage = (winnerName == "Game Over" || winnerName == "Draw") ? winnerName : $"{winnerName}  Win!";
         gameUIManager.ShowResult(resultMessage);
 
