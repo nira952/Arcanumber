@@ -39,6 +39,20 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
 
         PlayerUtility.RegisterPlayer(root);
 
+        if (IsServer)
+        {
+            // サーバー側でプレイヤーのインデックスを設定
+            int assignedIndex = PlayerDataManager.Instance.GetLobbyIndexByClientId(OwnerClientId);
+            root.PlayerIndex.Value = assignedIndex;
+
+            Skill[] skills = PlayerDataManager.Instance.GetPlayerSkillsByIndex(assignedIndex);
+            Arcana arcana = PlayerDataManager.Instance.GetPlayerArcanaByIndex(assignedIndex);
+
+            root.SetSkill(skills);
+            root.SetArcana(arcana);
+        }
+
+
         // 所有者でない場合、Inputコンポーネントを停止
         if (!IsOwner)
         {
@@ -57,9 +71,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
 
         if (IsServer)
         {
-            // サーバー側でプレイヤーのインデックスを設定
-            int assignedIndex = PlayerDataManager.Instance.GetLobbyIndexByClientId(OwnerClientId);
-            root.PlayerIndex.Value = assignedIndex;
+
 
             // サーバー側で ReactiveProperty の変更を NetworkVariable に同期
             root.PlayerIndex.Subscribe(v => netPlayerIndex.Value = v).AddTo(this);
