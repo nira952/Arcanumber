@@ -27,7 +27,7 @@ public class Arcana05HierophantBack : ArcanaLogic
     {
         Effect e = EffectRegistry.Get(EffectList.Reverse, false);
         EffectAbility ea = new EffectAbility(e, false, sourceArcana.GetKeepValue(), 0);
-        //とりあえず自分にかける
-        player.AddEffect(ea.Clone());
+        //とりあえず自分以外にかける
+        PlayerUtility.ApplyEffectToOtherPlayers(player, ea.Clone());
     }
 }

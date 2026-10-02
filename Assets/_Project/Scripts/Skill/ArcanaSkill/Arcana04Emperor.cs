@@ -12,8 +12,8 @@ public class Arcana04EmperorFront : ArcanaLogic
     {
        Effect e = EffectRegistry.Get(EffectList.Silence, false);
        EffectAbility ea = new EffectAbility(e, false, sourceArcana.GetKeepValue(), 0);
-       //とりあえず自分にかける
-       PlayerUtility.ApplyEffectToOtherPlayers(player, ea);
+       //自分以外にかける
+       PlayerUtility.ApplyEffectToOtherPlayers(player, ea.Clone());
     }
 }
 

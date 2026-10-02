@@ -14,13 +14,9 @@ public class Arcana19SunFront : ArcanaLogic
     private float numValue = 0.5f;
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        List<PlayerRoot> others = PlayerUtility.GetOtherPlayers(player);
-        foreach (PlayerRoot other in others)
-        {
-            Effect e = EffectRegistry.Get(EffectList.SunBurn, false);
-            EffectAbility effect = new EffectAbility(e, false, sourceArcana.GetKeepValue(), numValue);
-            other.AddEffect(effect);
-        }
+        Effect e = EffectRegistry.Get(EffectList.SunBurn, false);
+        EffectAbility effect = new EffectAbility(e, false, sourceArcana.GetKeepValue(), numValue);
+        PlayerUtility.ApplyEffectToOtherPlayers(player, effect.Clone());
     }
 }
 
@@ -32,12 +28,8 @@ public class Arcana19SunBack : ArcanaLogic
     //スタンする
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        List<PlayerRoot> others = PlayerUtility.GetOtherPlayers(player);
-        foreach (PlayerRoot other in others)
-        {
-            Effect e = EffectRegistry.Get(EffectList.Stun, false);
-            EffectAbility effect = new EffectAbility(e, false, sourceArcana.GetKeepValue(), -1);
-            other.AddEffect(effect);
-        }
+        Effect e = EffectRegistry.Get(EffectList.Stun, false);
+        EffectAbility effect = new EffectAbility(e, false, sourceArcana.GetKeepValue(), -1);
+        PlayerUtility.ApplyEffectToOtherPlayers(player, effect.Clone());
     }
 }

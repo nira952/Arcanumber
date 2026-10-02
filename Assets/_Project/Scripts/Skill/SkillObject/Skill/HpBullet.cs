@@ -18,6 +18,7 @@ public class HpBullet : EnvironmentObject, IRpcObjectInterface
 
     protected override void OnHit(PlayerRoot target)
     {
+        dmg = target.CurrentHealth.Value * 0.3f;
         base.OnHit(target);
         onDestroyed.OnNext(Unit.Default);
     }
