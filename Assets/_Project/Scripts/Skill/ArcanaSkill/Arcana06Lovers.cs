@@ -29,11 +29,7 @@ public class Arcana06LoversBack : ArcanaLogic
     public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
         //画面を暗くするエフェクトを再生
-        VisualEffectManager.Instance.StartCoroutine(
-            VisualEffectManager.Instance.ShowDarkPanel(true));
-        yield return new WaitForSeconds(sourceArcana.GetKeepValue());
-        //画面を暗くするエフェクトを再生
-        VisualEffectManager.Instance.StartCoroutine(
-            VisualEffectManager.Instance.ShowDarkPanel(false));
+        VisualEffectManager.Instance.ShowDarkPanel(player.PlayerIndex.Value,sourceArcana.GetKeepValue());
+        yield return null;
     }
 }
