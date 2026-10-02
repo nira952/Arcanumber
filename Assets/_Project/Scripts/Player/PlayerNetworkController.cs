@@ -45,7 +45,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
             if (inputController != null) { inputController.enabled = false; }
 
             // 所有者でない場合、タグを "Enemy" に設定
-            root.gameObject.tag = "Enemy";
+            //root.gameObject.tag = "Enemy";
         }
 
         // --- 入力バインダーの初期化 ---

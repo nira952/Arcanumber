@@ -70,12 +70,17 @@ public static class PlayerUtility
         return playerList.Where(root => root != null && root != self).ToList();
     }
 
+    public static List<PlayerRoot> GetOtherPlayersIndex(int selfIndex)
+    {
+        return playerList.Where(root => root != null && root.PlayerIndex.Value != selfIndex).ToList();
+
+    }
+
     /// <summary>
     /// 指定したプレイヤー以外にエフェクトを付与する
     /// </summary>
     public static void ApplyEffectToOtherPlayers(PlayerRoot self, EffectAbility effect)
     {
-        if (!IsServer()) { return; }
         List<PlayerRoot> otherPlayers = GetOtherPlayers(self);
         foreach (PlayerRoot player in otherPlayers)
         {
@@ -90,7 +95,6 @@ public static class PlayerUtility
     /// <param name="damage"></param>
     public static void ApplyDamageToOtherPlayers(PlayerRoot self, float damage)
     {
-        if (!IsServer()) { return; }
         List<PlayerRoot> otherPlayers = GetOtherPlayers(self);
         foreach (PlayerRoot player in otherPlayers)
         {

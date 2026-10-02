@@ -1,5 +1,6 @@
 using R3;
 using UnityEngine;
+using System.Linq;
 
 /// <summary>
 /// プレイヤーがスキルやAimCursorを使って発動するオブジェクト
@@ -104,7 +105,7 @@ public class SkillObject : MagicObject
         transform.position = spawnPos;
 
         //「Enemy」タグのオブジェクトから一番近いものを探す
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        GameObject[] enemies = PlayerUtility.GetOtherPlayersIndex(haveAttackerIndex).Select(p => p.gameObject).ToArray();
         float minDistance = float.MaxValue;
         Transform nearest = null;
 
