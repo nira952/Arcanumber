@@ -81,7 +81,6 @@ public static class PlayerUtility
     /// </summary>
     public static void ApplyEffectToOtherPlayers(PlayerRoot self, EffectAbility effect)
     {
-        if (!IsServer()) { return; }
         List<PlayerRoot> otherPlayers = GetOtherPlayers(self);
         foreach (PlayerRoot player in otherPlayers)
         {
@@ -96,7 +95,6 @@ public static class PlayerUtility
     /// <param name="damage"></param>
     public static void ApplyDamageToOtherPlayers(PlayerRoot self, float damage)
     {
-        if (!IsServer()) { return; }
         List<PlayerRoot> otherPlayers = GetOtherPlayers(self);
         foreach (PlayerRoot player in otherPlayers)
         {
