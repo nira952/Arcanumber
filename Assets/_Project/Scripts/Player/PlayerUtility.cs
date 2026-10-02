@@ -32,8 +32,6 @@ public static class PlayerUtility
 
     public static void RegisterPlayer(PlayerRoot playerRoot)
     {
-        if (!IsServer()){ return; }
-
         if (playerRoot == null) return;
 
         playerList.Add(playerRoot);
@@ -42,8 +40,6 @@ public static class PlayerUtility
 
     public static void UnregisterPlayer(PlayerRoot playerRoot)
     {
-        if (!IsServer()) { return; }
-
         if (playerRoot == null) return;
         playerList.Remove(playerRoot);
     }
@@ -52,8 +48,6 @@ public static class PlayerUtility
     /// </summary>
     public static List<PlayerRoot> GetAllPlayer()
     {
-        if (!IsServer()) { return null; }
-
         return playerList.Where(root => root != null).ToList();
     }
 
@@ -72,8 +66,6 @@ public static class PlayerUtility
     /// </summary>
     public static List<PlayerRoot> GetOtherPlayers(PlayerRoot self)
     {
-        if (!IsServer()) { return null; }
-
         if (self == null) return GetAllPlayer();
         return playerList.Where(root => root != null && root != self).ToList();
     }

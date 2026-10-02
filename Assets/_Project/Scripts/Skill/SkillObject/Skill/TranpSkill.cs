@@ -6,9 +6,12 @@ public class TranpSkill : SkillObject
     private int syncedDmg = 0;  //ダメージ
 
 
-    private void Start()
+    public override void Initialize(int attackerIndex, Skill skill, Vector2 targetPos)
     {
+        base.Initialize(attackerIndex, skill, targetPos);
+
         RollTranp();
+
     }
 
     void RollTranp()

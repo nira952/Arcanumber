@@ -52,8 +52,6 @@ public class PlayerRoot : MonoBehaviour
             CurrentSkill = skillList[index];
         });
 
-        SelectedSkillIndex.Value = 1;
-
         // ArcanaがNULLだったら愚者（逆）を入れる
         if (CurrentArcana == null)
             CurrentArcana = LoadManager.Instance.GetData(0, false);
@@ -80,6 +78,11 @@ public class PlayerRoot : MonoBehaviour
         playerSkill.Initialize(this, playerUIManager, skillList);
         aimCursor.Initialize(PlayerIndex.Value);
         playerUIManager.Initialize(this);
+
+        SelectedSkillIndex.Value = 0;
+
+        ExecuteSkillSelect(0); // 初期スキル選択を行う
+
     }
 
 
@@ -96,28 +99,40 @@ public class PlayerRoot : MonoBehaviour
         // 移動処理の更新
         movement.UpdateMovement();
 
-        // ジャンプ状態の更新
-
-
         // 状態異常の更新処理
         for (int i = ActiveEffects.Count - 1; i >= 0; i--)
         {
-            // nullチェック
-            if (ActiveEffects[i] == null) { ActiveEffects.RemoveAt(i); continue; }
-
             var effect = ActiveEffects[i];
 
-            // 1. 継続時間を減らす
+            // 1. nullチェック（インスタンス自体が null の場合は削除して次へ）
+            if (effect == null)
+            {
+                Debug.LogWarning($"[PlayerRoot] ActiveEffects[{i}] が null のため削除しました。");
+                ActiveEffects.RemoveAt(i);
+                continue;
+            }
+
+            // 2. 内部データ（ScriptableObject等）の健全性チェック
+            // ※GetEffect() などで保持データが null でないか確認（1つ目のエラー対策）
+            if (effect.GetEffect() == null)
+            {
+                Debug.LogWarning($"[PlayerRoot] {effect} の内部データ (Effect) が null のため削除しました。");
+                ActiveEffects.RemoveAt(i);
+                continue;
+            }
+
+            // 3. 継続時間を減らす
             effect.DecreaseTime(Time.deltaTime);
 
-            // 2. 毒・回復等の Tick 処理を実行
-            effect.ExecuteTick(Time.deltaTime, this);
-
-            // 3. 期限切れなら削除
+            // 4. 時間切れなら Tick を実行せずに削除
             if (effect.IsExpired)
             {
                 ActiveEffects.RemoveAt(i);
+                continue;
             }
+
+            // 5. 毒・回復等の Tick 処理を実行（safe に実行可能）
+            effect.ExecuteTick(Time.deltaTime, this);
         }
     }
 
@@ -131,8 +146,9 @@ public class PlayerRoot : MonoBehaviour
 
     public void ExecuteAttack()
     {
-        // TODO : 後でPlayerRootに移植する
 
+        // 一旦通常攻撃を無効化
+        return;
         //const int ATTACK_ACTION_INDEX = 0;
         //if (!IsActionReady(ATTACK_ACTION_INDEX)) return;
 
@@ -317,4 +333,13 @@ public class PlayerRoot : MonoBehaviour
  */
     public void SetMoveSpeed(float speed) { status.SetSpeed(speed); }
 
+    public void SetSkill(Skill[] skills)
+    {
+        skillList = skills;
+    }
+
+    public void SetArcana(Arcana arcana)
+    {
+        CurrentArcana = arcana;
+    }
 }

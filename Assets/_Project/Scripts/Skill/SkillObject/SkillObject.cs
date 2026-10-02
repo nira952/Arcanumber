@@ -19,7 +19,7 @@ public class SkillObject : MagicObject
     private bool isReturning = false;
     private Transform ownerTransform;
 
-    public void Initialize(int attackerIndex, Skill skill, Vector2 targetPos)
+    public virtual void Initialize(int attackerIndex, Skill skill, Vector2 targetPos)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(attackerIndex);
 
