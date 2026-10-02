@@ -1,4 +1,7 @@
+using NUnit.Framework;
 using SpriteGlow;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -30,6 +33,7 @@ public class AimCursor : MonoBehaviour
     private const float SCREEN_MARGIN_MAX = 0.95f;  //画面の端から95%の位置
     private const float ZERO_DIVISION_EPSILON = 0.001f; //ゼロ除算の対策用の値
 
+    int playerIndex = 0;
 
     private void Awake()
     {
@@ -43,6 +47,7 @@ public class AimCursor : MonoBehaviour
     /// </summary>
     public void Initialize(int playerIndex)
     {
+        this.playerIndex = playerIndex;
         //システムカーソルを非表示に
         Cursor.visible = false;
         //カーソルの色を変える
@@ -151,8 +156,10 @@ public class AimCursor : MonoBehaviour
     /// 画面内でマウスに最も近いEnemyタグのTransformを返す
     /// </summary>
     private Transform GetNearestEnemyOnScreen()
-    {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+    {   
+        List<PlayerRoot> players = PlayerUtility.GetOtherPlayersIndex(playerIndex);
+
+        GameObject[] enemies = players.Select(p => p.gameObject).ToArray();
         Transform nearest = null;
         float minDistance = float.MaxValue;
 

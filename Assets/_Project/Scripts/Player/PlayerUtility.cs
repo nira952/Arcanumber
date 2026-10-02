@@ -70,6 +70,12 @@ public static class PlayerUtility
         return playerList.Where(root => root != null && root != self).ToList();
     }
 
+    public static List<PlayerRoot> GetOtherPlayersIndex(int selfIndex)
+    {
+        return playerList.Where(root => root != null && root.PlayerIndex.Value != selfIndex).ToList();
+
+    }
+
     /// <summary>
     /// 指定したプレイヤー以外にエフェクトを付与する
     /// </summary>
