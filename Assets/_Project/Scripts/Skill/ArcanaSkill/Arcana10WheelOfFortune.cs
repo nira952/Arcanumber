@@ -27,7 +27,7 @@ public class Arcana10WheelOfFortuneFront : ArcanaLogic
     /// </summary>
     private Vector2 FindSafePosition(PlayerRoot player)
     {
-        CapsuleCollider2D cap = player.GetComponent<CapsuleCollider2D>();
+        BoxCollider2D cap = player.GetComponent<BoxCollider2D>();
         Camera cam = Camera.main;
         int groundMask = LayerMask.GetMask("Ground");
 
@@ -43,7 +43,7 @@ public class Arcana10WheelOfFortuneFront : ArcanaLogic
             );
 
             //床や壁にめり込んでないか
-            if (Physics2D.OverlapCapsule(targetPos + cap.offset, cap.size, cap.direction, 0, groundMask) == null)
+            if (Physics2D.OverlapBox(targetPos + cap.offset, cap.size, 0, groundMask) == null)
             {
                 return targetPos;
             }

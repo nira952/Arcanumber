@@ -105,6 +105,16 @@ public class EffectAbility
                     owner.ApplyHeal(value); // 1秒ごとに回復
                 }
                 break;
+            case EffectList.SunBurn:
+                if (CheckInterval(1.0f))
+                {
+                    // 頭上にGround（天井）がない場合のみダメージ
+                    if (!owner.HasCeiling())
+                    {
+                        owner.ApplyDamage(value); // 1秒ごとに日光ダメージ
+                    }
+                }
+                break;
 
             default:
                 break;
@@ -146,6 +156,7 @@ public class EffectAbility
         }
         return false;
     }
+
 }
 
 /// <summary>
