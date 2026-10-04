@@ -65,7 +65,7 @@ public class Arcana10WheelOfFortuneBack : ArcanaLogic
         Effect e = EffectRegistry.Get(EffectList.NoJump, false);
         EffectAbility ea = new EffectAbility(e, true, sourceArcana.GetKeepValue(), 0);
         //自分以外にかける
-        PlayerUtility.ApplyEffectToOtherPlayers(player, ea);
+        PlayerUtility.ApplyEffectToOtherPlayers(player, ea.Clone());
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

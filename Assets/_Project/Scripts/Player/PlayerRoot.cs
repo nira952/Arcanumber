@@ -95,14 +95,6 @@ public class PlayerRoot : MonoBehaviour
         // 操作できない場合は移動を停止して処理を終了
         if (!CanControl) { movement.StopMovement(); return; }
 
-        if(HaveEffect(EffectList.Stun, true)) { movement.StopMovement(); return; }
-
-        // スキルのクールタイムを更新
-        playerSkill.UpdateAllCoolTimes();
-
-        // 移動処理の更新
-        movement.UpdateMovement();
-
         // 状態異常の更新処理
         for (int i = ActiveEffects.Count - 1; i >= 0; i--)
         {
@@ -138,6 +130,15 @@ public class PlayerRoot : MonoBehaviour
             // 5. 毒・回復等の Tick 処理を実行（safe に実行可能）
             effect.ExecuteTick(Time.deltaTime, this);
         }
+
+        if (HaveEffect(EffectList.Stun, false)) { movement.StopMovement(); return; }
+
+        // スキルのクールタイムを更新
+        playerSkill.UpdateAllCoolTimes();
+
+        // 移動処理の更新
+        movement.UpdateMovement();
+
     }
 
     public void LateUpdate()
@@ -171,7 +172,7 @@ public class PlayerRoot : MonoBehaviour
     public void ExecuteMove(float rawInput)
     {
         // 移動方向の反転処理
-        bool isChangeMove = HaveEffect(EffectList.Reverse, true);
+        bool isChangeMove = HaveEffect(EffectList.Reverse, false);
 
         float finalInput = !isChangeMove ? rawInput : -rawInput;
 
@@ -191,7 +192,8 @@ public class PlayerRoot : MonoBehaviour
     public void ExecuteJump()
     {
         // ジャンプ禁止状態ならジャンプ不可
-        if (HaveEffect(EffectList.NoJump, true)) { return; }
+        if (HaveEffect(EffectList.Stun, false)) { return; }
+        if (HaveEffect(EffectList.NoJump, false)) { return; }
 
         bool isGrounded = rayInput.IsGrounded(movement.GetRigidbody());
 
