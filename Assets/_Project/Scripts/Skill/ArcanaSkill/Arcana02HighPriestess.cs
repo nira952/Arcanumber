@@ -19,6 +19,7 @@ public class Arcana02HighPriestessFront : ArcanaLogic
         {
             yield return new WaitForSeconds(timeInterval);
             player.GetPlayerStatus().SetAtk(player.GetPlayerStatus().GetAtk() * sourceArcana.GetKeepValue());
+            NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }
     }
 }
@@ -44,6 +45,7 @@ public class Arcana02HighPriestessBack : ArcanaLogic
         {
             yield return new WaitForSeconds(timeInterval);
             player.GetPlayerStatus().SetAtk(player.GetPlayerStatus().GetAtk() * sourceArcana.GetKeepValue());
+            NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }
     }
 }

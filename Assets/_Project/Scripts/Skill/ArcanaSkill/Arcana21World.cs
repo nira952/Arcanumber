@@ -27,5 +27,6 @@ public class Arcana21WorldBack : ArcanaLogic
         Effect e = EffectRegistry.Get(EffectList.WallSwap, true);
         EffectAbility ea = new EffectAbility(e, false, -1f, 0f);
         player.AddEffect(ea.Clone());
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

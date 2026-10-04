@@ -15,6 +15,7 @@ public class Arcana01MagicianFront : ArcanaLogic
         Effect e = EffectRegistry.Get(EffectList.IgnoreDefense, false);
         EffectAbility ea = new EffectAbility(e, false, -1f, -1f);
         player.AddEffect(ea.Clone());
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
 
@@ -26,6 +27,7 @@ public class Arcana01MagicianBack : ArcanaLogic
     //自分のサポートをしてくれる敵を召喚する
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         for (int i = 0; i < (int)sourceArcana.GetKeepValue(); i++)
         {
             SkillManager.Instance.SpawnRpcObject(player.PlayerIndex.Value);

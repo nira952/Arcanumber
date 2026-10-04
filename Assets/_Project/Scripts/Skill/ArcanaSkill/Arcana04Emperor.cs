@@ -14,6 +14,7 @@ public class Arcana04EmperorFront : ArcanaLogic
        EffectAbility ea = new EffectAbility(e, false, sourceArcana.GetKeepValue(), 0);
        //自分以外にかける
        PlayerUtility.ApplyEffectToOtherPlayers(player, ea.Clone());
+       NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
 

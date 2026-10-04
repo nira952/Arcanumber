@@ -14,6 +14,7 @@ public class Arcana05HierophantFront : ArcanaLogic
             EffectRegistry.Get(EffectList.SizeChange, true),
             false, -1, sourceArcana.GetKeepValue());
         player.AddEffect(effect.Clone());
+
     }
 }
 
@@ -29,5 +30,6 @@ public class Arcana05HierophantBack : ArcanaLogic
         EffectAbility ea = new EffectAbility(e, false, sourceArcana.GetKeepValue(), 0);
         //とりあえず自分以外にかける
         PlayerUtility.ApplyEffectToOtherPlayers(player, ea.Clone());
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

@@ -19,6 +19,7 @@ public class Arcana03EmpressFront : ArcanaLogic
         {
             yield return new WaitForSeconds(timeInterval);
             player.ApplyHeal(sourceArcana.GetKeepValue());
+            NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }
     }
 }
@@ -56,6 +57,7 @@ public class Arcana03EmpressBack : ArcanaLogic
                 player.AddEffect(randomEffect.Clone()); 
             }
 
+            NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
             yield return new WaitForSeconds(sourceArcana.GetKeepValue() - GetVisualDuration(sourceArcana));
         }
     }

@@ -16,6 +16,7 @@ public class Arcana09HermitFront : ArcanaLogic
         Effect e = EffectRegistry.Get(EffectList.HealSteal, true);
         EffectAbility ea = new EffectAbility(e, false, -1f, -1f);
         player.AddEffect(ea.Clone());
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
 
@@ -32,6 +33,7 @@ public class Arcana09HermitBack : ArcanaLogic
         {
             // トラップを設置するロジックをここに記述
             SkillManager.Instance.SpawnRpcObject(player.PlayerIndex.Value);
+            NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
 
             yield return new WaitForSeconds(sourceArcana.GetKeepValue());
         }

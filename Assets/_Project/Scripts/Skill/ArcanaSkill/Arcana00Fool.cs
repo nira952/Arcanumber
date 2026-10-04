@@ -12,6 +12,7 @@ public class Arcana00FoolFront : ArcanaLogic
     {
         float newHp = player.GetPlayerStatus().GetMaxHp() * sourceArcana.GetKeepValue();
         player.GetPlayerStatus().SetMaxHp(newHp);
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
 

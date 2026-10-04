@@ -17,6 +17,7 @@ public class Arcana19SunFront : ArcanaLogic
         Effect e = EffectRegistry.Get(EffectList.SunBurn, false);
         EffectAbility effect = new EffectAbility(e, false, sourceArcana.GetKeepValue(), numValue);
         PlayerUtility.ApplyEffectToOtherPlayers(player, effect.Clone());
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
 
@@ -31,5 +32,6 @@ public class Arcana19SunBack : ArcanaLogic
         Effect e = EffectRegistry.Get(EffectList.Stun, false);
         EffectAbility effect = new EffectAbility(e, false, sourceArcana.GetKeepValue(), -1);
         PlayerUtility.ApplyEffectToOtherPlayers(player, effect.Clone());
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

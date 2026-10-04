@@ -16,6 +16,7 @@ public class Arcana18MoonFront : ArcanaLogic
         if (player == null) return;
 
         player.StartCoroutine(OnUpdate(player, sourceArcana));
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 
     public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
@@ -107,8 +108,11 @@ public class Arcana18MoonBack : ArcanaLogic
     //分身を出す
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        for(int i = 0; i < sourceArcana.GetKeepValue(); i++)
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
+        for (int i = 0; i < sourceArcana.GetKeepValue(); i++)
         {
+            sourceArcana.GetEffectPrefab().GetComponent<SpriteRenderer>().sprite =
+                player.GetComponent<SpriteRenderer>().sprite;
             SkillManager.Instance.SpawnRpcObject(player.PlayerIndex.Value);
         }
     }

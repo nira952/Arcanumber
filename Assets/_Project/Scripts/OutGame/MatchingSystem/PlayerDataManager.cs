@@ -321,6 +321,7 @@ public class PlayerDataManager : NetworkBehaviour
 
                 // アルカナ情報を上書き
                 data.arcana = selectedArcana;
+                data.IsFront = isFace;
 
                 // NetworkListの内容を上書き更新（これで全プレイヤーに自動同期される）
                 _allPlayerData[i] = data;

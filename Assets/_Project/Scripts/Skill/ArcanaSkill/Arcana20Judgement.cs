@@ -7,6 +7,7 @@ public class Arcana20JudgementFront : ArcanaLogic
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         SkillManager.Instance.SpawnRpcObject(player.PlayerIndex.Value);
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
 
@@ -18,6 +19,7 @@ public class Arcana20JudgementBack : ArcanaLogic
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         player.StartCoroutine(OnUpdate(player, sourceArcana));
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
     public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {

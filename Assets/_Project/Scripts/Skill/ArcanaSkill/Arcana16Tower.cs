@@ -14,6 +14,7 @@ public class Arcana16TowerFront : ArcanaLogic
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         SkillManager.Instance.SpawnRpcObject(player.PlayerIndex.Value);
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
 
@@ -33,6 +34,7 @@ public class Arcana16TowerBack : ArcanaLogic
 
             // SkillManagerにスキル発動を依頼する
             SkillManager.Instance.RequestSkill(player);
+            NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }
     }
 }

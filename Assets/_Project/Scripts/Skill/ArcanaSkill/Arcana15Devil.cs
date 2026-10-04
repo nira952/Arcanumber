@@ -31,6 +31,7 @@ public class Arcana15DevilBack : ArcanaLogic
         //数だけ攻撃力を上げる
         player.GetPlayerStatus().SetAtk(
             player.GetPlayerStatus().GetAtk() + player.GetPlayerStatus().GetAtk() * efeNum * sourceArcana.GetKeepValue());
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
 

@@ -20,6 +20,7 @@ public class Arcana10WheelOfFortuneFront : ArcanaLogic
         if (rb != null) rb.linearVelocity = Vector2.zero;
 
         player.transform.position = safePos;
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
     /// <summary>
     /// テレポート先を探す処理
@@ -65,5 +66,6 @@ public class Arcana10WheelOfFortuneBack : ArcanaLogic
         EffectAbility ea = new EffectAbility(e, true, sourceArcana.GetKeepValue(), 0);
         //自分以外にかける
         PlayerUtility.ApplyEffectToOtherPlayers(player, ea);
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

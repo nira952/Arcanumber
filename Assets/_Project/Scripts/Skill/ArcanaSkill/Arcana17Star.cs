@@ -17,6 +17,7 @@ public class Arcana17StarFront : ArcanaLogic
     }
     public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         VisualEffectManager.Instance.ShowZoomPlayer(player.PlayerIndex.Value, sourceArcana.GetKeepValue());
 
         yield return null;
@@ -34,6 +35,7 @@ public class Arcana17StarBack : ArcanaLogic
         Effect e = EffectRegistry.Get(EffectList.Invincible, true);
         EffectAbility ea = new EffectAbility(e, true, sourceArcana.GetKeepValue(), -1f);
         player.AddEffect(ea.Clone());
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 
 }

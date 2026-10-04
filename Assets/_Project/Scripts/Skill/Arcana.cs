@@ -16,7 +16,7 @@ public class Arcana : ScriptableObject
     [ReadOnly][Label("クールタイム")][SerializeField] float coolTime;
     [ReadOnly][Label("持続数値")][SerializeField] float keepValue;
     [ReadOnly][Label("エフェクト")]public GameObject effectPrefab;
-    [ReadOnly][Label("効果音")]public AudioClip se;
+    [ReadOnly][Label("効果音")]public SeName se;
 
     //アルカナの効果を入れるためのクラス
     private ArcanaLogic arcanaLogic;
@@ -38,7 +38,13 @@ public class Arcana : ScriptableObject
 
         //リソース系
         this.effectPrefab = !string.IsNullOrEmpty(Get(6)) ? Resources.Load<GameObject>(Get(6)) : null;
-        this.se = !string.IsNullOrEmpty(Get(7)) ? Resources.Load<AudioClip>(Get(7)) : null;
+        
+        string seNameStr = Get(7); // 7列目がSEの名前（文字列）であると仮定
+        if (!string.IsNullOrEmpty(seNameStr) && System.Enum.TryParse<SeName>(seNameStr, true, out SeName parsedSeName))
+            this.se = parsedSeName; // 型が SeName になったのでそのまま代入できる
+        else
+            this.se = SeName.num;
+
         this.arcanaEx = Get(8);
         this.arcanaImage = !string.IsNullOrEmpty(Get(10)) ? Resources.Load<Sprite>(Get(10)) : null;
 
@@ -117,7 +123,7 @@ public class Arcana : ScriptableObject
     public float GetKeepValue() => keepValue;
     public GameObject GetEffectPrefab() => effectPrefab;
     public Animator GetAnimation() => effectPrefab != null ? effectPrefab.GetComponent<Animator>() : null;
-    public AudioClip GetSE() => se;
+    public SeName GetSE() => se;
 
 
     /**

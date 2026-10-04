@@ -16,6 +16,7 @@ public class Arcana06LoversFront : ArcanaLogic
         Effect e = EffectRegistry.Get(EffectList.Charm, true);
         EffectAbility ea = new EffectAbility(e, true, sourceArcana.GetKeepValue(), -1f);
         player.AddEffect(ea.Clone());
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
 
@@ -30,6 +31,7 @@ public class Arcana06LoversBack : ArcanaLogic
     {
         //画面を暗くするエフェクトを再生
         VisualEffectManager.Instance.ShowDarkPanel(player.PlayerIndex.Value,sourceArcana.GetKeepValue());
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         yield return null;
     }
 }

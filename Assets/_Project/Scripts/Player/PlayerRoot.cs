@@ -41,8 +41,12 @@ public class PlayerRoot : MonoBehaviour
         PlayerName.Value = PlayerDataManager.Instance.LocalPlayerName;
 
         //　ArcanaとスキルをPlayerDataManagerから取得
+        int myIndex = PlayerIndex.Value;
+
         skillList = PlayerDataManager.Instance.GetMySkills();
-        CurrentArcana = PlayerDataManager.Instance.GetMyArcana();
+        CurrentArcana = PlayerDataManager.Instance.GetPlayerArcanaByIndex(myIndex);
+        //CurrentArcana = PlayerDataManager.Instance.GetMyArcana();
+        //skillList = PlayerDataManager.Instance.GetPlayerSkillsByIndex(myIndex);
         SelectedSkillIndex.Subscribe(index =>
         {
             if (index < 0 || index >= skillList.Length)
