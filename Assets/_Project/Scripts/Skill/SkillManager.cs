@@ -247,15 +247,15 @@ public class SkillManager : NetworkBehaviour
             //サーバー（またはオフライン）側でオブジェクトを Instantiate 生成
             GameObject skillObj = Instantiate(skill.GetEffectAnimation(), playerRoot.transform.position, spawnRotation);
 
-            //サイズ変更効果の適用
-            float sizeMultiplier = playerRoot.GetEffectValue(EffectList.SizeChange);
-            if (sizeMultiplier > 0f)
-                skillObj.transform.localScale *= sizeMultiplier;
-
             //スキルコンポーネントの初期化
             if (skillObj.TryGetComponent(out SkillObject magic))
             {
                 magic.Initialize(playerRoot.PlayerIndex.Value, skill, pos);
+
+                //サイズ変更効果の適用
+                float sizeMultiplier = playerRoot.GetEffectValue(EffectList.SizeChange);
+                if (sizeMultiplier > 0f)
+                    magic.transform.localScale *= sizeMultiplier;
 
                 magic.OnDestroyed
                     .Subscribe(_ =>
@@ -429,14 +429,15 @@ public class SkillManager : NetworkBehaviour
         }
 
         // ネットワークオブジェクトの場合は全クライアントに同期スポーンする
-        if (!isLocalMode && IsServer)
+        if (isLocalMode)
+            // オフラインモードの場合は、Spawnは不要なのでそのまま画面に出す
+            Debug.Log("オフラインモード：Spawnスキップしてそのまま生成");
+        else if (IsServer)
         {
+            // オンラインモード（サーバー側）の場合のみ NetworkObject.Spawn を呼ぶ
             if (obj.TryGetComponent(out NetworkObject networkObject))
-            {
                 networkObject.Spawn();
-            }
         }
-
     }
 
     public void SpawnBulletObject(int playerIndex,Vector2 pos,Vector2 direction)
