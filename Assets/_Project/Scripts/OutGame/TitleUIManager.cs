@@ -37,6 +37,8 @@ public class TitleUIManager : MonoBehaviour
 
     [SerializeField] private Button trainingSceneButton;
 
+    [SerializeField] private Button tutorialSceneButton;
+
     // --- ボタンのクリックイベントをObservableとして公開 ---
 
 
@@ -50,6 +52,8 @@ public class TitleUIManager : MonoBehaviour
     public Observable<Unit> OnOpenLanHostPanelRequested => lanHostPanelButton.OnClickAsObservable();
 
     public Observable<Unit> OnOpenTrainingSceneRequested => trainingSceneButton.OnClickAsObservable();
+
+    public Observable<Unit> OnOpenTutorialSceneRequested => tutorialSceneButton.OnClickAsObservable();
 
     private readonly CompositeDisposable _disposables = new();
 

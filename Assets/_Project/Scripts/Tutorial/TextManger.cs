@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using R3;
 
 public class TextManager : MonoBehaviour
 {
@@ -33,8 +34,17 @@ public class TextManager : MonoBehaviour
     private List<DialogueData> dialogueList = new List<DialogueData>();
     private int currentIndex = 0;
 
+    private bool isTyping = false;
     private bool isDialogueActive = false;
     private Coroutine typingCoroutine;
+
+    private Subject<Unit> onMoveStart = new Subject<Unit>();
+    public Observable<Unit> OnMoveStart => onMoveStart;
+
+    private Subject<Unit> onDialogueEnd = new Subject<Unit>();
+
+    public Observable<Unit> OnDialogueEnd => onDialogueEnd;
+
 
 
     public void StartText()
@@ -59,7 +69,7 @@ public class TextManager : MonoBehaviour
     {
         if (!isDialogueActive) { return; }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetMouseButtonDown(0))
         {
             OnClickNextButton();
         }
@@ -143,7 +153,8 @@ public class TextManager : MonoBehaviour
             case "End":
                 EndTutorial();
                 break;
-
+            case "null":
+                break;
             default:
                 Debug.LogWarning($"未定義のコマンドです: {command}");
                 break;
@@ -156,7 +167,7 @@ public class TextManager : MonoBehaviour
 
     private void MoveStart()
     {
-        
+        onMoveStart.OnNext(Unit.Default);
     }
 
     private void EndTutorial()
@@ -167,12 +178,15 @@ public class TextManager : MonoBehaviour
             textPanel.SetActive(false);
         });
 
+        onDialogueEnd.OnNext(Unit.Default);
     }
 
     // ================================================
 
     private IEnumerator TypeTextCoroutine(string targetText)
     {
+        isTyping = true;
+
         textDisplay.text = "";
 
         foreach (char c in targetText.ToCharArray())
@@ -185,19 +199,41 @@ public class TextManager : MonoBehaviour
         {
             nextButton.gameObject.SetActive(true);
         }
+
+        isTyping = false;
     }
 
     private void OnClickNextButton()
     {
-        if (dialogueList.Count == 0) return;
-
-        currentIndex++;
-
-        if (currentIndex >= dialogueList.Count)
+        if (isTyping)
         {
-            currentIndex = 0;
+            // 文字送り中の場合は即座に全文表示
+            if (typingCoroutine != null)
+            {
+                StopCoroutine(typingCoroutine);
+            }
+            textDisplay.text = dialogueList[currentIndex].text;
+            if (nextButton != null)
+            {
+                nextButton.gameObject.SetActive(true);
+            }
+            isTyping = false;
         }
+        else
+        {
+            // 文字送りが完了している場合は次のテキストへ
+            if (dialogueList.Count == 0) return;
 
-        ShowCurrentText();
+            currentIndex++;
+
+            if (currentIndex >= dialogueList.Count)
+            {
+                currentIndex = 0;
+            }
+
+            ShowCurrentText();
+        }
     }
+
+
 }

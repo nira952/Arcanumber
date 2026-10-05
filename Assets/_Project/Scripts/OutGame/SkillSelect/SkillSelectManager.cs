@@ -196,7 +196,7 @@ public class SkillSelectManager : NetworkBehaviour
         await CurtainManager.Instance.CloseAsync("Ready!", GetType().Name); // カーテンを閉じる演出
 
         await UniTask.Delay(TimeSpan.FromSeconds(1.5f)); // 演出用ディレイ
-        GameSceneManager.Instance.LoadLocalScene("Game"); // オフライン用のシーン遷移
+        GameSceneManager.Instance.LoadLocalScene("Game").Forget(); // オフライン用のシーン遷移
     }
 
     /// <summary>
