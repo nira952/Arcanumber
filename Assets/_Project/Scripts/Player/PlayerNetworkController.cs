@@ -10,7 +10,6 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
 {
     private PlayerRoot root;
     private PlayerInputBinder inputBinder;
-
     private PlayerInputController inputController;
 
     private readonly NetworkVariable<int> netPlayerIndex = new(-1);
@@ -37,7 +36,11 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
         root            = GetComponent<PlayerRoot>();            // メインスクリプトを取得
         inputBinder     = GetComponent<PlayerInputBinder>();     // 入力バインダーの取得
 
+        // プレイヤーを PlayerUtility に登録
         PlayerUtility.RegisterPlayer(root);
+        // カメラにプレイヤーを登録
+        GameCameraManager.Instance.RegisterTarget(transform);
+
 
         if (IsServer)
         {
@@ -57,9 +60,6 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
         if (!IsOwner)
         {
             if (inputController != null) { inputController.enabled = false; }
-
-            // 所有者でない場合、タグを "Enemy" に設定
-            //root.gameObject.tag = "Enemy";
         }
 
         // --- 入力バインダーの初期化 ---
@@ -71,8 +71,6 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
 
         if (IsServer)
         {
-
-
             // サーバー側で ReactiveProperty の変更を NetworkVariable に同期
             root.PlayerIndex.Subscribe(v => netPlayerIndex.Value = v).AddTo(this);
             root.PlayerName.Subscribe(v => netPlayerName.Value = v).AddTo(this);

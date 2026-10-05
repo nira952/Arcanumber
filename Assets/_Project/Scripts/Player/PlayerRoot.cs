@@ -14,6 +14,7 @@ public class PlayerRoot : MonoBehaviour
     private Arcana CurrentArcana;
     private Skill CurrentSkill;
     private Skill[] skillList = new Skill[GameConfig.SKILL_HOPPER_MAX];
+    private RuntimeAnimatorController currentAnimator;
 
     [Header("Components")]
     [SerializeField] private PlayerMovement movement;
@@ -45,8 +46,8 @@ public class PlayerRoot : MonoBehaviour
 
         skillList = PlayerDataManager.Instance.GetMySkills();
         CurrentArcana = PlayerDataManager.Instance.GetPlayerArcanaByIndex(myIndex);
-        //CurrentArcana = PlayerDataManager.Instance.GetMyArcana();
-        //skillList = PlayerDataManager.Instance.GetPlayerSkillsByIndex(myIndex);
+
+
         SelectedSkillIndex.Subscribe(index =>
         {
             if (index < 0 || index >= skillList.Length)
@@ -78,7 +79,7 @@ public class PlayerRoot : MonoBehaviour
         movement.Initialize(this);
         rayInput.Initialize();
         playerAttack.Initialized(this);
-        playerAnimator.Initialize(PlayerIndex.Value);
+        currentAnimator = playerAnimator.Initialize(PlayerIndex.Value);
         playerSkill.Initialize(this, playerUIManager, skillList);
         aimCursor.Initialize(PlayerIndex.Value);
         playerUIManager.Initialize(this);
@@ -351,6 +352,8 @@ public class PlayerRoot : MonoBehaviour
     public PlayerStatus GetPlayerStatus() => status;
     public Arcana GetArcana() { return CurrentArcana; }
     public Skill[] GetSkill() { return skillList; }
+
+    public RuntimeAnimatorController GetCurrentAnimator() { return currentAnimator; }
 
 
     /**

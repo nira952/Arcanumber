@@ -48,9 +48,6 @@ public class PlayerSpawner : NetworkBehaviour
 
             spawnedPlayer.gameObject.name = "Player" + index;
 
-            // カメラにプレイヤーを登録
-            GameCameraManager.Instance.RegisterTarget(spawnedPlayer.transform);
-
             if (spawnedPlayer.TryGetComponent<NetworkObject>(out var networkObj))
             {
                 // 1. スポーン処理（これは全端末へ伝播する）
@@ -81,8 +78,6 @@ public class PlayerSpawner : NetworkBehaviour
 
         PlayerOfflineController controller = spawnedPlayer.gameObject.AddComponent<PlayerOfflineController>();
 
-        GameCameraManager.Instance.RegisterTarget(spawnedPlayer.transform);
-
         Debug.Log("[PlayerSpawner] PlayerOfflineController をアタッチし、オフライン生成を完了しました。");
 
 
@@ -95,8 +90,6 @@ public class PlayerSpawner : NetworkBehaviour
         spawnedEnemy.PlayerIndex.Value = enemyIndex; // 敵プレイヤーのインデックスを設定
 
         PlayerAutoController enemyController = spawnedEnemy.gameObject.AddComponent<PlayerAutoController>();
-
-        GameCameraManager.Instance.RegisterTarget(spawnedEnemy.transform);
 
         Debug.Log("[PlayerSpawner] PlayerAutoController をアタッチし、オフライン敵生成を完了しました。");
     }

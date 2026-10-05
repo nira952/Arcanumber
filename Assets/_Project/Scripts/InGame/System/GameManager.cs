@@ -289,9 +289,18 @@ public class GameManager : NetworkBehaviour
     private void TriggerFinishSequenceInternal(string winnerName)
     {
         if (isLocalMode)
+        {
             FinishAnimationAsync(winnerName).Forget();
+
+        }
         else if (IsServer)
+        {
+            // カーソルを再表示
+            Cursor.lockState = CursorLockMode.None;
+
             TriggerFinishSequenceClientRpc(winnerName);
+
+        }
     }
 
     [ClientRpc]

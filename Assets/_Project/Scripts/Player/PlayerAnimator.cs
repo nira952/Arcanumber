@@ -9,6 +9,7 @@ using UnityEngine;
 public class PlayerAnimator : NetworkBehaviour
 {
     private Animator animator;
+
     private OwnerNetworkAnimator networkAnimator;
 
     [SerializeField] private GameObject youObject; // 自分のプレイヤーを示すオブジェクト（UIやエフェクト用）
@@ -53,7 +54,7 @@ public class PlayerAnimator : NetworkBehaviour
     /// <summary>
     /// PlayerRoot から初期化され、入力・状態ストリームを購読する
     /// </summary>
-    public void Initialize(int playerIndex)
+    public RuntimeAnimatorController Initialize(int playerIndex)
     {
         // playerIndex が配列の範囲外になっていないかチェック
         if (playerIndex < 0 || playerIndex >= animatorControllers.Length)
@@ -67,7 +68,11 @@ public class PlayerAnimator : NetworkBehaviour
             youObject.SetActive(true); // 自分のプレイヤーを示すオブジェクトを有効化
         }
 
-        animator.runtimeAnimatorController = animatorControllers[playerIndex];
+        RuntimeAnimatorController runtimeAnimator = animatorControllers[playerIndex];
+
+        animator.runtimeAnimatorController = runtimeAnimator;
+
+        return runtimeAnimator;
     }
 
     private void OnPlayerIndexChanged(int previousValue, int newValue)
