@@ -83,6 +83,8 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
         }
     }
 
+
+
     /// <summary>
     /// 指定されたスロットの補助メソッド
     /// </summary>
@@ -109,6 +111,30 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
 
         }
 
+    }
+
+    public void UpdateAttackCoolTimeUI(float current, float max)
+    {
+        UpdateNormalAttackUI(current, max);
+    }
+    private void UpdateNormalAttackUI(float current, float max)
+    {
+        if (current > 0f)
+        {
+            float elapsed = max - current; //経過した時間
+            normalAttackTimeIcon.fillAmount = elapsed / max; //0から1に向かって増えていく
+            string formattedTime = current >= 10f
+                ? $"{Mathf.CeilToInt(current):F0}"
+                : $"{current:F1}";
+            //残り秒数をテキストに表示（9秒以下になると小数点が出てくる）
+            normalAttackText.text = formattedTime;
+            // 0.1より小さくなったら0にする
+            if (current <= 0.1f)
+            {
+                normalAttackTimeIcon.fillAmount = 1f;
+                normalAttackText.text = "";
+            }
+        }
     }
 
 
