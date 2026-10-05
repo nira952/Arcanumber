@@ -34,7 +34,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
         InstatiateEffectServerRpc(index, pos);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void InstatiateEffectServerRpc(int index, Vector2 pos)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
@@ -81,7 +81,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// <summary>
     /// 自分にエフェクトをつけるとき
     /// </summary>
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void SetEffectServerRpc(int index, int effectIndex, bool isBuff, bool isDisplay, float time, float value)
     {
         Effect effect = EffectRegistry.Get((EffectList)effectIndex, isBuff);
@@ -92,7 +92,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// <summary>
     /// 自分以外にエフェクトをつけるとき
     /// </summary>
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void SetEffectOtherServerRpc(int index, int effectIndex, bool isBuff, bool isDisplay, float time, float value)
     {
         Effect effect = EffectRegistry.Get((EffectList)effectIndex, isBuff);
@@ -110,7 +110,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
         ClearEffectServerRpc(index);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void ClearEffectServerRpc(int index)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
@@ -143,7 +143,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
         }
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     /// <summary>
     /// 指定したプレイヤーの最大HPを指定倍率に基づいて更新する。
     /// </summary>
@@ -157,7 +157,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// <summary>
     /// 攻撃力を上げる場合
     /// </summary>
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void SetAtkServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
@@ -168,7 +168,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// <summary>
     /// 防御力を上げる場合
     /// </summary>
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void SetDefServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
@@ -179,7 +179,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// <summary>
     /// 速度を上げる場合
     /// </summary>
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void SetSpeedServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
@@ -200,7 +200,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void HealServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
@@ -219,11 +219,28 @@ public class ArcanaNetworkManager : NetworkBehaviour
             DamageServerRpc(index, value);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void DamageServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
         player.ApplyDamage(value);
+    }
+
+    /// <summary>
+    /// ネットワーク用ジャンプ設定
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    public void SetJump(int index, int value)
+    {
+        JumpServerRpc(index, value);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void JumpServerRpc(int index, int value)
+    {
+        PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
+        player.GetPlayerStatus().SetMaxJump(player.GetPlayerStatus().GetMaxJump() + value);
     }
 }
 

@@ -12,7 +12,7 @@ public class Arcana21WorldFront : ArcanaLogic
     //二段ジャンプができる
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        player.GetPlayerStatus().SetMaxJump(player.GetPlayerStatus().GetMaxJump() + 1);
+        ArcanaNetworkManager.Instance.SetJump(player.PlayerIndex.Value, 1);
     }
 }
 
@@ -24,9 +24,8 @@ public class Arcana21WorldBack : ArcanaLogic
     //次元移動ができる
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        Effect e = EffectRegistry.Get(EffectList.WallSwap, true);
-        EffectAbility ea = new EffectAbility(e, false, -1f, 0f);
-        player.AddEffect(ea.Clone());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
+            (int)EffectList.WallSwap, true, false, -1f, 0f);
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

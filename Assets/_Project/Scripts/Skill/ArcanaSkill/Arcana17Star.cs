@@ -32,9 +32,8 @@ public class Arcana17StarBack : ArcanaLogic
     //無敵
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        Effect e = EffectRegistry.Get(EffectList.Invincible, true);
-        EffectAbility ea = new EffectAbility(e, true, sourceArcana.GetKeepValue(), -1f);
-        player.AddEffect(ea.Clone());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
+            (int)EffectList.Invincible, true, true, sourceArcana.GetKeepValue(), -1f);
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 

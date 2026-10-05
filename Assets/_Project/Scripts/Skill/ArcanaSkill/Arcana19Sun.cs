@@ -14,9 +14,8 @@ public class Arcana19SunFront : ArcanaLogic
     private float numValue = 0.5f;
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        Effect e = EffectRegistry.Get(EffectList.SunBurn, false);
-        EffectAbility effect = new EffectAbility(e, false, sourceArcana.GetKeepValue(), numValue);
-        PlayerUtility.ApplyEffectToOtherPlayers(player, effect.Clone());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, false,
+            (int)EffectList.SunBurn, false, false, sourceArcana.GetKeepValue(), numValue);
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
@@ -29,9 +28,8 @@ public class Arcana19SunBack : ArcanaLogic
     //スタンする
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        Effect e = EffectRegistry.Get(EffectList.Stun, false);
-        EffectAbility effect = new EffectAbility(e, false, sourceArcana.GetKeepValue(), -1);
-        PlayerUtility.ApplyEffectToOtherPlayers(player, effect.Clone());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, false,
+            (int)EffectList.Stun, false, false, sourceArcana.GetKeepValue(), -1);
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
