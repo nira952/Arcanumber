@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public class TitleUIManager : MonoBehaviour
 {
     [SerializeField] private GameObject titlePanel;
-    [SerializeField] private GameObject mainPanel;
     [SerializeField] private CanvasGroup mainPanelGroup;
 
     [SerializeField] private TextMeshProUGUI titleText;
@@ -62,7 +61,6 @@ public class TitleUIManager : MonoBehaviour
         CloseAllPanels();
         SettingObservable();
 
-        mainPanel.SetActive(true);
         titlePanel.SetActive(true);
 
         // DOTweenでguideTextを点滅させる
@@ -173,7 +171,6 @@ public class TitleUIManager : MonoBehaviour
     public void CloseAllPanels()
     {
         if (titlePanel != null) titlePanel.SetActive(false);
-        if (mainPanel != null) mainPanel.SetActive(false);
         if (privateMatchPanel != null) privateMatchPanel.SetActive(false);
         if (casualMatchPanel != null) casualMatchPanel.SetActive(false);
         if (lanJoinPanel != null) lanJoinPanel.SetActive(false);
@@ -184,7 +181,7 @@ public class TitleUIManager : MonoBehaviour
 
     public void OnClickExitTitlePanel(GameObject panel)
     {
-        ChangeCurtainPanel(mainPanel, panel).Forget();
+        ChangeCurtainPanel(titlePanel, panel).Forget();
     }
 
 }
