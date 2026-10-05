@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
 
 public class TextManager : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class TextManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI textDisplay;
     [SerializeField] private Button nextButton;
 
+    [SerializeField] private CanvasGroup textCanvasGroup; // CanvasGroupを追加
     [SerializeField] private TextAsset csvFile;
 
     [Header("読み込む縦列のインデックス (0始まり)")]
@@ -30,10 +32,19 @@ public class TextManager : MonoBehaviour
 
     private List<DialogueData> dialogueList = new List<DialogueData>();
     private int currentIndex = 0;
+
+    private bool isDialogueActive = false;
     private Coroutine typingCoroutine;
 
-    private void Start()
+
+    public void StartText()
     {
+        if (isDialogueActive) { return; }
+
+        textCanvasGroup.DOFade(1f, 0.5f); // フェードイン
+
+        isDialogueActive = true;
+
         if (nextButton != null)
         {
             nextButton.onClick.AddListener(OnClickNextButton);
@@ -46,6 +57,8 @@ public class TextManager : MonoBehaviour
 
     private void Update()
     {
+        if (!isDialogueActive) { return; }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             OnClickNextButton();
@@ -148,6 +161,11 @@ public class TextManager : MonoBehaviour
 
     private void EndTutorial()
     {
+        textCanvasGroup.DOFade(0f, 0.5f).OnComplete(() =>
+        {
+            isDialogueActive = false;
+            textPanel.SetActive(false);
+        });
 
     }
 

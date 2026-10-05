@@ -7,19 +7,8 @@ using UnityEngine;
 /// </summary>
 public class PlayerSpawner : NetworkBehaviour
 {
-    [SerializeField] private bool isLocalMode = false; // オフラインモードフラグ
     [SerializeField] private Transform[] spawnPoints;   // 各プレイヤーの初期位置
     [SerializeField] private PlayerRoot playerPrefab;   // 生成するプレイヤーのプレハブ
-
-    private void Start()
-    {
-        // PlayerDataManager が存在する場合はそこからモードを取得し、なければシリアライズされた isLocalMode を優先
-        if (PlayerDataManager.Instance != null)
-        {
-            isLocalMode = PlayerDataManager.Instance.IsLocalMode;
-        }
-
-    }
 
     /// <summary>
     /// 現在接続されているすべてのクライアントのプレイヤーを一括生成・登録する (サーバー専用)

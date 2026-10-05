@@ -2,15 +2,26 @@ using UnityEngine;
 
 public class TutorialManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private TextManager textManager;
+
+    private void Start()
     {
-        
+        textManager.StartText();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        // Escapeキーが押されたらタイトルシーンに移動する
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            EndTutorial();
+        }
+    }
+
+    private void EndTutorial()
+    {
+        // チュートリアル終了時の処理をここに追加
+        GameSceneManager.Instance.LoadLocalScene("TitleScene");
     }
 }
+
