@@ -12,7 +12,8 @@ public class Arcana15DevilFront : ArcanaLogic
     //通常攻撃にデバフがつく
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-
+        float value = 1.3f;
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Def, value);
     }
 }
 

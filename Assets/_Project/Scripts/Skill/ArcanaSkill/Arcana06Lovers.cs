@@ -15,6 +15,9 @@ public class Arcana06LoversFront : ArcanaLogic
     {
         ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
             (int)EffectList.Charm, true, false, sourceArcana.GetKeepValue(), -1f);
+
+        Vector2 pos = player.transform.position + sourceArcana.GetEffectPrefab().transform.position;
+        ArcanaNetworkManager.Instance.SetAnimation(player.PlayerIndex.Value, pos, sourceArcana.GetKeepValue());
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

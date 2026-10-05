@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 // ========================================================
 // 正義：Justice
@@ -27,6 +28,9 @@ public class Arcana11JusticeBack : ArcanaLogic
     {
         ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
             (int)EffectList.Counter, true, true, sourceArcana.GetKeepValue(), -1f);
+
+        Vector2 pos = player.transform.position + sourceArcana.GetEffectPrefab().transform.position;
+        ArcanaNetworkManager.Instance.SetAnimation(player.PlayerIndex.Value, pos, sourceArcana.GetKeepValue());
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

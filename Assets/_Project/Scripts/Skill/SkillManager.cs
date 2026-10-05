@@ -282,9 +282,9 @@ public class SkillManager : NetworkBehaviour
 
     private void Heal(PlayerRoot playerRoot, Skill skill)
     {
+        bool isHealStealActive = false;
         float baseHealAmount = skill.GetAtk();
 
-        playerRoot.ApplyHeal(baseHealAmount);
         PlayAnimation(playerRoot, skill);
 
         float sharedHealAmount = baseHealAmount * 0.5f;
@@ -298,8 +298,14 @@ public class SkillManager : NetworkBehaviour
             {
                 target.ApplyHeal(sharedHealAmount);
                 PlayAnimation(target, skill);
+                isHealStealActive = true;
             }
         }
+
+        if (isHealStealActive)
+            playerRoot.ApplyHeal(sharedHealAmount);
+        else
+            playerRoot.ApplyHeal(baseHealAmount);
     }
 
     private void EffectBuffPlayer(PlayerRoot playerRoot, Skill skill)

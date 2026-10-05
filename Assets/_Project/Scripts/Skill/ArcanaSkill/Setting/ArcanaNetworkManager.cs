@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
 public class ArcanaNetworkManager : NetworkBehaviour
@@ -28,7 +29,11 @@ public class ArcanaNetworkManager : NetworkBehaviour
     bool isLocalMode = false;
 
 
-
+    /// <summary>
+    /// ネットワークでオブジェクトを生成
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="pos"></param>
     public void SetData(int index, Vector2 pos)
     {
         InstatiateEffectServerRpc(index, pos);
@@ -58,6 +63,35 @@ public class ArcanaNetworkManager : NetworkBehaviour
             AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
             Destroy(effectObj, stateInfo.length);
         }
+    }
+
+    /// <summary>
+    /// 時間で消すエフェクト
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="pos"></param>
+    /// <param name="time"></param>
+    public void SetAnimation(int index, Vector2 pos, float time)
+    {
+        SetAnimationServerRpc(index, pos, time);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetAnimationServerRpc(int index, Vector2 pos, float time)
+    {
+        PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
+
+        GameObject effectObj = Instantiate(player.GetArcana().GetEffectPrefab(), pos, Quaternion.identity);
+
+        if (!isLocalMode && IsServer)
+        {
+            if (effectObj.TryGetComponent(out NetworkObject networkObject))
+            {
+                networkObject.Spawn();
+            }
+        }
+        effectObj.transform.SetParent(player.transform);
+        Destroy(effectObj, time);
     }
 
     /// <summary>
@@ -241,6 +275,24 @@ public class ArcanaNetworkManager : NetworkBehaviour
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
         player.GetPlayerStatus().SetMaxJump(player.GetPlayerStatus().GetMaxJump() + value);
+    }
+
+    public void SetTransform(int index, Vector2 pos)
+    {
+        TransformServerRpc(index, pos);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void TransformServerRpc(int index, Vector2 pos)
+    {
+        PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
+        var netTransform = player.GetComponent<NetworkTransform>();
+        if (netTransform != null)
+            // 補間を無視して一瞬でワープさせる
+            netTransform.Teleport(pos, player.transform.rotation, player.transform.localScale);
+        else
+            // 通常の書き換え
+            player.transform.position = pos;
     }
 }
 
