@@ -60,6 +60,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
         if (!IsOwner)
         {
             if (inputController != null) { inputController.enabled = false; }
+            return; // 所有者でない場合はここで終了
         }
 
         // --- 入力バインダーの初期化 ---

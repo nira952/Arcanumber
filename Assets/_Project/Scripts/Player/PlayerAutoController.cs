@@ -14,6 +14,7 @@ public class PlayerAutoController : MonoBehaviour, IPlayerInputMediator
         root.gameObject.tag = "Enemy";
 
         PlayerUtility.RegisterPlayer(root);
+        GameCameraManager.Instance.RegisterTarget(root.transform);
 
     }
 
