@@ -61,14 +61,14 @@ public class PlayerRoot : MonoBehaviour
         if (CurrentArcana == null)
             CurrentArcana = LoadManager.Instance.GetData(0, false);
 
+        // エフェクトの初期化
+        ActiveEffects.Clear();
+
         // 初期発動のアルカナを発動する
         CurrentArcana.ExecuteArcanaEffect(ASkillCategory.StartEffect, this);
 
         // 最大体力を設定
         CurrentHealth.Value = status.GetMaxHp();
-
-        // エフェクトの初期化
-        ActiveEffects.Clear();
 
         // ステータスを新品に入れ替える
         status = new PlayerStatus();

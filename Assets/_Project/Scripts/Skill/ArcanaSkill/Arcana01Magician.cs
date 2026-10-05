@@ -12,7 +12,7 @@ public class Arcana01MagicianFront : ArcanaLogic
     //防御無視
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        Effect e = EffectRegistry.Get(EffectList.IgnoreDefense, false);
+        Effect e = EffectRegistry.Get(EffectList.IgnoreDefense, true);
         EffectAbility ea = new EffectAbility(e, false, -1f, -1f);
         player.AddEffect(ea.Clone());
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());

@@ -39,7 +39,6 @@ public class ArcanaNetworkManager : NetworkBehaviour
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
 
         GameObject effectObj = Instantiate(player.GetArcana().GetEffectPrefab(), pos, Quaternion.identity);
-        effectObj.transform.SetParent(player.transform);
 
         if (!isLocalMode && IsServer)
         {
@@ -48,6 +47,8 @@ public class ArcanaNetworkManager : NetworkBehaviour
                 networkObject.Spawn();
             }
         }
+
+        effectObj.transform.SetParent(player.transform);
 
         Animator animator = effectObj.GetComponentInChildren<Animator>();
         if (animator != null)
