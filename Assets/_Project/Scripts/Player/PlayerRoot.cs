@@ -44,16 +44,15 @@ public class PlayerRoot : MonoBehaviour
         //　ArcanaとスキルをPlayerDataManagerから取得
         int myIndex = PlayerIndex.Value;
 
+        // 自分のスキルとアルカナを取得
         skillList = PlayerDataManager.Instance.GetMySkills();
-        CurrentArcana = PlayerDataManager.Instance.GetPlayerArcanaByIndex(myIndex);
+        CurrentArcana = PlayerDataManager.Instance.GetMyArcana();
 
 
+        // 選択スキル番号が変更されたときにCurrentSkillを更新する
         SelectedSkillIndex.Subscribe(index =>
         {
-            if (index < 0 || index >= skillList.Length)
-            {
-                return;
-            }
+            if (index < 0 || index >= skillList.Length){ return; }
             CurrentSkill = skillList[index];
         });
 
@@ -210,7 +209,6 @@ public class PlayerRoot : MonoBehaviour
     /// <summary> スキル選択実行メソッド </summary>
     public void ExecuteSkillSelect(int direction)
     {
-        if (!CanControl) { return; }
         int newSkillNo = playerSkill.SkillSelect(SelectedSkillIndex.Value, direction);
 
         // 選択スキル番号を更新
@@ -359,6 +357,13 @@ public class PlayerRoot : MonoBehaviour
     /**
  * --------- セッター ---------
  */
+    public void SetPlayerIndex(int index)
+    {
+        if(index >= 0)
+        {
+            PlayerIndex.Value = index;
+        }
+    }
     public void SetMoveSpeed(float speed) { status.SetSpeed(speed); }
 
     public void SetSkill(Skill[] skills)

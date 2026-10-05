@@ -32,6 +32,9 @@ public class PlayerSpawner : NetworkBehaviour
             // プレイヤーを生成
             PlayerRoot spawnedPlayer = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
 
+            // プレイヤーのインデックスを設定
+            spawnedPlayer.SetPlayerIndex(index);
+
             // プレイヤー名を設定
             string playerName = PlayerDataManager.Instance.GetPlayerNameByIndex(index);
 
@@ -63,7 +66,7 @@ public class PlayerSpawner : NetworkBehaviour
         Transform spawnPoint = GetSpawnPoint(playerIndex);
         PlayerRoot spawnedPlayer = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
 
-        spawnedPlayer.PlayerIndex.Value = playerIndex; // プレイヤーのインデックスを設定
+        spawnedPlayer.SetPlayerIndex(playerIndex); // プレイヤーのインデックスを設定
 
         PlayerOfflineController controller = spawnedPlayer.gameObject.AddComponent<PlayerOfflineController>();
 
@@ -76,7 +79,7 @@ public class PlayerSpawner : NetworkBehaviour
         Transform enemySpawnPoint = GetSpawnPoint(enemyIndex);
         PlayerRoot spawnedEnemy = Instantiate(playerPrefab, enemySpawnPoint.position, enemySpawnPoint.rotation);
 
-        spawnedEnemy.PlayerIndex.Value = enemyIndex; // 敵プレイヤーのインデックスを設定
+        spawnedEnemy.SetPlayerIndex(enemyIndex); // 敵プレイヤーのインデックスを設定
 
         PlayerAutoController enemyController = spawnedEnemy.gameObject.AddComponent<PlayerAutoController>();
 

@@ -1,3 +1,4 @@
+using NPOI.SS.Formula.Functions;
 using ObservableCollections;
 using R3;
 using Unity.Collections;
@@ -36,37 +37,10 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
         root            = GetComponent<PlayerRoot>();            // メインスクリプトを取得
         inputBinder     = GetComponent<PlayerInputBinder>();     // 入力バインダーの取得
 
-        // プレイヤーを PlayerUtility に登録
+        // 生成されたプレイヤー分の PlayerRoot を PlayerUtility に登録
         PlayerUtility.RegisterPlayer(root);
         // カメラにプレイヤーを登録
         GameCameraManager.Instance.RegisterTarget(transform);
-
-
-        if (IsServer)
-        {
-            // サーバー側でプレイヤーのインデックスを設定
-            int assignedIndex = PlayerDataManager.Instance.GetLobbyIndexByClientId(OwnerClientId);
-            root.PlayerIndex.Value = assignedIndex;
-
-            Skill[] skills = PlayerDataManager.Instance.GetPlayerSkillsByIndex(assignedIndex);
-            Arcana arcana = PlayerDataManager.Instance.GetPlayerArcanaByIndex(assignedIndex);
-
-            root.SetSkill(skills);
-            root.SetArcana(arcana);
-        }
-
-
-        // 所有者でない場合、Inputコンポーネントを停止
-        if (!IsOwner)
-        {
-            if (inputController != null) { inputController.enabled = false; }
-            return; // 所有者でない場合はここで終了
-        }
-
-        // --- 入力バインダーの初期化 ---
-
-        // バインダーに現在のコントローラーを設定し、入力イベントを購読する
-        inputBinder.Initialize(this);
 
         // --- ネットワーク同期の初期化 ---
 
@@ -122,6 +96,16 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
                 netActiveEffects.Clear();
             }).AddTo(this);
 
+
+            // サーバーのみ自分以外のPlayerObjectのスキルとアルカナを設定する
+            if (!IsOwner)
+            {
+                Skill[] skills = PlayerDataManager.Instance.GetPlayerSkillsByIndex(root.PlayerIndex.Value);
+                Arcana arcana = PlayerDataManager.Instance.GetPlayerArcanaByIndex(root.PlayerIndex.Value);
+
+                root.SetSkill(skills);
+                root.SetArcana(arcana);
+            }
         }
         else
         {
@@ -137,6 +121,19 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
             // 途中参加などで既にネットワークリストに要素がある場合の初期同期
             InitializeEffectsFromNetworkList();
         }
+
+        // 所有者でない場合はここで終了（以降の初期化は所有者のみが行う
+        if (!IsOwner) 
+        {
+            // 所有者でない場合、Inputコンポーネントを停止
+            if (inputController != null) { inputController.enabled = false; }
+            return; 
+        }
+
+        // --- 入力バインダーの初期化 ---
+
+        // バインダーに現在のコントローラーを設定し、入力イベントを購読する
+        inputBinder.Initialize(this);
 
         // プレイヤーの初期化を実行
         root.OwnerInitialize();
