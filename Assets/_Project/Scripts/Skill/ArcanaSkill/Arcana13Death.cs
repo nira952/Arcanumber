@@ -12,8 +12,8 @@ public class Arcana13DeathFront : ArcanaLogic
     //攻撃を降るたびにダメージを受け、攻撃力を上げる
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        player.ApplyDamage(sourceArcana.GetKeepValue());
-        player.GetPlayerStatus().SetAtk(player.GetPlayerStatus().GetAtk() * 1.05f);
+        ArcanaNetworkManager.Instance.SetDamage(player.PlayerIndex.Value, false, sourceArcana.GetKeepValue());
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, 1.05f);
     }
 }
 
@@ -25,9 +25,8 @@ public class Arcana13DeathBack : ArcanaLogic
     //攻撃が当たるたびに回復する
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        Effect e = EffectRegistry.Get(EffectList.AtkHeal, true);
-        EffectAbility ea = new EffectAbility(e, false, -1f, -1f);
-        player.AddEffect(ea.Clone());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
+            (int)EffectList.AtkHeal, true, false, -1f, -1f);
     }
 }
 

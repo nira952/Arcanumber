@@ -18,7 +18,7 @@ public class Arcana03EmpressFront : ArcanaLogic
         while (true)
         {
             yield return new WaitForSeconds(timeInterval);
-            player.ApplyHeal(sourceArcana.GetKeepValue());
+            ArcanaNetworkManager.Instance.SetHeal(player.PlayerIndex.Value, sourceArcana.GetKeepValue());
             NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }
     }
@@ -52,9 +52,8 @@ public class Arcana03EmpressBack : ArcanaLogic
             //ランダムな効果を選ぶ
             if (masterEffect != null)
             {
-                //レジストリから得たマスターデータを元に、能力インスタンスを生成
-                randomEffect = new EffectAbility(masterEffect, true, sourceArcana.GetKeepValue(), finalNum);
-                player.AddEffect(randomEffect.Clone()); 
+                ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
+                    (int)randomType, isSuccess, true, sourceArcana.GetKeepValue(), finalNum);
             }
 
             NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());

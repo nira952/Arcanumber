@@ -18,7 +18,7 @@ public class Arcana02HighPriestessFront : ArcanaLogic
         while (true)
         {
             yield return new WaitForSeconds(timeInterval);
-            player.GetPlayerStatus().SetAtk(player.GetPlayerStatus().GetAtk() * sourceArcana.GetKeepValue());
+            ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, sourceArcana.GetKeepValue());
             NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }
     }
@@ -35,7 +35,7 @@ public class Arcana02HighPriestessBack : ArcanaLogic
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         //最初に攻撃力を上げる
-        player.GetPlayerStatus().SetAtk(normalAtkValue);
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, normalAtkValue);
         player.StartCoroutine(OnUpdate(player, sourceArcana));
     }
     public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
@@ -44,7 +44,7 @@ public class Arcana02HighPriestessBack : ArcanaLogic
         while (true)
         {
             yield return new WaitForSeconds(timeInterval);
-            player.GetPlayerStatus().SetAtk(player.GetPlayerStatus().GetAtk() * sourceArcana.GetKeepValue());
+            ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, sourceArcana.GetKeepValue());
             NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }
     }

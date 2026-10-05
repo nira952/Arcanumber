@@ -13,10 +13,8 @@ public class Arcana14TemperanceFront : ArcanaLogic
     //自分のスキルのクールタイムを減らす
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        Effect e = EffectRegistry.Get(EffectList.CoolTimeReduction, true);
-        EffectAbility ea = new EffectAbility(e, false, -1f, sourceArcana.GetKeepValue());
-        //自分にかける
-        player.AddEffect(ea.Clone());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
+            (int)EffectList.CoolTimeReduction, true, false, -1f, sourceArcana.GetKeepValue());
     }
 }
 
@@ -28,9 +26,7 @@ public class Arcana14TemperanceBack : ArcanaLogic
     //相手のスキルのクールタイムを増やす
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        Effect e = EffectRegistry.Get(EffectList.CoolTimeReduction, false);
-        EffectAbility ea = new EffectAbility(e, false, -1f, sourceArcana.GetKeepValue());
-        //自分以外にかける
-        PlayerUtility.ApplyEffectToOtherPlayers(player, ea);
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, false,
+            (int)EffectList.CoolTimeReduction, false, false, -1f, sourceArcana.GetKeepValue());
     }
 }

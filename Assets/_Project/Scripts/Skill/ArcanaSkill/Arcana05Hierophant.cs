@@ -10,11 +10,8 @@ public class Arcana05HierophantFront : ArcanaLogic
     //スキルの当たり判定がすこし大きくなる
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        EffectAbility effect = new EffectAbility(
-            EffectRegistry.Get(EffectList.SizeChange, true),
-            false, -1, sourceArcana.GetKeepValue());
-        player.AddEffect(effect.Clone());
-
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
+            (int)EffectList.SizeChange, true, false, -1, sourceArcana.GetKeepValue());
     }
 }
 
@@ -26,10 +23,8 @@ public class Arcana05HierophantBack : ArcanaLogic
     //左右移動が反転
     public override void Execute(PlayerRoot player, Arcana sourceArcana) 
     {
-        Effect e = EffectRegistry.Get(EffectList.Reverse, false);
-        EffectAbility ea = new EffectAbility(e, false, sourceArcana.GetKeepValue(), 0);
-        //とりあえず自分以外にかける
-        PlayerUtility.ApplyEffectToOtherPlayers(player, ea.Clone());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, false,
+            (int)EffectList.Reverse, false, false, sourceArcana.GetKeepValue(), 0);
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

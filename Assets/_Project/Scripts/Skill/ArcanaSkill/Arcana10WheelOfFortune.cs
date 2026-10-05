@@ -62,10 +62,8 @@ public class Arcana10WheelOfFortuneBack : ArcanaLogic
     //ジャンプができないようにする
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        Effect e = EffectRegistry.Get(EffectList.NoJump, false);
-        EffectAbility ea = new EffectAbility(e, true, sourceArcana.GetKeepValue(), 0);
-        //自分以外にかける
-        PlayerUtility.ApplyEffectToOtherPlayers(player, ea.Clone());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, false,
+            (int)EffectList.NoJump, false, true, sourceArcana.GetKeepValue(), 0);
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
