@@ -13,9 +13,8 @@ public class Arcana06LoversFront : ArcanaLogic
     //魅了状態にする
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        Effect e = EffectRegistry.Get(EffectList.Charm, true);
-        EffectAbility ea = new EffectAbility(e, true, sourceArcana.GetKeepValue(), -1f);
-        player.AddEffect(ea.Clone());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
+            (int)EffectList.Charm, true, false, sourceArcana.GetKeepValue(), -1f);
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

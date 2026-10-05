@@ -33,9 +33,8 @@ public class Arcana12HangedManBack : ArcanaLogic
     //運の確立を最大まで上げる
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        Effect e = EffectRegistry.Get(EffectList.Lacky, true);
-        EffectAbility ea = new EffectAbility(e, false, -1, -1);
-        player.AddEffect(ea.Clone());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
+            (int)EffectList.Lacky, true, false, -1f, -1f);
     }
 
 }

@@ -12,8 +12,7 @@ public class Arcana08StrengthFront : ArcanaLogic
     //攻撃力が上がる
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        float newAttack = player.GetPlayerStatus().GetAtk() * sourceArcana.GetKeepValue();
-        player.GetPlayerStatus().SetAtk(newAttack);
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, sourceArcana.GetKeepValue());
     }
 }
 
@@ -30,7 +29,6 @@ public class Arcana08StrengthBack : ArcanaLogic
         _owner = player;
         sArcana = sourceArcana;
         
-        // TODO : 保留
     }
     private void OnDamageReceived(PlayerRoot target, float damage)
     {

@@ -12,8 +12,7 @@ public class Arcana07ChariotFront : ArcanaLogic
     //速度が上がる
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        float newSpeed = player.GetPlayerStatus().GetSpeed() * sourceArcana.GetKeepValue();
-        player.GetPlayerStatus().SetSpeed(newSpeed);
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Speed, sourceArcana.GetKeepValue());
     }
 }
 
@@ -25,10 +24,8 @@ public class Arcana07ChariotBack : ArcanaLogic
     //スキル発動が50％速くなる
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        EffectAbility effect = new EffectAbility(
-            EffectRegistry.Get(EffectList.SkillTimeReduction, true),
-            false, -1, sourceArcana.GetKeepValue());
-        player.AddEffect(effect.Clone());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
+            (int)EffectList.SkillTimeReduction, true, false, -1, sourceArcana.GetKeepValue());
     }
 }
 

@@ -27,10 +27,8 @@ public class Arcana15DevilBack : ArcanaLogic
         //デバフ、バフの数を数える
         int efeNum = player.GetAllEffectCount();
         //すべて消す
-        player.ClearAllEffects();
-        //数だけ攻撃力を上げる
-        player.GetPlayerStatus().SetAtk(
-            player.GetPlayerStatus().GetAtk() + player.GetPlayerStatus().GetAtk() * efeNum * sourceArcana.GetKeepValue());
+        ArcanaNetworkManager.Instance.ClearEffect(player.PlayerIndex.Value);
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, efeNum * sourceArcana.GetKeepValue());
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

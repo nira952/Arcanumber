@@ -32,7 +32,7 @@ public class Arcana16TowerBack : ArcanaLogic
         {
             yield return new WaitForSeconds(time);
 
-            // SkillManagerにスキル発動を依頼する
+            //SkillManagerにスキル発動を依頼する
             SkillManager.Instance.RequestSkill(player);
             NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }

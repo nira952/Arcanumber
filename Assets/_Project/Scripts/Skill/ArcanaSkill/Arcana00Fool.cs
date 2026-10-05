@@ -10,8 +10,7 @@ public class Arcana00FoolFront : ArcanaLogic
     //HP‚ð1.3”{‚É‚·‚é
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        float newHp = player.GetPlayerStatus().GetMaxHp() * sourceArcana.GetKeepValue();
-        player.GetPlayerStatus().SetMaxHp(newHp);
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Hp, sourceArcana.GetKeepValue());
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

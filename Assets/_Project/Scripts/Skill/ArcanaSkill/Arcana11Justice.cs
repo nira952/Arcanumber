@@ -12,9 +12,7 @@ public class Arcana11JusticeFront : ArcanaLogic
     //全員にダメージを与える
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        List<PlayerRoot> list = PlayerUtility.GetOtherPlayers(player);
-        foreach (PlayerRoot p in list)
-            p.ApplyDamage(sourceArcana.GetKeepValue());
+        ArcanaNetworkManager.Instance.SetDamage(player.PlayerIndex.Value, true, sourceArcana.GetKeepValue());
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
@@ -27,9 +25,8 @@ public class Arcana11JusticeBack : ArcanaLogic
     //半分のダメージを返す（カウンター）
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        Effect e = EffectRegistry.Get(EffectList.Counter, true);
-        EffectAbility ea = new EffectAbility(e, true, sourceArcana.GetKeepValue(), -1f);
-        player.AddEffect(ea.Clone());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
+            (int)EffectList.Counter, true, true, sourceArcana.GetKeepValue(), -1f);
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

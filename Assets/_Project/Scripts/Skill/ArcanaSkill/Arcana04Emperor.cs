@@ -10,11 +10,9 @@ public class Arcana04EmperorFront : ArcanaLogic
     //スキルを使用禁止にする
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-       Effect e = EffectRegistry.Get(EffectList.Silence, false);
-       EffectAbility ea = new EffectAbility(e, false, sourceArcana.GetKeepValue(), 0);
-       //自分以外にかける
-       PlayerUtility.ApplyEffectToOtherPlayers(player, ea.Clone());
-       NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, false, 
+           (int)EffectList.Silence, false, false, sourceArcana.GetKeepValue(), 0);
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
 
@@ -26,8 +24,8 @@ public class Arcana04EmperorBack : ArcanaLogic
     //通常攻撃が振れないが、ダメージが2倍になる
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        player.GetPlayerStatus().SetAtk(player.GetPlayerStatus().GetAtk() * 2);
-        Effect e = EffectRegistry.Get(EffectList.EnperorAura, true);
-        EffectAbility ea = new EffectAbility(e, false, -1, -1);
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, 2);
+        ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, false,
+          (int)EffectList.EnperorAura, true, false, sourceArcana.GetKeepValue(), -1f);
     }
 }
