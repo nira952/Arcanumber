@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
 public class ArcanaNetworkManager : NetworkBehaviour
@@ -144,6 +143,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
         }
     }
 
+    [ServerRpc]
     /// <summary>
     /// 指定したプレイヤーの最大HPを指定倍率に基づいて更新する。
     /// </summary>
