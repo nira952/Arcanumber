@@ -254,7 +254,7 @@ public class ArcanaSelectManager : NetworkBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(1.0f));
 
-        GameSceneManager.Instance.LoadLocalScene("SkillSelect"); // オフライン用のシーン遷移
+        GameSceneManager.Instance.LoadLocalScene("SkillSelect").Forget(); // オフライン用のシーン遷移
 
     }
 

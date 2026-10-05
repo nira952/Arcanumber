@@ -1,5 +1,6 @@
 using UnityEngine;
 using R3;
+using Cysharp.Threading.Tasks;
 
 public class TitleManager : MonoBehaviour
 {
@@ -16,9 +17,17 @@ public class TitleManager : MonoBehaviour
             PlayerDataManager.Instance.SetLocalMode(true);
 
             // トレーニングシーンに遷移する処理をここに追加
-            GameSceneManager.Instance.LoadLocalScene(traningSceneName);
+            GameSceneManager.Instance.LoadLocalScene(traningSceneName).Forget();
         }).AddTo(this);
 
+
+        titleUIManager.OnOpenTutorialSceneRequested.Subscribe(_ =>
+        {
+            // ローカルモードを有効にする
+            PlayerDataManager.Instance.SetLocalMode(true);
+            // チュートリアルシーンに遷移する処理をここに追加
+            GameSceneManager.Instance.LoadLocalScene("Tutorial").Forget();
+        }).AddTo(this);
     }
 
 

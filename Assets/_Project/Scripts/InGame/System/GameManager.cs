@@ -74,7 +74,7 @@ public class GameManager : NetworkBehaviour
         Debug.Log("[GameManager] オフラインモードで起動します。");
 
         // オフラインモードでは全プレイヤーを一括生成
-        playerSpawner.SpawnAllPlayersOffline();
+        playerSpawner.SpawnAllPlayersOffline(false);
 
         // プレイヤーのダウン状態を監視する購読を設定
         SettingPlayerObservable();
@@ -181,9 +181,7 @@ public class GameManager : NetworkBehaviour
     {
         // Network変数の変更を購読して、stateRxに反映させる
         NetWorkGameState.AsObservable().Subscribe(state => stateRx.Value = state).AddTo(this);
-
-        // ゲームUIManagerの初期化
-        gameUIManager.Initialize(this, timeManager);
+        gameUIManager.PlayerUIInitialize();
 
 
         StartGameSequenceAsync().Forget();

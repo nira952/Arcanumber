@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -84,8 +85,10 @@ public class GameSceneManager : MonoBehaviour
     /// <summary>
     /// 通常のローカルシーン遷移（タイトルに戻る場合や、オフライン画面用）
     /// </summary>
-    public void LoadLocalScene(string sceneName)
+    public async UniTask LoadLocalScene(string sceneName)
     {
+        await CurtainManager.Instance.CloseAsync($"{sceneName}シーンに移動します",GetType().Name);
+
         Debug.Log($"[GameSceneManager] ローカル単体シーン遷移を開始します: {sceneName}");
         SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
     }

@@ -7,6 +7,8 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerInputMediator
     private PlayerRoot root;
     private PlayerInputBinder inputBinder;
 
+    public bool IsStop = false;
+
     private void Awake()
     {
         // --- コンポーネントの取得 ---
@@ -36,6 +38,8 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerInputMediator
 
     public void OnAttackTriggered()
     {
+        if (IsStop) { return; }
+
         // 攻撃を実行する
         root.ExecuteAttack();
     }
@@ -43,21 +47,29 @@ public class PlayerOfflineController : MonoBehaviour, IPlayerInputMediator
     // ローカルで移動入力を処理する
     public void OnMoveTriggered(float direction)
     {
+        if (IsStop) { return; }
+
         root.ExecuteMove(direction); // 移動のアクションを呼び出す
     }
 
     public void OnJumpTriggered()
     {
+        if (IsStop) { return; }
+
         root.ExecuteJump();
     }
 
     public void OnSkillSelectTriggered(int skillIndex)
     {
+        if (IsStop) { return; }
+
         root.ExecuteSkillSelect(skillIndex);
     }
 
     public void OnSkillUseTriggered()
     {
+        if (IsStop) { return; }
+
         root.ExecuteSkillUse();
     }
 

@@ -87,14 +87,6 @@ public class GameUIManager : MonoBehaviour
         // タイマーの初期表示
         if (timerText != null) { timerText.text = ""; }
 
-        // --- 3. playerEffectBlocks の null チェック ---
-        if (playerEffectBlocks != null)
-        {
-            foreach (var block in playerEffectBlocks)
-            {
-                if (block != null) block.HideAll();
-            }
-        }
 
         // --- 4. TimeManager の Subscribe ---
         if (timeManager != null && timeManager.RemainingTime != null)
@@ -105,8 +97,18 @@ public class GameUIManager : MonoBehaviour
             }).AddTo(this);
         }
 
+    }
 
-        Debug.Log("[GameUIManager] Initialize called.3");
+    public void PlayerUIInitialize()
+    {
+        // --- 3. playerEffectBlocks の null チェック ---
+        if (playerEffectBlocks != null)
+        {
+            foreach (var block in playerEffectBlocks)
+            {
+                if (block != null) block.HideAll();
+            }
+        }
 
         // ステータスオブジェクトの非表示
         if (statusObjects != null)
@@ -119,7 +121,7 @@ public class GameUIManager : MonoBehaviour
 
         // --- 5. プレイヤーリストの処理 ---
         List<PlayerRoot> playerList = PlayerUtility.GetAllPlayer();
-        if (playerList == null) { return;}
+        if (playerList == null) { return; }
         foreach (var root in playerList)
         {
             Debug.Log($"[GameUIManager] PlayerRoot found: {root?.name}, PlayerIndex: {root?.PlayerIndex.Value}");
@@ -152,7 +154,7 @@ public class GameUIManager : MonoBehaviour
             {
                 UpdateHealth(pIndex, hp);
             }).AddTo(playerSubscriptions);
-            
+
 
             // アクティブ効果の変更購読
             if (root.ActiveEffects != null)
@@ -164,6 +166,7 @@ public class GameUIManager : MonoBehaviour
                     }).AddTo(playerSubscriptions);
             }
         }
+
     }
 
 

@@ -57,7 +57,7 @@ public class PlayerSpawner : NetworkBehaviour
     /// <summary>
     /// オフライン（単体テスト等）用にプレイヤーを生成・初期化する
     /// </summary>
-    public void SpawnAllPlayersOffline()
+    public void SpawnAllPlayersOffline(bool isTutorial)
     {
         PlayerUtility.SetIsServer(true); // サーバーとしてのフラグを設定
 
@@ -69,6 +69,9 @@ public class PlayerSpawner : NetworkBehaviour
         spawnedPlayer.SetPlayerIndex(playerIndex); // プレイヤーのインデックスを設定
 
         PlayerOfflineController controller = spawnedPlayer.gameObject.AddComponent<PlayerOfflineController>();
+
+        // チュートリアルモードの場合、プレイヤーの操作を止める
+        controller.IsStop = isTutorial; 
 
         Debug.Log("[PlayerSpawner] PlayerOfflineController をアタッチし、オフライン生成を完了しました。");
 
