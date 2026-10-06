@@ -111,8 +111,7 @@ public class Arcana18MoonBack : ArcanaLogic
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         for (int i = 0; i < sourceArcana.GetKeepValue(); i++)
         {
-            sourceArcana.GetEffectPrefab().GetComponent<Animator>().runtimeAnimatorController =
-                player.GetCurrentAnimator();
+            ArcanaNetworkManager.Instance.SetSprite(player.PlayerIndex.Value);
             SkillManager.Instance.SpawnRpcObject(player.PlayerIndex.Value);
         }
     }

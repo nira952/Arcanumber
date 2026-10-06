@@ -14,8 +14,10 @@ public class Arcana19SunFront : ArcanaLogic
     private float numValue = 0.5f;
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
+        Vector2 pos = player.GetAimCursor().GetEfeUpperPos().position;
         ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, false,
             (int)EffectList.SunBurn, false, false, sourceArcana.GetKeepValue(), numValue);
+        ArcanaNetworkManager.Instance.SetAnimation(player.PlayerIndex.Value, pos, sourceArcana.GetKeepValue());
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

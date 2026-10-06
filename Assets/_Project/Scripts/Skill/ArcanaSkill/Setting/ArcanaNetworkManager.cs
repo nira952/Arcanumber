@@ -76,6 +76,16 @@ public class ArcanaNetworkManager : NetworkBehaviour
         SetAnimationServerRpc(index, pos, time);
     }
 
+    public void SetOtherAnimation(int index, float times)
+    {
+        List<PlayerRoot> other = PlayerUtility.GetOtherPlayersIndex(index);
+        for (int i = 0; i < other.Count; i++)
+        {
+            Vector2 pos = other[i].GetAimCursor().GetEfeUpperPos().position;
+            SetAnimationServerRpc(other[i].PlayerIndex.Value, pos, times);
+        }
+    }
+
     [ServerRpc(RequireOwnership = false)]
     private void SetAnimationServerRpc(int index, Vector2 pos, float time)
     {
@@ -293,6 +303,20 @@ public class ArcanaNetworkManager : NetworkBehaviour
         else
             // 通常の書き換え
             player.transform.position = pos;
+    }
+
+    public void SetSprite(int index)
+    {
+        SetSpriteServerRpc(index);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetSpriteServerRpc(int index)
+    {
+        PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
+        RuntimeAnimatorController spriteRenderer = player.GetCurrentAnimator();
+        Animator animator = player.GetArcana().GetEffectPrefab().GetComponent<Animator>();
+        animator.runtimeAnimatorController = spriteRenderer;
     }
 }
 

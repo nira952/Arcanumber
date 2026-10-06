@@ -25,6 +25,7 @@ public class Arcana05HierophantBack : ArcanaLogic
     {
         ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, false,
             (int)EffectList.Reverse, false, false, sourceArcana.GetKeepValue(), 0);
+        ArcanaNetworkManager.Instance.SetOtherAnimation(player.PlayerIndex.Value, sourceArcana.GetKeepValue());
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }
