@@ -37,12 +37,8 @@ public class PlayerSkiller : MonoBehaviour
             }
         }
 
-        Debug.Log("PlayerSkiller initialized with skills and UI manager1.");
-
         //クールタイムリセット
         for (int i = 0; i < currentCoolTimes.Length; i++) { currentCoolTimes[i] = 0f; }
-
-        Debug.Log("PlayerSkiller initialized with skills and UI manager2.");
 
         //最大クールタイムを初期化
         for (int i = 0; i < maxCoolTimes.Length; i++)

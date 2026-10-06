@@ -28,10 +28,13 @@ public class PlayerRoot : MonoBehaviour
     public ReactiveProperty<int> PlayerIndex { get; } = new(-1);
     public ReactiveProperty<string> PlayerName { get; } = new("Player");
     public ReactiveProperty<float> CurrentHealth { get; } = new(100);
+    public ReactiveProperty<bool> CanMove { get; } = new(true);
     public ReactiveProperty<bool> IsDown { get; } = new(false);
     public ObservableList<EffectAbility> ActiveEffects { get; } = new();
     public ReactiveProperty<int> SelectedSkillIndex { get; } = new(0);
 
+
+    private Vector3 currentDirection = Vector3.right;
     /// <summary> 入力を受け付けて制御できるかどうかを示します </summary>
     public bool CanControl => 
         !IsDown.Value && (GameManager.Instance == null || GameManager.Instance.StateRx.CurrentValue == GameState.Playing);
@@ -72,12 +75,15 @@ public class PlayerRoot : MonoBehaviour
         // ステータスを新品に入れ替える
         status = new PlayerStatus();
 
+
+
+
         PlayerUIManager playerUIManager = PlayerUIManager.Instance;
 
         // コンポーネントの初期化
         movement.Initialize(this);
         rayInput.Initialize();
-        playerAttack.Initialized(this);
+        playerAttack.Initialized(this, false);
         currentAnimator = playerAnimator.Initialize(PlayerIndex.Value);
         playerSkill.Initialize(this, playerUIManager, skillList);
         aimCursor.Initialize(PlayerIndex.Value);
@@ -136,8 +142,14 @@ public class PlayerRoot : MonoBehaviour
         // スキルのクールタイムを更新
         playerSkill.UpdateAllCoolTimes();
 
+
+
+        if (!CanMove.Value) { movement.StopMovement(); return; }
+        
         // 移動処理の更新
         movement.UpdateMovement();
+
+        
 
     }
 
@@ -151,26 +163,27 @@ public class PlayerRoot : MonoBehaviour
 
     public void ExecuteAttack()
     {
-
-        // 一旦通常攻撃を無効化
         return;
-        //const int ATTACK_ACTION_INDEX = 0;
-        //if (!IsActionReady(ATTACK_ACTION_INDEX)) return;
 
-        //// CT開始
-        //StartActionCoolTime(ATTACK_ACTION_INDEX, 0.5f); // ※本来の攻撃CTを取得して入れてください
+        if (!CanMove.Value) { return; }
 
         // エンペラーオーラ状態なら攻撃不可
         if (HaveEffect(EffectList.EnperorAura, true)) { return; }
 
         playerAttack.ResetList();
-        playerAttack.NormalAttackActive();
+        playerAttack.NormalAttackActive(currentDirection);
         CurrentArcana?.ExecuteArcanaEffect(ASkillCategory.SkillEffect,this);
+
+        // アニメーション再生
+        playerAnimator.PlayMagicAnimation();
+
     }
 
     /// <summary> 移動実行メソッド </summary>
     public void ExecuteMove(float rawInput)
     {
+        if (!CanMove.Value) { return; }
+        
         // 移動方向の反転処理
         bool isChangeMove = HaveEffect(EffectList.Reverse, false);
 
@@ -179,8 +192,7 @@ public class PlayerRoot : MonoBehaviour
         movement.SetMoveDirection(finalInput);
 
         // 向きの反転
-        playerAnimator.Flip(rawInput);
-        playerAttack.Flip(rawInput);
+        currentDirection = playerAnimator.Flip(rawInput);
 
         // ダッシュアニメーションの切り替え
         bool isDashing = Mathf.Abs(rawInput) > 0.01f;
@@ -191,6 +203,8 @@ public class PlayerRoot : MonoBehaviour
     /// <summary> ジャンプ実行メソッド </summary>
     public void ExecuteJump()
     {
+        if (!CanMove.Value) { return; }
+
         // ジャンプ禁止状態ならジャンプ不可
         if (HaveEffect(EffectList.Stun, false)) { return; }
         if (HaveEffect(EffectList.NoJump, false)) { return; }
@@ -225,6 +239,8 @@ public class PlayerRoot : MonoBehaviour
     // / <summary> スキル使用実行メソッド </summary>
     public void ExecuteSkillUse()
     {
+        if (!CanMove.Value) { return; }
+
         // サイレンス状態ならスキル使用不可
         if (HaveEffect( EffectList.Silence, false)) { return; }
 

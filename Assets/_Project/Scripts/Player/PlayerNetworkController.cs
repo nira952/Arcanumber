@@ -17,6 +17,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
     private readonly NetworkVariable<FixedString64Bytes> netPlayerName =new("Player"); 
     private readonly NetworkVariable<float> netCurrentHealth = new(100);
     private readonly NetworkVariable<bool> netIsDown = new(false);
+    private readonly NetworkVariable<bool> netCanMove = new(true);
     private readonly NetworkList<NetworkEffectData> netActiveEffects = new NetworkList<NetworkEffectData>();
 
 
@@ -51,6 +52,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
             root.PlayerName.Subscribe(v => netPlayerName.Value = v).AddTo(this);
             root.CurrentHealth.Subscribe(v => netCurrentHealth.Value = v).AddTo(this);
             root.IsDown.Subscribe(v => netIsDown.Value = v).AddTo(this);
+            root.CanMove.Subscribe(v => netCanMove.Value = v).AddTo(this);
 
             // --- NetworkList の同期処理 ---
 
@@ -114,6 +116,7 @@ public class PlayerNetworkController : NetworkBehaviour, IPlayerInputMediator
             netPlayerName.AsObservable().Subscribe(v => root.PlayerName.Value = v.ToString()).AddTo(this);
             netCurrentHealth.AsObservable().Subscribe(v => root.CurrentHealth.Value = v).AddTo(this);
             netIsDown.AsObservable().Subscribe(v => root.IsDown.Value = v).AddTo(this);
+            netCanMove.AsObservable().Subscribe(v => root.CanMove.Value = v).AddTo(this);
 
             // イベントリスナーの登録
             netActiveEffects.OnListChanged += HandleNetworkListChanged;

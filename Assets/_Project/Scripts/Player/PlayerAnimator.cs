@@ -118,10 +118,10 @@ public class PlayerAnimator : NetworkBehaviour
     /// <summary>
     /// 移動入力の方向に応じて Visual の Scale.x を反転させる
     /// </summary>
-    public void Flip(float moveInput)
+    public Vector3 Flip(float moveInput)
     {
         // 入力がほぼ 0 の場合は直前の向きを維持
-        if (Mathf.Abs(moveInput) <= 0.01f) return;
+        if (Mathf.Abs(moveInput) <= 0.01f) return transform.localScale;
 
         Vector3 currentScale = transform.localScale;
 
@@ -137,5 +137,7 @@ public class PlayerAnimator : NetworkBehaviour
         }
 
         transform.localScale = currentScale;
+
+        return currentScale;
     }
 }

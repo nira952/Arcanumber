@@ -1,9 +1,18 @@
 using Cysharp.Threading.Tasks;
+using Unity.Netcode;
 using UnityEngine;
 
 // プレイヤーの通常攻撃を管理するクラス
-public class PlayerAttack : MonoBehaviour
+public class PlayerAttack : NetworkBehaviour
 {
+   [SerializeField]  private PlayerRoot root;
+
+    private float attackPower = 3.0f; // 攻撃力の倍率
+    private float attackUpPower = 5.5f; // パワーアップ時の攻撃力の倍率
+    private float attackWindupTime = 0.5f; // 攻撃の前振り時間
+
+    private bool isLocalMode = false; // ローカルモードかどうかのフラグ
+
     [SerializeField] private NormalSlash slashObject;
 
     private void Start()
@@ -14,57 +23,73 @@ public class PlayerAttack : MonoBehaviour
             return;
         }
 
-        
-
-        slashObject.gameObject.SetActive(false); // 初期状態では攻撃オブジェクトを非アクティブにする   
+        isLocalMode = PlayerDataManager.Instance.IsLocalMode;
     }
 
-    public void Initialized(PlayerRoot root)
+    public void Initialized(PlayerRoot root,bool isPowerUp)
     {
+        this.root = root;
+
         int playerIndex = root.PlayerIndex.Value;
 
-        slashObject.Initialize(playerIndex, 1, -1);
+        float damage = isPowerUp ? attackUpPower : attackPower;
+
+        // 攻撃オブジェクトを初期化する
+        slashObject.Initialize(playerIndex, damage, -1);
+
     }
 
 
-    public void Flip(float moveInput)
+
+    public void NormalAttackActive(Vector3 direction)
     {
-        // 入力がほぼ 0 の場合は直前の向きを維持
-        if (Mathf.Abs(moveInput) <= 0.01f) return;
 
-        Vector3 currentScale = transform.localScale;
-
-        // 右移動 (moveInput > 0) なら Scale.x を正、左移動 (moveInput < 0) なら負にする
-        // ※ 元のスプライトが「左向き」基準で作られている場合は、不等号を逆にしてください
-        if (moveInput > 0f)
+        if (isLocalMode)
         {
-            currentScale.x = -Mathf.Abs(currentScale.x);
+            // ローカルモードでは通常攻撃のオブジェクトを0.5秒アクティブにする
+            ExecuteAttack(direction).Forget();
         }
-        else if (moveInput < 0f)
+        else if (IsOwner)
         {
-            currentScale.x = Mathf.Abs(currentScale.x);
+            if (IsServer)
+            {
+                // 通常攻撃のオブジェクトを0.5秒アクティブにする
+                AttackServerRpc(direction);
+            }
         }
-
-        transform.localScale = currentScale;
     }
 
-
-
-    public void NormalAttackActive()
+    [ServerRpc]
+    private void AttackServerRpc(Vector3 direction)
     {
-        Debug.Log("NormalAttackActive called.");
-
-        // 通常攻撃のオブジェクトを0.5秒アクティブにする
-        StartAttackSequenceAsync().Forget();
+        ExecuteAttack(direction).Forget();
 
     }
-
-    private async UniTaskVoid StartAttackSequenceAsync()
+    [ClientRpc]
+    private void PlayAttackEffectClientRpc()
     {
+        slashObject.ActiveAniation("RedSlash");
+    }
+
+    private async UniTaskVoid ExecuteAttack(Vector3 direction)
+    {
+        // 向きを変更する
+        transform.localScale = direction;
+
+        root.CanMove.Value = false; // 攻撃中は移動を禁止する
+
+        await UniTask.Delay((int)(attackWindupTime * 1000)); // 前振り時間を待機
+
         // 攻撃のシーケンスを非同期で実行する
-        slashObject.gameObject.SetActive(true); // 攻撃オブジェクトをアクティブにする
-        await UniTask.Delay(500); // 0.5秒待機
-        slashObject.gameObject.SetActive(false); // 攻撃オブジェクトを非アクティブにする
+        slashObject.ActiveAttack(); // 攻撃アニメーションを再生
+
+        PlayAttackEffectClientRpc();
+
+        await UniTask.Delay(300); // 0.5秒待機
+
+        slashObject.EndAttack(); // 攻撃終了処理
+
+        root.CanMove.Value = true; // 攻撃終了後に移動を許可する
     }
 
     /// <summary>

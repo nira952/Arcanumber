@@ -2,11 +2,32 @@ using UnityEngine;
 
 public class NormalSlash : MagicObject
 {
+    [SerializeField] private BoxCollider2D attackColider;
+
+    [SerializeField] private Animator attackAnimator;
+
     public void Initialize(int charaNo, float damage, float lifetime = 1.0f)
     {
         CommonInitialize(charaNo, damage);
         isPenetrate = true;
         dmg = damage;
+
+        attackColider.enabled = false;
+    }
+
+    public void ActiveAttack()
+    {
+        attackColider.enabled = true;
+    }
+
+    public void ActiveAniation(string animationName)
+    {
+        attackAnimator.Play(animationName);
+    }
+
+    public void EndAttack()
+    {
+        attackColider.enabled = false;
     }
 
     // プレイヤーに当たったときに呼ばれる（MagicObject側で重複ヒット防止済み）
