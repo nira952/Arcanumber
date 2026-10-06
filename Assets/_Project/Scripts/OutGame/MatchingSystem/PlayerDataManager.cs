@@ -41,7 +41,7 @@ public class PlayerDataManager : NetworkBehaviour
 
 
         // デバッグ用のアルカナを設定する
-        Arcana arcana = AssetLoader.Instance.GetArcana(ArcanaList.Tower, true);
+        Arcana arcana = AssetLoader.Instance.GetArcana(ArcanaList.Star, true);
         myArcana = arcana;
     }
 

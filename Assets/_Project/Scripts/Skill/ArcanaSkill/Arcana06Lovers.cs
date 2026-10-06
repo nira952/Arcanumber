@@ -31,6 +31,7 @@ public class Arcana06LoversBack : ArcanaLogic
     public override void Execute(PlayerRoot player, Arcana sourceArcana) { player.StartCoroutine(OnUpdate(player, sourceArcana)); }
     public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
+
         //画面を暗くするエフェクトを再生
         VisualEffectManager.Instance.ShowDarkPanel(player.PlayerIndex.Value,sourceArcana.GetKeepValue());
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());

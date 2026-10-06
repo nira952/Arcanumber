@@ -181,8 +181,8 @@ public class GameManager : NetworkBehaviour
     {
         // Network変数の変更を購読して、stateRxに反映させる
         NetWorkGameState.AsObservable().Subscribe(state => stateRx.Value = state).AddTo(this);
-        gameUIManager.PlayerUIInitialize();
 
+        gameUIManager.Initialize(this, timeManager);
 
         StartGameSequenceAsync().Forget();
     }

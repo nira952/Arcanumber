@@ -155,7 +155,6 @@ public class PlayerRoot : MonoBehaviour
 
     public void LateUpdate()
     {
-        if (!CanControl) return;
         aimCursor.AimUpdate();
     }
 

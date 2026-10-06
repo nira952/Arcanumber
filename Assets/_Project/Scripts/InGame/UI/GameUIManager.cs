@@ -97,6 +97,7 @@ public class GameUIManager : MonoBehaviour
             }).AddTo(this);
         }
 
+        PlayerUIInitialize();
     }
 
     public void PlayerUIInitialize()

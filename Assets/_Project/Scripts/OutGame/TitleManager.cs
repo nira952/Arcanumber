@@ -10,6 +10,9 @@ public class TitleManager : MonoBehaviour
 
     private void Start()
     {
+        // カーソルを再表示する
+        Cursor.visible = true;
+
         NetWorkAudioManager.Instance.PlayLocal(BgmName.Title);
         titleUIManager.OnOpenTrainingSceneRequested.Subscribe(_ =>
         {
