@@ -95,14 +95,14 @@ public class EffectAbility
             case EffectList.Poison:
                 if (CheckInterval(1.0f))
                 {
-                    owner.ApplyDamage(value); // 1秒ごとにダメージ
+                    ArcanaNetworkManager.Instance.SetDamage(owner.PlayerIndex.Value, false, value);
                 }
                 break;
 
             case EffectList.Heal:
                 if (CheckInterval(1.0f))
                 {
-                    owner.ApplyHeal(value); // 1秒ごとに回復
+                    ArcanaNetworkManager.Instance.SetHeal(owner.PlayerIndex.Value, value);
                 }
                 break;
             case EffectList.SunBurn:
@@ -111,7 +111,7 @@ public class EffectAbility
                     // 頭上にGround（天井）がない場合のみダメージ
                     if (!owner.HasCeiling())
                     {
-                        owner.ApplyDamage(value); // 1秒ごとに日光ダメージ
+                        ArcanaNetworkManager.Instance.SetDamage(owner.PlayerIndex.Value, false, value);
                     }
                 }
                 break;
