@@ -338,7 +338,7 @@ public class ArcanaUIManager : MonoBehaviour
             await UniTask.Delay(System.TimeSpan.FromSeconds(cardMoveInterval), cancellationToken: token);
         }
 
-        await UniTask.Delay(System.TimeSpan.FromSeconds(2f), cancellationToken: token);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(1f), cancellationToken: token);
 
         // ランダムに選んだカードを記録しておき、スキップ時にも同じカードを処理できるようにします
         List<int> chosenIndices = new List<int>();
@@ -351,15 +351,15 @@ public class ArcanaUIManager : MonoBehaviour
             animationCards[randomIndex].sprite = cardSprite;
             //animationCards[randomIndex].backImage.sprite = backSprite;
 
-            await UniTask.Delay(System.TimeSpan.FromSeconds(0.3f), cancellationToken: token);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(0.2f), cancellationToken: token);
 
             animationCards[randomIndex].rectTransform.SetParent(animationDefaultParent, true);
             animationCards[randomIndex].rectTransform.DOAnchorPosY(1000f, 0.5f).SetId("ArcanaAnimationTweens");
 
-            await UniTask.Delay(System.TimeSpan.FromSeconds(0.2f), cancellationToken: token);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(0.1f), cancellationToken: token);
         }
 
-        await UniTask.Delay(System.TimeSpan.FromSeconds(1f), cancellationToken: token);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.5f), cancellationToken: token);
 
         // 回転しているオブジェクトを画面外の上に移動させる
         animationDefaultParent.DOAnchorPosY(-300, 0.5f).SetId("ArcanaAnimationTweens")
@@ -373,7 +373,7 @@ public class ArcanaUIManager : MonoBehaviour
             });
         });
 
-        await UniTask.Delay(System.TimeSpan.FromSeconds(1f), cancellationToken: token);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.5f), cancellationToken: token);
 
         // 全てのアニメーションが正常終了したらスキップ終了処理へ（通常ルート）
         FinishAnimation(false);
