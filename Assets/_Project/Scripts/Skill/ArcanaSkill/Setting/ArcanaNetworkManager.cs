@@ -105,6 +105,35 @@ public class ArcanaNetworkManager : NetworkBehaviour
     }
 
     /// <summary>
+    /// スキル発動
+    /// </summary>
+    public void SetSkill(int index, int skillIndex, Vector2 pos)
+    {
+        SetSkillServerRpc(index, skillIndex, pos);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetSkillServerRpc(int index, int skillIndex, Vector2 pos)
+    {
+        PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
+        Skill skill = player.GetSkill()[skillIndex];
+
+        GameObject skillObj = Instantiate(skill.GetEffectAnimation(), pos, Quaternion.identity);
+
+        if (!isLocalMode && IsServer)
+        {
+            if (skillObj.TryGetComponent(out NetworkObject networkObject))
+            {
+                networkObject.Spawn();
+            }
+        }
+        if (skill.GetKeepTime() > 0)
+            Destroy(skillObj, skill.GetKeepTime());
+        else
+            Destroy(skillObj, 10f);
+    }
+
+    /// <summary>
     /// ネットワーク経由でエフェクトをつける
     /// </summary>
     /// <param name="index">プレイヤー番号</param>
