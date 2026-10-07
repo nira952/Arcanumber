@@ -322,17 +322,7 @@ public class PlayerRoot : MonoBehaviour
     /// </summary>
     public bool HasCeiling()
     {
-        // プレイヤーの位置（少し足元なら調整してください）から真上にレイを飛ばす距離
-        float rayDistance = 20f;
-
-        // Ground レイヤーのマスクを取得（レイヤー名が "Ground" の場合）
-        int groundLayerMask = LayerMask.GetMask("Ground");
-
-        // 真上に向かってレイキャストを飛ばす
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.up, rayDistance, groundLayerMask);
-
-        // ヒットしたものが存在すれば、頭上に天井がある
-        return hit.collider != null;
+         return rayInput.HasCeiling();
     }
 
 
