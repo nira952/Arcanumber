@@ -15,6 +15,7 @@ public class Arcana09HermitFront : ArcanaLogic
     {
         ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
             (int)EffectList.HealSteal, true, false, -1f, -1f);
+        ArcanaNetworkManager.Instance.SetAnimation(player.PlayerIndex.Value, player.transform.position, 0.5f);
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

@@ -194,8 +194,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     private void SetHpServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
-        float newHp = player.GetPlayerStatus().GetMaxHp() * value;
-        player.GetPlayerStatus().SetMaxHp(newHp);
+        player.GetPlayerStatus().SetMaxHp(value);
     }
 
     /// <summary>
@@ -205,8 +204,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     private void SetAtkServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
-        float newAtk = player.GetPlayerStatus().GetAtk() * value;
-        player.GetPlayerStatus().SetAtk(newAtk);
+        player.GetPlayerStatus().SetAtk(value);
     }
 
     /// <summary>
@@ -216,8 +214,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     private void SetDefServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
-        float newDef = player.GetPlayerStatus().GetDef() * value;
-        player.GetPlayerStatus().SetDef(newDef);
+        player.GetPlayerStatus().SetDef(value);
     }
 
     /// <summary>
@@ -227,8 +224,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     private void SetSpeedServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
-        float newSpeed = player.GetPlayerStatus().GetSpeed() * value;
-        player.GetPlayerStatus().SetSpeed(newSpeed);
+        player.GetPlayerStatus().SetSpeed(value);
     }
 
     /// <summary>

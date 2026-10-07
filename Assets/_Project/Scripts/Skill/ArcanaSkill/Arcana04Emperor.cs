@@ -24,7 +24,7 @@ public class Arcana04EmperorBack : ArcanaLogic
     //通常攻撃が振れないが、ダメージが2倍になる
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, 2);
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, player.GetPlayerStatus().GetAtk() * 2);
         ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, false,
           (int)EffectList.EnperorAura, true, false, sourceArcana.GetKeepValue(), -1f);
     }

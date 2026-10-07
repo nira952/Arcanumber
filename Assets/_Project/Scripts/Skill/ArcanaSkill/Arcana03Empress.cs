@@ -19,6 +19,7 @@ public class Arcana03EmpressFront : ArcanaLogic
         {
             yield return new WaitForSeconds(timeInterval);
             ArcanaNetworkManager.Instance.SetHeal(player.PlayerIndex.Value, sourceArcana.GetKeepValue());
+            ArcanaNetworkManager.Instance.SetAnimation(player.PlayerIndex.Value, player.transform.position, 0.5f);
             NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }
     }

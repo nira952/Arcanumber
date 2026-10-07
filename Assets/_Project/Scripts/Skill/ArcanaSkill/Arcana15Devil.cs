@@ -13,7 +13,7 @@ public class Arcana15DevilFront : ArcanaLogic
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
         float value = 1.3f;
-        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Def, value);
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Def, player.GetPlayerStatus().GetDef() * value);
     }
 }
 
@@ -29,7 +29,8 @@ public class Arcana15DevilBack : ArcanaLogic
         int efeNum = player.GetAllEffectCount();
         //すべて消す
         ArcanaNetworkManager.Instance.ClearEffect(player.PlayerIndex.Value);
-        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, efeNum * sourceArcana.GetKeepValue());
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, player.GetPlayerStatus().GetAtk() * efeNum * sourceArcana.GetKeepValue());
+        ArcanaNetworkManager.Instance.SetAnimation(player.PlayerIndex.Value, player.transform.position, 0.5f);
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

@@ -2,6 +2,7 @@
 // 力：Strength
 // ========================================================
 
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
 /// <summary>
@@ -12,7 +13,7 @@ public class Arcana08StrengthFront : ArcanaLogic
     //攻撃力が上がる
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, sourceArcana.GetKeepValue());
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, player.GetPlayerStatus().GetAtk() * sourceArcana.GetKeepValue());
     }
 }
 
@@ -28,7 +29,8 @@ public class Arcana08StrengthBack : ArcanaLogic
     {
         _owner = player;
         sArcana = sourceArcana;
-        
+
+        OnDamageReceived(_owner, 0f);
     }
     private void OnDamageReceived(PlayerRoot target, float damage)
     {
@@ -36,21 +38,22 @@ public class Arcana08StrengthBack : ArcanaLogic
         if (target != _owner) return;
         //攻撃・防御・速度のどれか一つをランダムに選ぶ (0:攻撃, 1:防御, 2:速度)
         int choice = Random.Range(0, 3);
-        PlayerStatus status = _owner.GetPlayerStatus();
+        PlayerStatus status = target.GetPlayerStatus();
 
         //ステータスを強化
         switch (choice)
         {
             case 0:
-                status.SetAtk(status.GetAtk() + sArcana.GetKeepValue() * damage);
+                ArcanaNetworkManager.Instance.SetStatus(target.PlayerIndex.Value, StatusCategory.Atk, status.GetAtk() + sArcana.GetKeepValue() * damage);
                 break;
             case 1:
-                status.SetDef(status.GetDef() + sArcana.GetKeepValue() * damage);
+                ArcanaNetworkManager.Instance.SetStatus(target.PlayerIndex.Value, StatusCategory.Def, status.GetDef() + sArcana.GetKeepValue() * damage);
                 break;
             case 2:
-                status.SetSpeed(status.GetSpeed() + sArcana.GetKeepValue() * damage);
-                _owner.SetMoveSpeed(status.GetSpeed());
+                ArcanaNetworkManager.Instance.SetStatus(target.PlayerIndex.Value, StatusCategory.Speed, status.GetSpeed() + sArcana.GetKeepValue() * damage);
                 break;
         }
+
+        ArcanaNetworkManager.Instance.SetAnimation(target.PlayerIndex.Value, target.transform.position, 0.5f);
     }
 }
