@@ -208,7 +208,8 @@ public class GameManager : NetworkBehaviour
         ChangeGameState(GameState.Start);
         await UniTask.Yield(PlayerLoopTiming.Update);
         ChangeGameState(GameState.Playing);
-        if (!isLocalMode)
+
+        if (isLocalMode)
             NetWorkAudioManager.Instance.PlayLocal(BgmName.Practice);
         else
             NetWorkAudioManager.Instance.PlayGlobal(BgmName.Game);
