@@ -43,6 +43,9 @@ MonoBehaviour:
   - name: Yellow
     clip: {fileID: 8300000, guid: edeea3520facfa44cbecfdf554d8eb3e, type: 3}
     volume: 0.628
+  - name: Game2
+    clip: {fileID: 8300000, guid: adc9b650339642f499cbb16046e7035d, type: 3}
+    volume: 0.512
   seList:
   - name: num
     clip: {fileID: 0}

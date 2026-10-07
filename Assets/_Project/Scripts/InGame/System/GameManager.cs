@@ -214,7 +214,13 @@ public class GameManager : NetworkBehaviour
         if (isLocalMode)
             NetWorkAudioManager.Instance.PlayLocal(BgmName.Practice);
         else
-            NetWorkAudioManager.Instance.PlayGlobal(BgmName.Game);
+        {
+            int randomValue = UnityEngine.Random.Range(0, 2);
+            if (randomValue == 0)
+                NetWorkAudioManager.Instance.PlayGlobal(BgmName.Game);
+            else
+                NetWorkAudioManager.Instance.PlayGlobal(BgmName.Game2);
+        }
 
         await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: this.GetCancellationTokenOnDestroy());
         HideGameStateTextInternal();

@@ -9,4 +9,5 @@ public enum BgmName {
     Red,
     Green,
     Yellow,
+    Game2,
 }
