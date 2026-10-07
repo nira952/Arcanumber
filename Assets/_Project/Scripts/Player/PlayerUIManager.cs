@@ -1,5 +1,4 @@
 using R3;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -67,7 +66,7 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
 
         // アルカナのスプライトを変更
         if(arcana.GetASkillCategory() != ASkillCategory.Command)
-            skillTimeTexts[GameConfig.COOLTIME_HOPPER_MAX].text = ""; // アルカナのテキストは空にする
+            skillTimeTexts[GameConfig.COOLTIME_HOPPER_MAX - 1].text = ""; // アルカナのテキストは空にする
 
         // スキル選択のUI反映
         SkillFrameChange(1);

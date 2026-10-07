@@ -383,6 +383,8 @@ public class PlayerRoot : MonoBehaviour
     }
     public void SetMoveSpeed(float speed) { status.SetSpeed(speed); }
 
+    public void SetAttackPower(float attackPower) { status.SetAtk(attackPower); }
+
     public void SetSkill(Skill[] skills)
     {
         skillList = skills;

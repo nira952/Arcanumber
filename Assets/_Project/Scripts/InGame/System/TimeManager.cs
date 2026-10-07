@@ -7,9 +7,7 @@ public class TimeManager : NetworkBehaviour
     [Header("Mode Settings")]
     private bool isLocalMode = false;
 
-    [Header("Timer Settings")]
-    [Tooltip("制限時間（秒単位）。5分 = 300秒")]
-    [SerializeField] private int maxTimeInSeconds = 300;
+    private const int max_TimeInSeconds = 180;
 
     // 1秒ごとに整数（int）のみを同期（通信量を最小化）
     public NetworkVariable<int> NetworkTime = new NetworkVariable<int>(
@@ -21,6 +19,8 @@ public class TimeManager : NetworkBehaviour
     // クライアント/UIが参照する ReactiveProperty（int型に統一）
     public ReactiveProperty<int> RemainingTime { get; } = new(0);
     public Subject<Unit> onTimeUp = new Subject<Unit>();
+
+    public Subject<Unit> OnTimePowerUp = new Subject<Unit>();
 
     private float timerAccumulator;
     private bool isTimerRunning = false;
@@ -36,7 +36,7 @@ public class TimeManager : NetworkBehaviour
         if (!isLocalMode) return;
 
         // ローカルモード時の初期化
-        SetRemainingTime(maxTimeInSeconds);
+        SetRemainingTime(max_TimeInSeconds);
     }
 
     public override void OnNetworkSpawn()
@@ -58,7 +58,7 @@ public class TimeManager : NetworkBehaviour
         // サーバー側でのみ初期時間をセット
         if (IsServer)
         {
-            NetworkTime.Value = maxTimeInSeconds;
+            NetworkTime.Value = max_TimeInSeconds;
         }
     }
 
@@ -129,6 +129,13 @@ public class TimeManager : NetworkBehaviour
             hasTimeUpTriggered = false;
         }
 
+        // 残り時間が30秒以下になった瞬間に1回だけタイムハリーイベントを発火
+        if (previousValue > 30 && newValue <= 30)
+        {
+            OnTimePowerUp.OnNext(Unit.Default);
+        }
+
+        // 残り時間が0秒になった瞬間に1回だけタイムアップイベントを発火
         if (previousValue > 0 && newValue <= 0 && !hasTimeUpTriggered)
         {
             hasTimeUpTriggered = true;

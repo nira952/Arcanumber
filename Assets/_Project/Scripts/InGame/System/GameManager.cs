@@ -137,6 +137,8 @@ public class GameManager : NetworkBehaviour
         // タイムアップ時の処理を購読
         timeManager.onTimeUp.Subscribe(_ => HandleTimeUp()).AddTo(this);
 
+        timeManager.OnTimePowerUp.Subscribe(_ => HandleTimePowerUp()).AddTo(this);
+
         // ゲーム開始シーケンスを非同期で開始
         StartGameSequenceClientRpc();
     }
@@ -218,6 +220,37 @@ public class GameManager : NetworkBehaviour
         HideGameStateTextInternal();
     }   
 
+
+    private void HandleTimePowerUp()
+    {
+        if (!isLocalMode && !IsServer) return;
+
+        HandleTimePowerUpClientRpc();
+    }
+
+
+    [ClientRpc]
+    private void HandleTimePowerUpClientRpc()
+    {
+        if (isLocalMode) return;
+
+        gameUIManager.ShowPowerUpText();
+
+        // すべてのプレイヤーを取得
+        List<PlayerRoot> Players = PlayerUtility.GetAllPlayer();
+
+        // 全プレイヤーの攻撃力を1.5倍にする
+        foreach (var player in Players)
+        {
+            if (player != null)
+            {
+                float currentAttackPower = player.GetCurrentAttackPower();
+                float newAttackPower = currentAttackPower * 1.5f;
+                player.SetAttackPower(newAttackPower);
+            }
+        }
+
+    }
 
 
     private void HandleTimeUp()

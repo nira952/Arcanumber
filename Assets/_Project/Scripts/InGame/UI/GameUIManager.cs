@@ -29,6 +29,8 @@ public class GameUIManager : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI gameStateText;
 
+    [SerializeField] private TextMeshProUGUI powerUpText;
+
     [Header("ステータス関係 (プレイヤーごと)")]
     [SerializeField] private PlayerEffectBlock[] playerEffectBlocks = new PlayerEffectBlock[4];
 
@@ -293,6 +295,21 @@ public class GameUIManager : MonoBehaviour
                 targetImage.gameObject.SetActive(true);
                 imageIndex++; // 次の枠へインクリメント
             }
+        }
+    }
+
+
+    public void ShowPowerUpText()
+    {
+        // PowerUpTextをフェードで1秒間表示し、その後フェードアウトする
+        powerUpText.text = "残り30秒 全員の攻撃力増加！";
+
+        if (powerUpText != null)
+        {
+            powerUpText.DOFade(1f, 0.5f).OnComplete(() =>
+            {
+                powerUpText.DOFade(0f, 1f).SetDelay(2f);
+            });
         }
     }
 
