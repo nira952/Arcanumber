@@ -119,11 +119,17 @@ public static class PlayerUtility
 
         // カウンター効果を持っている場合、攻撃者に反射ダメージを与える
         if (targetPlayer.HaveEffect(EffectList.Counter, true))
+        {
             ProcessCounterDamage(targetPlayer, attackPlayer, finalDmg);
+            NetWorkAudioManager.Instance.PlayGlobal(SeName.Counter);
+        }
 
         // 無敵効果がある場合、ダメージを与えない
         if (targetPlayer.HaveEffect(EffectList.Invincible, true))
+        {
+            NetWorkAudioManager.Instance.PlayGlobal(SeName.Guard);
             return;
+        }
 
         // チャーム効果がある場合、ダメージを他のプレイヤーに分散させる
         if (targetPlayer.HaveEffect(EffectList.Charm, true))

@@ -21,7 +21,7 @@ MonoBehaviour:
     volume: 0.681
   - name: Game
     clip: {fileID: 8300000, guid: e3822784a56410140be8d3cdf7623b4a, type: 3}
-    volume: 0.687
+    volume: 0.493
   - name: Tutorial
     clip: {fileID: 8300000, guid: cec5f3060fe594946b50ed3b2082c14c, type: 3}
     volume: 0.628
@@ -36,7 +36,7 @@ MonoBehaviour:
     volume: 0.628
   - name: Red
     clip: {fileID: 8300000, guid: 1635b57ae63624b4f9fa7d8a7345361d, type: 3}
-    volume: 0.628
+    volume: 0.57
   - name: Green
     clip: {fileID: 8300000, guid: 31824653f586bcc44a156069802882e4, type: 3}
     volume: 0.628

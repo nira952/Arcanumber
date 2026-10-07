@@ -57,6 +57,8 @@ public class GameManager : NetworkBehaviour
 
     private void Awake()
     {
+        NetWorkAudioManager.Instance.StopGlobalBgm(); // BGMを停止
+
         SetUpSingleton(); // Singletonの設定
 
         // ローカルモードかどうかを判定
@@ -206,6 +208,10 @@ public class GameManager : NetworkBehaviour
         ChangeGameState(GameState.Start);
         await UniTask.Yield(PlayerLoopTiming.Update);
         ChangeGameState(GameState.Playing);
+        if (!isLocalMode)
+            NetWorkAudioManager.Instance.PlayLocal(BgmName.Practice);
+        else
+            NetWorkAudioManager.Instance.PlayGlobal(BgmName.Game);
 
         await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: this.GetCancellationTokenOnDestroy());
         HideGameStateTextInternal();
@@ -294,11 +300,12 @@ public class GameManager : NetworkBehaviour
         else if (IsServer)
         {
             // カーソルを再表示
-            Cursor.lockState = CursorLockMode.None;
-
             TriggerFinishSequenceClientRpc(winnerName);
 
         }
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     [ClientRpc]
@@ -311,6 +318,8 @@ public class GameManager : NetworkBehaviour
     {
         await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: this.GetCancellationTokenOnDestroy());
         await CurtainManager.Instance.CloseAsync("Finish!", GetType().Name, 0.1f);
+
+        NetWorkAudioManager.Instance.PlayGlobal(BgmName.Gameend);
 
         // プレイヤーを全て非表示にする
         List<PlayerRoot> players = PlayerUtility.GetAllPlayer();

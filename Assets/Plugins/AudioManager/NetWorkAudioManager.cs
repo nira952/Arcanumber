@@ -204,4 +204,48 @@ public class NetWorkAudioManager : NetworkBehaviour
         Debug.LogWarning("SEの最大同時再生数を超えているため再生をスキップしました。");
         return null;
     }
+
+    /// <summary>
+    /// 自分の画面だけでBGMを停止する
+    /// </summary>
+    public void StopLocalBgm()
+    {
+        if (bgmSource != null && bgmSource.isPlaying)
+        {
+            bgmSource.Stop();
+        }
+    }
+
+    /// <summary>
+    /// 【全員共有】ロビー内全員の画面でBGMを停止する
+    /// </summary>
+    public void StopGlobalBgm()
+    {
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
+        {
+            StopLocalBgm();
+            return;
+        }
+
+        if (IsServer)
+        {
+            StopBgmRpc();
+        }
+        else
+        {
+            RequestStopBgmServerRpc();
+        }
+    }
+
+    [Rpc(SendTo.Server, RequireOwnership = false)]
+    private void RequestStopBgmServerRpc()
+    {
+        StopBgmRpc();
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void StopBgmRpc()
+    {
+        StopLocalBgm();
+    }
 }

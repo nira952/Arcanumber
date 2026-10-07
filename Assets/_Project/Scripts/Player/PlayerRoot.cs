@@ -260,6 +260,7 @@ public class PlayerRoot : MonoBehaviour
         if (IsDown.Value) return;
 
         CurrentHealth.Value = Mathf.Clamp(CurrentHealth.Value - damage, 0, status.GetMaxHp());
+        NetWorkAudioManager.Instance.PlayGlobal(SeName.Damage); // ダメージ音を再生
         GetArcana().ExecuteArcanaEffect(ASkillCategory.DamageEffect, this); //ダメージを受けたら発動
 
         if (CurrentHealth.Value <= 0)
