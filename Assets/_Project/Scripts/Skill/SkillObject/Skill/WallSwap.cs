@@ -23,6 +23,7 @@ public class WallSwap : MonoBehaviour
 
             // ArcanaNetworkManager に新しく追加した TransformServerRpc を直接叩く
             ArcanaNetworkManager.Instance.SetTransform(player.PlayerIndex.Value, newPos);
+            NetWorkAudioManager.Instance.PlayGlobal(SeName.Dimension);
 
             StartCoroutine(WarpCooldown(player));
         }

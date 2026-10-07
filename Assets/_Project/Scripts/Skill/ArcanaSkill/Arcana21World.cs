@@ -26,6 +26,5 @@ public class Arcana21WorldBack : ArcanaLogic
     {
         ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
             (int)EffectList.WallSwap, true, false, -1f, 0f);
-        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 }

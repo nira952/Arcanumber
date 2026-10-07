@@ -173,3 +173,24 @@ MonoBehaviour:
   - name: Correct
     clip: {fileID: 8300000, guid: 891b66c0237589c47b8e01c16ec6005b, type: 3}
     volume: 1
+  - name: ArcanaSkill
+    clip: {fileID: 8300000, guid: d8678e31d025b6b41a0742cb71433be2, type: 3}
+    volume: 1
+  - name: BulletRain
+    clip: {fileID: 8300000, guid: 4005c699c0f4097408baee08ef8903eb, type: 3}
+    volume: 1
+  - name: Bullet
+    clip: {fileID: 8300000, guid: d81a9292aec34f34589b072eeb8d4c30, type: 3}
+    volume: 1
+  - name: Blink
+    clip: {fileID: 8300000, guid: 34d2b09cf689e684a9296d731162f99a, type: 3}
+    volume: 1
+  - name: Ster
+    clip: {fileID: 8300000, guid: f3551062b173a754e90f089e88488567, type: 3}
+    volume: 1
+  - name: Installation
+    clip: {fileID: 8300000, guid: d942b7b9d9734d445b7c8a326285cfd3, type: 3}
+    volume: 1
+  - name: Up
+    clip: {fileID: 8300000, guid: 4554e5cbb16e18a4bb3c9b715ca75247, type: 3}
+    volume: 1

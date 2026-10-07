@@ -31,6 +31,7 @@ public class Arcana08StrengthBack : ArcanaLogic
         sArcana = sourceArcana;
 
         OnDamageReceived(_owner, 0f);
+        NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
     private void OnDamageReceived(PlayerRoot target, float damage)
     {
@@ -55,5 +56,6 @@ public class Arcana08StrengthBack : ArcanaLogic
         }
 
         ArcanaNetworkManager.Instance.SetAnimation(target.PlayerIndex.Value, target.transform.position, 0.5f);
+
     }
 }
