@@ -43,6 +43,8 @@ public class TutorialManager : MonoBehaviour
         // チュートリアル開始時にカーテンを開く
         CurtainManager.Instance.FullOpenAsync(GetType().Name).Forget();
 
+        NetWorkAudioManager.Instance.PlayGlobal(BgmName.Tutorial);
+
         // チュートリアルの開始
         textManager.StartText();
     }

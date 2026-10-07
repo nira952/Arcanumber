@@ -31,6 +31,8 @@ public class LobbyPresenter : IDisposable
     private bool _isHost = false;   //ホストかどうかのフラグ
     private string _myLocalPlayerId;    //自分のローカルID
 
+    private int _lastPlayedIndex = -1;
+
     public LobbyPresenter(
         LobbyUIManager view, LobbyModel lobbyModel, NetworkSessionModel networkModel,
         string nextSceneName, CancellationToken destroyToken)
@@ -227,8 +229,18 @@ public class LobbyPresenter : IDisposable
                     pName = nameData.Value;
 
                 string suffix = "";
+
+
                 if (player.Id == myPlayerId)
+                {
                     suffix = (player.Id == lobby.HostId) ? "<br> (あなた/ホスト)" : "<br> (あなた)";
+
+                    if (_lastPlayedIndex != i)
+                    {
+                        _lastPlayedIndex = i;
+                        NetWorkAudioManager.Instance.PlayLocal(GetBgm(i)); // 曲を流す
+                    }
+                }
                 else if (player.Id == lobby.HostId)
                     suffix = "<br> (ホスト)";
 
@@ -240,7 +252,6 @@ public class LobbyPresenter : IDisposable
 
         int ngoCount = NetworkManager.Singleton != null ? NetworkManager.Singleton.ConnectedClientsIds.Count : 0;
         bool canStartGame = _isHost && lobby.Players.Count >= MinPlayersToStart && ngoCount >= MinPlayersToStart;
-
         _view.SetNextSceneButtonActive(canStartGame);
     }
 
@@ -295,7 +306,6 @@ public class LobbyPresenter : IDisposable
 
             processedClientIds.Add(clientId);
 
-            //NetWorkAudioManager.Instance.PlayLocal(GetBgm(index)); //曲を流す
 
             index++;
         }

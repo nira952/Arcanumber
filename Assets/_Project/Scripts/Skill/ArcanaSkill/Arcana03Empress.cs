@@ -19,6 +19,7 @@ public class Arcana03EmpressFront : ArcanaLogic
         {
             yield return new WaitForSeconds(timeInterval);
             ArcanaNetworkManager.Instance.SetHeal(player.PlayerIndex.Value, sourceArcana.GetKeepValue());
+            ArcanaNetworkManager.Instance.SetAnimation(player.PlayerIndex.Value, player.transform.position, 0.5f);
             NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }
     }
@@ -38,6 +39,7 @@ public class Arcana03EmpressBack : ArcanaLogic
         while (true)
         {
             PlayArcanaVisuals(player, sourceArcana, pos);
+            NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
             yield return new WaitForSeconds(GetVisualDuration(sourceArcana));
 
             //6割の確率でバフ、4割の確率でデバフ

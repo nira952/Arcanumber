@@ -18,7 +18,8 @@ public class Arcana02HighPriestessFront : ArcanaLogic
         while (true)
         {
             yield return new WaitForSeconds(timeInterval);
-            ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, sourceArcana.GetKeepValue());
+            ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, player.GetPlayerStatus().GetAtk() * sourceArcana.GetKeepValue());
+            ArcanaNetworkManager.Instance.SetAnimation(player.PlayerIndex.Value, player.transform.position, 0.5f);
             NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }
     }
@@ -44,7 +45,8 @@ public class Arcana02HighPriestessBack : ArcanaLogic
         while (true)
         {
             yield return new WaitForSeconds(timeInterval);
-            ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, sourceArcana.GetKeepValue());
+            ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Atk, player.GetPlayerStatus().GetAtk() * sourceArcana.GetKeepValue());
+            ArcanaNetworkManager.Instance.SetAnimation(player.PlayerIndex.Value, player.transform.position, 0.5f);
             NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }
     }

@@ -49,6 +49,7 @@ public class Turret : MonoBehaviour, IRpcObjectInterface
         if(time > createSpeed)
         {
             InstanceBullet();
+            NetWorkAudioManager.Instance.PlayGlobal(SeName.Bullet);
             time = 0;
         }
     }

@@ -105,6 +105,35 @@ public class ArcanaNetworkManager : NetworkBehaviour
     }
 
     /// <summary>
+    /// スキル発動
+    /// </summary>
+    public void SetSkill(int index, int skillIndex, Vector2 pos)
+    {
+        SetSkillServerRpc(index, skillIndex, pos);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetSkillServerRpc(int index, int skillIndex, Vector2 pos)
+    {
+        PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
+        Skill skill = player.GetSkill()[skillIndex];
+
+        GameObject skillObj = Instantiate(skill.GetEffectAnimation(), pos, Quaternion.identity);
+
+        if (!isLocalMode && IsServer)
+        {
+            if (skillObj.TryGetComponent(out NetworkObject networkObject))
+            {
+                networkObject.Spawn();
+            }
+        }
+        if (skill.GetKeepTime() > 0)
+            Destroy(skillObj, skill.GetKeepTime());
+        else
+            Destroy(skillObj, 10f);
+    }
+
+    /// <summary>
     /// ネットワーク経由でエフェクトをつける
     /// </summary>
     /// <param name="index">プレイヤー番号</param>
@@ -194,8 +223,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     private void SetHpServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
-        float newHp = player.GetPlayerStatus().GetMaxHp() * value;
-        player.GetPlayerStatus().SetMaxHp(newHp);
+        player.GetPlayerStatus().SetMaxHp(value);
     }
 
     /// <summary>
@@ -205,8 +233,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     private void SetAtkServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
-        float newAtk = player.GetPlayerStatus().GetAtk() * value;
-        player.GetPlayerStatus().SetAtk(newAtk);
+        player.GetPlayerStatus().SetAtk(value);
     }
 
     /// <summary>
@@ -216,8 +243,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     private void SetDefServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
-        float newDef = player.GetPlayerStatus().GetDef() * value;
-        player.GetPlayerStatus().SetDef(newDef);
+        player.GetPlayerStatus().SetDef(value);
     }
 
     /// <summary>
@@ -227,8 +253,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     private void SetSpeedServerRpc(int index, float value)
     {
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
-        float newSpeed = player.GetPlayerStatus().GetSpeed() * value;
-        player.GetPlayerStatus().SetSpeed(newSpeed);
+        player.GetPlayerStatus().SetSpeed(value);
     }
 
     /// <summary>

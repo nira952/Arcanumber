@@ -34,6 +34,7 @@ public class Arcana17StarBack : ArcanaLogic
     {
         ArcanaNetworkManager.Instance.SetEffect(player.PlayerIndex.Value, true,
             (int)EffectList.Invincible, true, true, sourceArcana.GetKeepValue(), -1f);
+        ArcanaNetworkManager.Instance.SetAnimation(player.PlayerIndex.Value, player.transform.position, sourceArcana.GetKeepValue());
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
     }
 

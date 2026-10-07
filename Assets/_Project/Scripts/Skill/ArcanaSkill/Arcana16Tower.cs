@@ -30,10 +30,12 @@ public class Arcana16TowerBack : ArcanaLogic
     {
         if (Random.value <= sourceArcana.GetKeepValue())
         {
+            int skillindex = player.SelectedSkillIndex.Value;
+            Vector2 pos = player.GetAimCursor().GetTransform().position;
             yield return new WaitForSeconds(time);
 
             //SkillManagerにスキル発動を依頼する
-            SkillManager.Instance.RequestSkill(player);
+            ArcanaNetworkManager.Instance.SetSkill(player.PlayerIndex.Value, skillindex, pos);
             NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
         }
     }

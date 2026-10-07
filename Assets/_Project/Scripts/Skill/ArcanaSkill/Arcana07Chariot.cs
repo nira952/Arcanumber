@@ -12,7 +12,7 @@ public class Arcana07ChariotFront : ArcanaLogic
     //速度が上がる
     public override void Execute(PlayerRoot player, Arcana sourceArcana)
     {
-        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Speed, sourceArcana.GetKeepValue());
+        ArcanaNetworkManager.Instance.SetStatus(player.PlayerIndex.Value, StatusCategory.Speed, player.GetPlayerStatus().GetSpeed() * sourceArcana.GetKeepValue());
     }
 }
 

@@ -42,4 +42,11 @@ public enum SeName {
     Counter,
     FlipCamera,
     Correct,
+    ArcanaSkill,
+    BulletRain,
+    Bullet,
+    Blink,
+    Ster,
+    Installation,
+    Up,
 }

@@ -66,8 +66,8 @@ public class PlayerUIManager : SingletonMonoBehaviour<PlayerUIManager>
         }
 
         // アルカナのスプライトを変更
-        //skillIcons[GameConfig.SKILL_ARCANA].sprite = arcana();
-
+        if(arcana.GetASkillCategory() != ASkillCategory.Command)
+            skillTimeTexts[GameConfig.COOLTIME_HOPPER_MAX].text = ""; // アルカナのテキストは空にする
 
         // スキル選択のUI反映
         SkillFrameChange(1);
