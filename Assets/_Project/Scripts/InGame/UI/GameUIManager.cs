@@ -46,6 +46,7 @@ public class GameUIManager : MonoBehaviour
     public Button endButton;
     public Button reMatchButton;
 
+    [SerializeField] private TextMeshProUGUI trainingText;
     private readonly CompositeDisposable playerSubscriptions = new();
 
     public void Initialize(GameManager gameManager, TimeManager timeManager)
@@ -332,7 +333,13 @@ public class GameUIManager : MonoBehaviour
 
     }
 
-
+    public void ShowTrainingText()
+    {
+        if (trainingText != null)
+        {
+            trainingText.gameObject.SetActive(true);
+        }
+    }
     private void OnDestroy()
     {
         playerSubscriptions.Dispose();

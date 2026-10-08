@@ -39,6 +39,14 @@ public class PlayerRoot : MonoBehaviour
     public bool CanControl => 
         !IsDown.Value && (GameManager.Instance == null || GameManager.Instance.StateRx.CurrentValue == GameState.Playing);
 
+
+    private void Start()
+    {
+        // 仮でプレイヤーの初期化を行う
+        playerAttack.Initialized(this, PlayerUIManager.Instance, false);
+
+    }
+
     public void OwnerInitialize()
     {
         // プレイヤー名をPlayerDataManagerから取得
@@ -83,7 +91,6 @@ public class PlayerRoot : MonoBehaviour
         // コンポーネントの初期化
         movement.Initialize(this);
         rayInput.Initialize();
-        playerAttack.Initialized(this, false);
         currentAnimator = playerAnimator.Initialize(PlayerIndex.Value);
         playerSkill.Initialize(this, playerUIManager, skillList);
         aimCursor.Initialize(PlayerIndex.Value);
@@ -142,7 +149,7 @@ public class PlayerRoot : MonoBehaviour
         // スキルのクールタイムを更新
         playerSkill.UpdateAllCoolTimes();
 
-
+        playerAttack.UpdateAttackCoolTime();
 
         if (!CanMove.Value) { movement.StopMovement(); return; }
         
@@ -162,8 +169,6 @@ public class PlayerRoot : MonoBehaviour
 
     public void ExecuteAttack()
     {
-        return;
-
         if (!CanMove.Value) { return; }
 
         // エンペラーオーラ状態なら攻撃不可
