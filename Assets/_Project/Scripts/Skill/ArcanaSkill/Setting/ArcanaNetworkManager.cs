@@ -36,6 +36,8 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// <param name="pos"></param>
     public void SetData(int index, Vector2 pos)
     {
+        if (isLocalMode) { return; }
+
         InstatiateEffectServerRpc(index, pos);
     }
 
@@ -73,6 +75,8 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// <param name="time"></param>
     public void SetAnimation(int index, Vector2 pos, float time)
     {
+        if (isLocalMode) { return; }
+
         SetAnimationServerRpc(index, pos, time);
     }
 
@@ -109,6 +113,8 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// </summary>
     public void SetSkill(int index, int skillIndex, Vector2 pos)
     {
+        if (isLocalMode) { return; }
+
         SetSkillServerRpc(index, skillIndex, pos);
     }
 
@@ -145,6 +151,8 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// <param name="value">値</param>
     public void SetEffect(int index, bool isMine, int effectIndex, bool isBuff, bool isDisplay, float time, float value)
     {
+        if (isLocalMode) { return; }
+
         if (isMine)
             SetEffectServerRpc(index, effectIndex, isBuff, isDisplay, time, value);
         else
@@ -180,6 +188,8 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// <param name="index"></param>
     public void ClearEffect(int index)
     {
+        if (isLocalMode) { return; }
+
         ClearEffectServerRpc(index);
     }
 
@@ -282,6 +292,8 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// </summary>
     public void SetHeal(int index, float value)
     {
+        if (isLocalMode) { return; }
+
         HealServerRpc(index, value);
     }
 
@@ -299,6 +311,8 @@ public class ArcanaNetworkManager : NetworkBehaviour
 
     public void SetDamage(int index, bool isOther, float value)
     {
+        if (isLocalMode) { return; }
+
         if (isOther)
         {
             List<PlayerRoot> other = PlayerUtility.GetOtherPlayersIndex(index);
@@ -323,6 +337,8 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// <param name="value"></param>
     public void SetJump(int index, int value)
     {
+        if (isLocalMode) { return; }
+
         JumpServerRpc(index, value);
     }
 
@@ -335,6 +351,8 @@ public class ArcanaNetworkManager : NetworkBehaviour
 
     public void SetTransform(int index, Vector2 pos)
     {
+        if (isLocalMode) { return; }
+
         TransformServerRpc(index, pos);
     }
 
@@ -353,6 +371,8 @@ public class ArcanaNetworkManager : NetworkBehaviour
 
     public void SetSprite(int index)
     {
+        if (isLocalMode) { return; }
+
         SetSpriteServerRpc(index);
     }
 

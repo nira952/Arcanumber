@@ -72,7 +72,7 @@ public class GameManager : NetworkBehaviour
     private void Start()
     {
         if (!isLocalMode) { return; }
-        
+
         Debug.Log("[GameManager] オフラインモードで起動します。");
 
         // オフラインモードでは全プレイヤーを一括生成
@@ -80,6 +80,8 @@ public class GameManager : NetworkBehaviour
 
         // プレイヤーのダウン状態を監視する購読を設定
         SettingPlayerObservable();
+
+        gameUIManager.ShowTrainingText();
 
         gameUIManager.Initialize(this, timeManager);
 
@@ -214,17 +216,11 @@ public class GameManager : NetworkBehaviour
         if (isLocalMode)
             NetWorkAudioManager.Instance.PlayLocal(BgmName.Practice);
         else
-        {
-            int randomValue = UnityEngine.Random.Range(0, 2);
-            if (randomValue == 0)
-                NetWorkAudioManager.Instance.PlayGlobal(BgmName.Game);
-            else
-                NetWorkAudioManager.Instance.PlayGlobal(BgmName.Game2);
-        }
+            NetWorkAudioManager.Instance.PlayGlobal(BgmName.Game);
 
         await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: this.GetCancellationTokenOnDestroy());
         HideGameStateTextInternal();
-    }   
+    }
 
 
     private void HandleTimePowerUp()
@@ -409,6 +405,19 @@ public class GameManager : NetworkBehaviour
 
     [ClientRpc]
     private void HideGameStateTextClientRpc() => gameUIManager.HideGameStateText();
+
+
+    private void Update()
+    {
+        if (isLocalMode)
+        {
+            // デバッグ用: Escapeキーでタイトルに戻る
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                GameSceneManager.Instance.LoadNetworkScene(Scene.Title.ToString());
+            }
+        }
+    }
 
 
     public override void OnNetworkDespawn()
