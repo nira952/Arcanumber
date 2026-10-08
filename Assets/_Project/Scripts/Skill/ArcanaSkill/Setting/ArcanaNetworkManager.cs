@@ -199,6 +199,27 @@ public class ArcanaNetworkManager : NetworkBehaviour
     /// <param name="value"></param>
     public void SetStatus(int index, StatusCategory statusIndex, float value)
     {
+        if (isLocalMode)
+        {
+            PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
+            switch (statusIndex)
+            {
+                case StatusCategory.Hp:
+                    player.GetPlayerStatus().SetMaxHp(value);
+                    break;
+                case StatusCategory.Atk:
+                    player.GetPlayerStatus().SetAtk(value);
+                    break;
+                case StatusCategory.Def:
+                    player.GetPlayerStatus().SetDef(value);
+                    break;
+                case StatusCategory.Speed:
+                    player.GetPlayerStatus().SetSpeed(value);
+                    break;
+            }
+            return;
+        }
+
         switch (statusIndex)
         {
             case StatusCategory.Hp:
