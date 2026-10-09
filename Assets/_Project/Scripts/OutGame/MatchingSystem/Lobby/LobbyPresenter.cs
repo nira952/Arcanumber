@@ -55,10 +55,46 @@ public class LobbyPresenter : IDisposable
         InitializeServicesAsync().Forget();
     }
 
-    /// <summary>
-    /// UIイベントのバインドを行う
-    /// </summary>
-    private void BindEvents()
+    private async void Start()
+    {
+        // タイトル開始時に残留しているロビー・接続をクリア
+        await AutoLeaveLobbyOnTitleStartAsync();
+    }
+
+    private async UniTask AutoLeaveLobbyOnTitleStartAsync()
+    {
+        try
+        {
+            // キャンセル用トークン（この GameObject の Lifetime に紐付ける）
+            var token = _destroyToken;
+
+            Debug.Log("[Title] 既存セッション・ロビーの残留クリーンアップ処理を開始します...");
+
+            // 1. NGO の Shutdown
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                NetworkManager.Singleton.Shutdown();
+            }
+
+            // 2. ロビーからの離脱/削除処理
+            if (_lobbyModel != null)
+            {
+                await _lobbyModel.CleanupAndLeaveAsync();
+            }
+
+            Debug.Log("[Title] ロビー自動脱出・クリーンアップ完了");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"[Title] ロビー自動脱出時にエラーが発生しました: {ex.Message}");
+        }
+    }
+
+
+/// <summary>
+/// UIイベントのバインドを行う
+/// </summary>
+private void BindEvents()
     {
         _view.OnLanModeToggled.Subscribe(isOn => _isLanMode = isOn).AddTo(_disposables);
 

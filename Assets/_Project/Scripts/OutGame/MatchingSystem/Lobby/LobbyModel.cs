@@ -51,6 +51,29 @@ public class LobbyModel
         }
     }
 
+    /// <summary>
+    /// タイトルシーン遷移時などに呼び出す完全クリーンアップ処理
+    /// </summary>
+    public async UniTask CleanupAndLeaveAsync()
+    {
+        // 1. Netcode (NGO) のセッションが残っていれば切断
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+        {
+            NetworkManager.Singleton.Shutdown();
+            Debug.Log("[LobbyModel] NGO NetworkManager Shutdown 完了");
+        }
+
+        // 2. もし CurrentLobby が残っていれば離脱/削除
+        if (CurrentLobby != null)
+        {
+            await LeaveOrDeleteLobbyAsync();
+        }
+
+        // 補足: もし CurrentLobby が null でも、Authentication 経由で自分が参加中のロビーが残っていないか
+        // サーバ側に問い合わせて退室したい場合は、JoinedLobby 検索等を併用することも可能です。
+    }
+
+
     public async UniTask<Lobby> FindAvailableLobbyByNameAsync(string lobbyName, string matchType)
     {
         try
