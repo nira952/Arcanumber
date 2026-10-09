@@ -22,12 +22,17 @@ public class LobbyBootstrapper : MonoBehaviour
 
     private void Start()
     {
+        // オンラインモードに戻す
+        PlayerDataManager.Instance.SetLocalMode(false);
+        PlayerDataManager.Instance.SetRetryMode(false);
+
         uiManager.OnSignInRequested.Subscribe(_ =>
         {
             Debug.Log("[LobbyBootstrapper] サインインリクエストを受信しました。");
             TestConnectionAsync().Forget();
 
         }).AddTo(_disposables);
+
 
         TestConnectionAsync().Forget();
     }
@@ -60,6 +65,8 @@ public class LobbyBootstrapper : MonoBehaviour
         // 両方インスタンス化
         _onlinePresenter = new LobbyPresenter(uiManager, _lobbyModel, _networkSessionModel, nextSceneName, this.destroyCancellationToken);
         _lanPresenter = new LanLobbyPresenter(uiManager, _networkSessionModel, nextSceneName, this.destroyCancellationToken);
+
+        _lobbyModel.CleanupAndLeaveAsync().Forget();
 
         // 💡 自身のローカルIPを表示する初期化処理などはBootstrapperで行うとスッキリします
         string myIp = _networkSessionModel.GetLocalIPAddress();

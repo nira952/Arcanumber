@@ -48,6 +48,13 @@ public class ArcanaSelectManager : NetworkBehaviour
 
     private void Start()
     {
+        if (PlayerDataManager.Instance.IsRetry)
+        {
+            // リトライ時は全データをリセット
+            PlayerDataManager.Instance.ResetAllData();
+        }
+
+
         // カーテンを開く
         CurtainManager.Instance.OpenAsync(GetType().Name).Forget();
 

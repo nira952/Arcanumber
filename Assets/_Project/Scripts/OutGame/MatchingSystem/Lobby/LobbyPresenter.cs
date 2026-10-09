@@ -55,12 +55,6 @@ public class LobbyPresenter : IDisposable
         InitializeServicesAsync().Forget();
     }
 
-    private async void Start()
-    {
-        // タイトル開始時に残留しているロビー・接続をクリア
-        await AutoLeaveLobbyOnTitleStartAsync();
-    }
-
     private async UniTask AutoLeaveLobbyOnTitleStartAsync()
     {
         try

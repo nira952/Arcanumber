@@ -381,12 +381,18 @@ public class GameManager : NetworkBehaviour
 
     private void SettingEndButton()
     {
-        gameUIManager.endButton.onClick.AddListener(() =>
-            GameSceneManager.Instance.LoadNetworkScene(Scene.Title.ToString()));
+        gameUIManager.endButton.onClick.AddListener(() => 
+        {
+            GameSceneManager.Instance.LoadNetworkScene(Scene.Title.ToString());
+
+        });
 
         gameUIManager.reMatchButton.onClick.AddListener(() =>
-            GameSceneManager.Instance.LoadNetworkScene(Scene.ArcanaSelect.ToString()));
-    }
+        {
+            PlayerDataManager.Instance.SetRetryMode(true);
+            GameSceneManager.Instance.LoadNetworkScene(Scene.ArcanaSelect.ToString());
+        });
+}
 
     private void UpdateGameStateTextInternal(string text)
     {

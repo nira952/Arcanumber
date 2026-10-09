@@ -10,6 +10,8 @@ public class PlayerDataManager : NetworkBehaviour
 
     public bool IsLocalMode { get; private set; } = false;
 
+    public bool IsRetry { get; set; } = false;
+
     // セーブデータ用のキー
     private const string NameSaveKey = "Save_PlayerName";
     // 初期名の定数
@@ -35,15 +37,6 @@ public class PlayerDataManager : NetworkBehaviour
 
     [SerializeField] private Arcana myArcana;   // アルカナ
 
-
-    public void DebugSettings()
-    {
-
-
-        // デバッグ用のアルカナを設定する
-        Arcana arcana = AssetLoader.Instance.GetArcana(ArcanaList.Star, true);
-        myArcana = arcana;
-    }
 
     private void Awake()
     {
@@ -367,6 +360,11 @@ public class PlayerDataManager : NetworkBehaviour
         IsLocalMode = isLocal;
     }
 
+    public void SetRetryMode(bool isRetry)
+    {
+        IsRetry = isRetry;
+    }
+
     /// <summary>
     /// ローカルスキルを設定する
     /// </summary>
@@ -454,13 +452,17 @@ public class PlayerDataManager : NetworkBehaviour
         }
     }
 
-
-    private void Update()
+    public void ResetAllData()
     {
-        if (Input.GetKeyDown(KeyCode.F1))
+        // ローカルデータのリセット 
+        mySkills = new Skill[4];
+        myArcana = null;
+        // ネットワークデータのリセット（ホスト専用）
+        if (IsServer)
         {
-            Debug.Log("[PlayerDataManager] F1キーが押されました。デバッグ用の設定を適用します。");
-            DebugSettings();
+            _allPlayerData.Clear();
+            previewAllPlayerNames.Clear();
+            Debug.Log("[PlayerDataManager] 全てのプレイヤーデータをリセットしました。");
         }
     }
 
