@@ -428,7 +428,7 @@ public class SkillManager : NetworkBehaviour
             {
                 if (obj != null)
                 {
-                    Destroy(obj);
+                    Destroy(obj, player.GetArcana().GetKeepValue());
                 }
             }).AddTo(obj);
 
