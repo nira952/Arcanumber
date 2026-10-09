@@ -8,7 +8,7 @@ public class PlayerAttack : NetworkBehaviour
 {
     [SerializeField] private PlayerRoot root;
     private PlayerUIManager playerUIManager;
-    private float attackPower = 3.0f; // 攻撃力の倍率
+    private float attackPower = 1.0f; // 攻撃力の倍率
     private float attackUpPower = 5.5f; // パワーアップ時の攻撃力の倍率
     private float attackWindupTime = 0.5f; // 攻撃の前振り時間
 
