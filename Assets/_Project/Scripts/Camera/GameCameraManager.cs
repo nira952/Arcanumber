@@ -1,8 +1,9 @@
 using R3;
 using Unity.Cinemachine;
+using Unity.Netcode;
 using UnityEngine;
 
-public class GameCameraManager : MonoBehaviour
+public class GameCameraManager : NetworkBehaviour
 {
     // シングルトン処理
     #region Singleton Pattern
@@ -72,11 +73,27 @@ public class GameCameraManager : MonoBehaviour
         UpdateCameraPriorities();
     }
 
+    public void SetReversed(bool value, int index)
+    {
+        if (PlayerDataManager.Instance.IsLocalMode) return;
+
+        if (IsServer) SetReversedServerRpc(value, index);
+    }
+
     /// <summary>
     /// 反転の状態を更新
     /// </summary>
-    public void SetReversed(bool value)
+    [ServerRpc(RequireOwnership = false)]
+    public void SetReversedServerRpc(bool value, int index)
     {
+        SetReversedClientRpc(value, index);
+    }
+
+    [ClientRpc]
+    public void SetReversedClientRpc(bool value, int index)
+    {
+        if (PlayerDataManager.Instance.GetMyLobbyIndex() == index) return;
+
         isReversed = value;
         UpdateCameraPriorities();
     }

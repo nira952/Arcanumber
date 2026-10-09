@@ -18,10 +18,10 @@ public class Arcana12HangedManFront : ArcanaLogic
     public override IEnumerator OnUpdate(PlayerRoot player, Arcana sourceArcana)
     {
         NetWorkAudioManager.Instance.PlayGlobal(sourceArcana.GetSE());
-        GameCameraManager.Instance.SetReversed(true);
+        GameCameraManager.Instance.SetReversed(true, player.PlayerIndex.Value);
         //アルカナの効果持続時間、もしくは必要な時間だけ待機
         yield return new WaitForSeconds(sourceArcana.GetKeepValue());
-        GameCameraManager.Instance.SetReversed(false);
+        GameCameraManager.Instance.SetReversed(false, player.PlayerIndex.Value);
     }
 }
 
