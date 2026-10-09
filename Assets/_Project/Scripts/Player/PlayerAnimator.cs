@@ -10,6 +10,8 @@ public class PlayerAnimator : NetworkBehaviour
 {
     private Animator animator;
 
+    [SerializeField] private SpriteRenderer animSprite;
+
     private OwnerNetworkAnimator networkAnimator;
 
     [SerializeField] private GameObject youObject; // 自分のプレイヤーを示すオブジェクト（UIやエフェクト用）
@@ -98,6 +100,12 @@ public class PlayerAnimator : NetworkBehaviour
     public void SetDash(bool isDash)
     {
         animator.SetBool(IsDashHash, isDash);
+    }
+
+    public void SetDown()
+    {
+        animator.SetBool(IsDashHash, false);
+        animSprite.color = Color.gray; // ダウン時は灰色にする
     }
 
     /// <summary>

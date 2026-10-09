@@ -45,6 +45,19 @@ public class PlayerRoot : MonoBehaviour
         // 仮でプレイヤーの初期化を行う
         playerAttack.Initialized(this, PlayerUIManager.Instance, false);
 
+        IsDown.Subscribe(isDown =>
+        {
+            if (isDown)
+            {
+                // ダウン時の処理
+                CanMove.Value = false;
+                playerAnimator.SetDown();
+
+                PlayerUtility.UnregisterPlayer(this); // プレイヤーをリストから削除
+            }
+
+        });
+
     }
 
     public void OwnerInitialize()

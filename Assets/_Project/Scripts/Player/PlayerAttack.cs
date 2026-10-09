@@ -12,7 +12,7 @@ public class PlayerAttack : NetworkBehaviour
     private float attackUpPower = 5.5f; // パワーアップ時の攻撃力の倍率
     private float attackWindupTime = 0.5f; // 攻撃の前振り時間
 
-    private const float attackCoolTimeDuration = 0.5f; // 通常攻撃のクールタイムの時間
+    private const float attackCoolTimeDuration = 3f; // 通常攻撃のクールタイムの時間
 
     private float currentCoolTime = 0f; // 現在のクールタイムの残り時間
 

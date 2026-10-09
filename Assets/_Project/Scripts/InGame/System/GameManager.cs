@@ -383,16 +383,29 @@ public class GameManager : NetworkBehaviour
     {
         gameUIManager.endButton.onClick.AddListener(() => 
         {
-            GameSceneManager.Instance.LoadNetworkScene(Scene.Title.ToString());
+            //GameSceneManager.Instance.LoadNetworkScene(Scene.Title.ToString());
+
+            if(IsServer)
+            {
+                EndGameClientRpc();
+            }
 
         });
 
         gameUIManager.reMatchButton.onClick.AddListener(() =>
         {
-            PlayerDataManager.Instance.SetRetryMode(true);
-            GameSceneManager.Instance.LoadNetworkScene(Scene.ArcanaSelect.ToString());
+            //PlayerDataManager.Instance.SetRetryMode(true);
+            //GameSceneManager.Instance.LoadNetworkScene(Scene.ArcanaSelect.ToString());
         });
-}
+    }
+
+    [ClientRpc]
+    private void EndGameClientRpc()
+    {
+        // ゲームを強制終了する
+        Application.Quit();
+    }
+
 
     private void UpdateGameStateTextInternal(string text)
     {
@@ -420,7 +433,7 @@ public class GameManager : NetworkBehaviour
             // デバッグ用: Escapeキーでタイトルに戻る
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                GameSceneManager.Instance.LoadNetworkScene(Scene.Title.ToString());
+               GameSceneManager.Instance.LoadLocalScene(Scene.Title.ToString()).Forget();
             }
         }
     }
