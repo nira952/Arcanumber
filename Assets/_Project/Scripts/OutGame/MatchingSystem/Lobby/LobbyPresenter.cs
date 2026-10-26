@@ -15,6 +15,8 @@ public class LobbyPresenter : IDisposable
 {
     private const int MinPlayersToStart = 2;    //最低限必要なプレイヤー数
 
+    private const int MaxPlayers = 4;   //最大プレイヤー数
+
     private readonly LobbyUIManager _view;
     private readonly LobbyModel _lobbyModel;
     private readonly NetworkSessionModel _networkModel;
@@ -249,7 +251,7 @@ private void BindEvents()
         _view.UpdateRoomName(lobby.Name);
         string myPlayerId = AuthenticationService.Instance.PlayerId;
 
-        for (int i = 0; i < MinPlayersToStart; i++)
+        for (int i = 0; i < MaxPlayers; i++)
         {
             if (i < lobby.Players.Count)
             {
