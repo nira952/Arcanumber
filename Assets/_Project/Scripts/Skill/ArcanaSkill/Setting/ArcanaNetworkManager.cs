@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ArcanaNetworkManager : NetworkBehaviour
@@ -382,7 +383,9 @@ public class ArcanaNetworkManager : NetworkBehaviour
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
         RuntimeAnimatorController spriteRenderer = player.GetCurrentAnimator();
         Animator animator = player.GetArcana().GetEffectPrefab().GetComponent<Animator>();
+        SpriteRenderer sprite = player.GetArcana().GetEffectPrefab().GetComponent<SpriteRenderer>();
         animator.runtimeAnimatorController = spriteRenderer;
+        sprite.sprite = spriteRenderer.GetComponent<SpriteRenderer>().sprite;
     }
 }
 
