@@ -69,6 +69,24 @@ public class PlayerDataManager : NetworkBehaviour
         }
     }
 
+    private void Update()
+    {
+
+        // デバッグ用に、特定のアルカナスキルを設定するショートカットキーを用意（開発中のみ）
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            //SetLocalSkills(new Skill[]
+            //{
+            //    AssetLoader.Instance.GetSkill(0),
+            //    AssetLoader.Instance.GetSkill(1),
+            //    AssetLoader.Instance.GetSkill(2),
+            //    AssetLoader.Instance.GetSkill(3)
+            //});
+            SetLocalArcana(AssetLoader.Instance.GetArcana(ArcanaList.Moon, false));
+            Debug.Log("[PlayerDataManager] デバッグ用にスキルとアルカナを設定しました。");
+        }
+    }
+
 
     // ==========================================
     // プレイヤーがデータを取得するための便利なメソッド群
