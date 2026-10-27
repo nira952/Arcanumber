@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Components;
-using Unity.VisualScripting;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
 public class ArcanaNetworkManager : NetworkBehaviour
@@ -26,6 +26,7 @@ public class ArcanaNetworkManager : NetworkBehaviour
     }
     #endregion
 
+    [SerializeField] private AIPlayer moonPrefab;
 
     bool isLocalMode = false;
 
@@ -370,22 +371,44 @@ public class ArcanaNetworkManager : NetworkBehaviour
             player.transform.position = pos;
     }
 
-    public void SetSprite(int index)
-    {
-        if (isLocalMode) { return; }
 
-        SetSpriteServerRpc(index);
+    public void ExecuteMoon(int index)
+    {
+        // オフライン時、またはすでにサーバー上で動作している場合は直接実行
+        if (isLocalMode || IsServer)
+        {
+            CreateMoon(index);
+
+        }
+        else
+        {
+            // クライアントからの要求の場合：ServerRpc を経由してサーバー側で処理を開始する
+            ExecuteMoonServerRpc(index);
+        }
+
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SetSpriteServerRpc(int index)
+    public void ExecuteMoonServerRpc(int index)
     {
+        CreateMoon(index);
+    }
+
+    private void CreateMoon(int index)
+    {
+        // 発動するプレイヤーを取得
         PlayerRoot player = PlayerUtility.GetPlayerByIndex(index);
-        RuntimeAnimatorController spriteRenderer = player.GetCurrentAnimator();
-        Animator animator = player.GetArcana().GetEffectPrefab().GetComponent<Animator>();
-        SpriteRenderer sprite = player.GetArcana().GetEffectPrefab().GetComponent<SpriteRenderer>();
-        animator.runtimeAnimatorController = spriteRenderer;
-        sprite.sprite = spriteRenderer.GetComponent<SpriteRenderer>().sprite;
+
+        // 分身体をプレイヤーの位置に生成する
+        Vector2 spawnPosition = player.transform.position + new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0);
+        AIPlayer moonClone = Instantiate(moonPrefab, spawnPosition, Quaternion.identity)
+            ;
+
+        moonClone.GetComponent<NetworkObject>().Spawn(); // ネットワーク上でスポーン
+
+
+        moonClone.RpcInitialize(index); // 分身体にプレイヤーのインデックスを設定
+
     }
 }
 

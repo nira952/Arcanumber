@@ -6112,6 +6112,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  moonPrefab: {fileID: 6914292353977707104, guid: 11edd5ab17540f44ba7a677a0b6fc868, type: 3}
 --- !u!1 &928872848
 GameObject:
   m_ObjectHideFlags: 0

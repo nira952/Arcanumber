@@ -1,10 +1,17 @@
 using R3;
+using Unity.Netcode;
 using UnityEngine;
 
-public class AIPlayer : MonoBehaviour,IRpcObjectInterface
+public class AIPlayer : NetworkBehaviour,IRpcObjectInterface
 {
     private enum AIState { IDLE, MOVE, JUMP }
     private AIState currentState = AIState.IDLE;    //現在の状態
+
+    private readonly NetworkVariable<int> syncedPlayerIndex = new NetworkVariable<int>(
+        0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner // または Server（権限設計に合わせて変更）
+    );
 
     private float moveSpeed = 5f;  //移動速度
     private float jumpForce = 12f;  //ジャンプの威力
@@ -16,6 +23,10 @@ public class AIPlayer : MonoBehaviour,IRpcObjectInterface
     //接地判定用
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform groundCheck;
+
+    [SerializeField] private Animator animator;
+
+    [SerializeField] private RuntimeAnimatorController[] animatorControllers = new RuntimeAnimatorController[4];
 
     private bool isAIPlayer = false;
 
@@ -38,30 +49,59 @@ public class AIPlayer : MonoBehaviour,IRpcObjectInterface
     //ランダムな時間を返すプロパティ
     private float RandomTime => Random.Range(timerMin, timerMax);
 
-    private bool IsOwner = false;
-
     private Subject<Unit> onDestroyed = new Subject<Unit>();
     public Observable<Unit> OnDestroyed => new Subject<Unit>();
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        syncedPlayerIndex.OnValueChanged += OnPlayerIndexChanged;
+        // すでに設定されている場合（途中参加や初期化済みの場合）は即座に反映
+        ApplyAnimatorController(syncedPlayerIndex.Value);
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        syncedPlayerIndex.OnValueChanged -= OnPlayerIndexChanged;
+        base.OnNetworkDespawn();
+    }
+
 
     public void RpcInitialize(int playerIndex)
     {
+        syncedPlayerIndex.Value = playerIndex;
+
         PlayerRoot root = PlayerUtility.GetPlayerByIndex(playerIndex);
         //最初の状態をセット
         ChangeState(AIState.IDLE);
-
+        
         // tagをplayerと同じにする
         gameObject.tag = root.gameObject.tag;
         // layerをplayerと同じにする
         gameObject.layer = root.gameObject.layer;
+    }
+    private void OnPlayerIndexChanged(int previousValue, int newValue)
+    {
+        ApplyAnimatorController(newValue);
+    }
 
-        IsOwner = true;
-
+    /// <summary>
+    /// 指定された Index の AnimatorController を適用する
+    /// </summary>
+    private void ApplyAnimatorController(int index)
+    {
+        if (animatorControllers != null && index >= 0 && index < animatorControllers.Length)
+        {
+            if (animatorControllers[index] != null)
+            {
+                animator.runtimeAnimatorController = animatorControllers[index];
+            }
+        }
     }
 
 
     private void Update()
     {
-        if (!IsOwner) return;
+        if (!IsServer) return;
 
 
         //動くべきではなかったら動かない
